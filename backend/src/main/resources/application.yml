@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: bankflow-api
+  datasource:
+    url: jdbc:postgresql://${DB_URL:localhost:5432}/banking?currentSchema=retail_banking
+    username: ${DB_USER:chaitanyamahajan}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:update} # Allows overriding via env variable in prod
+    show-sql: true
+    properties:
+      hibernate:
+        default_schema: retail_banking
+        # dialect removed — Hibernate 6 auto-detects Postgres
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  error:
+    include-message: never
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+
+app:
+  cors-origin: ${CORS_ORIGIN:http://localhost:5173}
+  jwt-secret: ${JWT_SECRET:bankflow-development-key-must-be-replaced-before-production-2026}

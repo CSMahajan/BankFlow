@@ -9,7 +9,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO:update} # Allows overriding via env variable in prod
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         default_schema: retail_banking
@@ -20,6 +20,13 @@ spring:
 server:
   error:
     include-message: never
+
+logging:
+  level:
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF
+    org.hibernate.orm.jdbc.bind: OFF
+    org.springframework.orm.jpa: WARN
 
 springdoc:
   swagger-ui:

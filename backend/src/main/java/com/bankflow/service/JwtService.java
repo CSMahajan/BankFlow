@@ -1,8 +1,12 @@
-package com.bankflow.security;
+package com.bankflow.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class JwtService {
 
@@ -26,16 +31,21 @@ public class JwtService {
      * Generate JWT Token for user
      */
     public String generateToken(String email, String role) {
+        log.info("Generating JWT token for user [{}] with role [{}]", email, role);
+
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("role", role);
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .claims(extraClaims)
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey())
                 .compact();
+
+        log.debug("JWT token generated successfully for user [{}]", email);
+        return token;
     }
 
     /**
@@ -56,8 +66,24 @@ public class JwtService {
      * Validate token against email and check expiration
      */
     public boolean isTokenValid(String token, String email) {
-        final String tokenEmail = extractEmail(token);
-        return (tokenEmail.equals(email)) && !isTokenExpired(token);
+        try {
+            final String tokenEmail = extractEmail(token);
+            boolean isValid = tokenEmail.equalsIgnoreCase(email) && !isTokenExpired(token);
+
+            if (!isValid) {
+                log.warn("JWT Token validation failed for user [{}]: Mismatched subject or expired token", email);
+            }
+            return isValid;
+        } catch (ExpiredJwtException ex) {
+            log.warn("JWT Token validation failed for user [{}]: Token has expired", email);
+            return false;
+        } catch (SignatureException | MalformedJwtException ex) {
+            log.warn("JWT Token validation failed for user [{}]: Invalid token signature or format", email);
+            return false;
+        } catch (Exception ex) {
+            log.error("Unexpected error during JWT token validation for user [{}]", email, ex);
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
@@ -74,11 +100,22 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException ex) {
+            log.warn("JWT parsing error: Token is expired");
+            throw ex;
+        } catch (SignatureException | MalformedJwtException ex) {
+            log.warn("JWT parsing error: Invalid signature or malformed token structure");
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Failed to parse JWT claims", ex);
+            throw ex;
+        }
     }
 
     private SecretKey getSigningKey() {

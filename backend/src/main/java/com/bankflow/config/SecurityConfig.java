@@ -1,6 +1,6 @@
 package com.bankflow.config;
 
-import com.bankflow.security.JwtAuthenticationFilter;
+import com.bankflow.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

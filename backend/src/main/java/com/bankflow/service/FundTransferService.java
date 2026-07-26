@@ -9,6 +9,7 @@ import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.TransactionRepository;
 import com.bankflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FundTransferService {
@@ -31,36 +33,50 @@ public class FundTransferService {
     public FundTransferResponse transferFunds(FundTransferRequest request) {
         User currentUser = getAuthenticatedUser();
 
-        // 1. Validate distinct accounts
+        log.info("Initiating fund transfer request by user [{}] from account [{}] to target [{}] for amount [Rs. {}]",
+                currentUser.getEmail(), request.sourceAccountNumber(), request.targetAccountNumber(), request.amount());
+
         if (request.sourceAccountNumber().equalsIgnoreCase(request.targetAccountNumber())) {
+            log.warn("Transfer failed: Source and target accounts are identical [{}]", request.sourceAccountNumber());
             throw new IllegalArgumentException("Source and destination accounts cannot be the same");
         }
 
-        // 2. Fetch & Validate Source Account
         Account sourceAccount = accountRepository.findByAccountNumber(request.sourceAccountNumber())
-                .orElseThrow(() -> new IllegalArgumentException("Source account not found"));
+                .orElseThrow(() -> {
+                    log.error("Source account [{}] not found", request.sourceAccountNumber());
+                    return new IllegalArgumentException("Source account not found");
+                });
 
         if (!sourceAccount.getUser().getId().equals(currentUser.getId())) {
+            log.warn("Security Alert: User [{}] attempted unauthorized transfer from account [{}] owned by User ID [{}]",
+                    currentUser.getEmail(), sourceAccount.getAccountNumber(), sourceAccount.getUser().getId());
             throw new AccessDeniedException("You are not authorized to transfer funds from this account");
         }
 
         if (sourceAccount.getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            log.warn("Transfer failed: Source account [{}] is in state [{}]",
+                    sourceAccount.getAccountNumber(), sourceAccount.getAccountStatus());
             throw new IllegalArgumentException("Source account is not active");
         }
 
         if (sourceAccount.getCurrentBalance().compareTo(request.amount()) < 0) {
+            log.warn("Transfer failed: Insufficient balance in account [{}]. Current: {}, Requested: {}",
+                    sourceAccount.getAccountNumber(), sourceAccount.getCurrentBalance(), request.amount());
             throw new IllegalArgumentException("Insufficient funds in source account");
         }
 
-        // 3. Fetch & Validate Target Account
         Account targetAccount = accountRepository.findByAccountNumber(request.targetAccountNumber())
-                .orElseThrow(() -> new IllegalArgumentException("Destination account not found"));
+                .orElseThrow(() -> {
+                    log.error("Destination account [{}] not found", request.targetAccountNumber());
+                    return new IllegalArgumentException("Destination account not found");
+                });
 
         if (targetAccount.getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            log.warn("Transfer failed: Destination account [{}] is in state [{}]",
+                    targetAccount.getAccountNumber(), targetAccount.getAccountStatus());
             throw new IllegalArgumentException("Destination account is inactive or frozen");
         }
 
-        // 4. Update Balances
         BigDecimal newSourceBalance = sourceAccount.getCurrentBalance().subtract(request.amount());
         BigDecimal newTargetBalance = targetAccount.getCurrentBalance().add(request.amount());
 
@@ -70,7 +86,6 @@ public class FundTransferService {
         accountRepository.save(sourceAccount);
         accountRepository.save(targetAccount);
 
-        // 5. Create Transaction Audit Records
         String txRef = "TRF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String remark = request.remark() != null && !request.remark().isBlank() ? " | " + request.remark() : "";
 
@@ -94,6 +109,9 @@ public class FundTransferService {
 
         transactionRepository.save(debitTx);
         transactionRepository.save(creditTx);
+
+        log.info("Fund transfer successful. Ref: [{}], Source New Balance: [Rs. {}], Target New Balance: [Rs. {}]",
+                txRef, newSourceBalance, newTargetBalance);
 
         return new FundTransferResponse(
                 txRef,

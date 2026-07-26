@@ -2,14 +2,14 @@
 <configuration>
     <property name="LOG_PATH" value="logs" />
 
-    <!-- Console Appender -->
+    <!-- Console Appender with Trace ID -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-SYSTEM}] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Rolling File Appender for Banking Audits -->
+    <!-- Rolling File Appender for Auditing -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/bankflow.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -17,7 +17,7 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-SYSTEM}] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -26,7 +26,6 @@
         <appender-ref ref="FILE" />
     </root>
 
-    <!-- Specific Logging for Security & Financial Transactions -->
-    <logger name="com.bankflow.service" level="DEBUG" />
-    <logger name="org.springframework.security" level="INFO" />
+    <logger name="com.bankflow" level="DEBUG" />
+    <logger name="org.springframework.security" level="WARN" />
 </configuration>

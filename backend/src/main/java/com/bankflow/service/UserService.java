@@ -6,13 +6,14 @@ import com.bankflow.dto.LoginRequest;
 import com.bankflow.dto.RegisterRequest;
 import com.bankflow.entity.User;
 import com.bankflow.repository.UserRepository;
-import com.bankflow.security.JwtService; // Assuming you have a JWT generator service
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -23,7 +24,10 @@ public class UserService {
 
     @Transactional
     public void registerCustomer(RegisterRequest request) {
+        log.info("Attempting customer registration for email [{}]", request.email());
+
         if (userRepository.existsByEmail(request.email())) {
+            log.warn("Registration failed: Email [{}] is already registered", request.email());
             throw new IllegalArgumentException("Email is already registered");
         }
 
@@ -36,22 +40,31 @@ public class UserService {
                 .role(User.Role.CUSTOMER)
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        log.info("Customer registered successfully. User ID: [{}], Email: [{}]", savedUser.getId(), savedUser.getEmail());
     }
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
+        log.info("Attempting authentication for email [{}]", request.email());
+
         // 1. Fetch user by email or throw uniform error for security
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+                .orElseThrow(() -> {
+                    log.warn("Authentication failed for email [{}]: Account not found", request.email());
+                    return new BadCredentialsException("Invalid email or password");
+                });
 
         // 2. Compare plain password with stored BCrypt hash
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.warn("Authentication failed for email [{}]: Password mismatch", request.email());
             throw new BadCredentialsException("Invalid email or password");
         }
 
         // 3. Generate JWT token
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
+
+        log.info("User [{}] authenticated successfully with role [{}]", user.getEmail(), user.getRole());
 
         // 4. Return token and user metadata
         return new AuthResponse(token, user.getEmail(), user.getRole().name());
@@ -59,7 +72,10 @@ public class UserService {
 
     @Transactional
     public void createAdminAccount(CreateAdminRequest request) {
+        log.info("Attempting ADMIN account creation for email [{}]", request.email());
+
         if (userRepository.existsByEmail(request.email())) {
+            log.warn("Admin account creation failed: Email [{}] is already registered", request.email());
             throw new IllegalArgumentException("Email is already registered");
         }
 
@@ -72,6 +88,7 @@ public class UserService {
                 .role(User.Role.ADMIN) // Explicitly assign ADMIN role
                 .build();
 
-        userRepository.save(adminUser);
+        User savedAdmin = userRepository.save(adminUser);
+        log.info("ADMIN account created successfully. User ID: [{}], Email: [{}]", savedAdmin.getId(), savedAdmin.getEmail());
     }
 }

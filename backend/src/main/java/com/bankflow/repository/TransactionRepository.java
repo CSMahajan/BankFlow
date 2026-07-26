@@ -2,6 +2,7 @@ package com.bankflow.repository;
 
 import com.bankflow.entity.Transaction;
 import com.bankflow.entity.Transaction.TransactionType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     // Global transaction search for admins by account number
     List<Transaction> findByAccountAccountNumberOrderByTransactionDateDesc(String accountNumber);
+
+    List<Transaction> findByAccountIdInOrderByTransactionDateDesc(List<Long> accountIds, Pageable pageable);
+
 }

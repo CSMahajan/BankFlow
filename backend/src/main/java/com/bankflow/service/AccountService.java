@@ -5,8 +5,10 @@ import com.bankflow.dto.BalanceResponse;
 import com.bankflow.dto.CreateAccountRequest;
 import com.bankflow.dto.UpdateProfileRequest;
 import com.bankflow.entity.Account;
+import com.bankflow.entity.Transaction;
 import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
+import com.bankflow.repository.TransactionRepository;
 import com.bankflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,21 +28,38 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
 
     @Transactional
     public AccountResponse createAccount(CreateAccountRequest request) {
         User currentUser = getAuthenticatedUser();
+        BigDecimal initialDeposit = request.initialDeposit() != null ? request.initialDeposit() : BigDecimal.ZERO;
 
         Account account = Account.builder()
                 .accountNumber(generateUniqueAccountNumber())
                 .user(currentUser)
                 .accountType(request.accountType())
                 .branchName(request.branchName())
-                .currentBalance(request.initialDeposit() != null ? request.initialDeposit() : BigDecimal.ZERO)
+                .currentBalance(initialDeposit)
                 .accountStatus(Account.AccountStatus.ACTIVE)
                 .build();
 
         Account savedAccount = accountRepository.save(account);
+
+        // Record initial deposit transaction if amount is greater than zero
+        if (initialDeposit.compareTo(BigDecimal.ZERO) > 0) {
+            Transaction creditTx = Transaction.builder()
+                    .transactionId(UUID.randomUUID().toString())
+                    .account(savedAccount)
+                    .transactionType(Transaction.TransactionType.CREDIT)
+                    .amount(initialDeposit)
+                    .availableBalance(initialDeposit)
+                    .description("Initial Account Opening Deposit")
+                    .build();
+
+            transactionRepository.save(creditTx);
+        }
+
         return mapToResponse(savedAccount);
     }
 
@@ -99,8 +119,7 @@ public class AccountService {
 
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Authenticated user not found"));
     }
 

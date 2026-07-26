@@ -1,11 +1,16 @@
 package com.bankflow.service;
 
-import com.bankflow.dto.*;
+import com.bankflow.dto.CreateFdRequest;
+import com.bankflow.dto.FdCalculatorRequest;
+import com.bankflow.dto.FdCalculatorResponse;
+import com.bankflow.dto.FdResponse;
 import com.bankflow.entity.Account;
 import com.bankflow.entity.FixedDeposit;
+import com.bankflow.entity.Transaction;
 import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.FixedDepositRepository;
+import com.bankflow.repository.TransactionRepository;
 import com.bankflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,6 +24,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,16 +33,12 @@ public class FixedDepositService {
     private final FixedDepositRepository fdRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
 
-    // Standard Tiered Annual Interest Rates
-    private static final BigDecimal RATE_1_YEAR = new BigDecimal("6.50"); // 6.5%
-    private static final BigDecimal RATE_3_YEARS = new BigDecimal("7.00"); // 7.0%
-    private static final BigDecimal RATE_5_YEARS = new BigDecimal("7.50"); // 7.5%
+    private static final BigDecimal RATE_1_YEAR = new BigDecimal("6.50");
+    private static final BigDecimal RATE_3_YEARS = new BigDecimal("7.00");
+    private static final BigDecimal RATE_5_YEARS = new BigDecimal("7.50");
 
-    /**
-     * FD Calculator Logic (Compound Quarterly Interest Formula)
-     * A = P * (1 + r/n)^(n*t)
-     */
     public FdCalculatorResponse calculateMaturity(FdCalculatorRequest request) {
         validateTenure(request.tenureYears());
 
@@ -57,13 +59,12 @@ public class FixedDepositService {
     public FdResponse createFixedDeposit(CreateFdRequest request) {
         User currentUser = getAuthenticatedUser();
 
-        // 1. Validate Business Rules
+        // Validate minimum deposit constraint
         if (request.depositAmount().compareTo(new BigDecimal("10000.00")) <= 0) {
             throw new IllegalArgumentException("Deposit amount must be strictly greater than Rs. 10,000");
         }
         validateTenure(request.tenureYears());
 
-        // 2. Fetch and Validate Source Account Ownership & Balance
         Account sourceAccount = accountRepository.findByAccountNumber(request.sourceAccountNumber())
                 .orElseThrow(() -> new IllegalArgumentException("Source account not found"));
 
@@ -75,17 +76,28 @@ public class FixedDepositService {
             throw new IllegalArgumentException("Insufficient balance in source account");
         }
 
-        // 3. Deduct Amount from Source Savings/Current Account
-        sourceAccount.setCurrentBalance(sourceAccount.getCurrentBalance().subtract(request.depositAmount()));
+        // Deduct balance from source account
+        BigDecimal newBalance = sourceAccount.getCurrentBalance().subtract(request.depositAmount());
+        sourceAccount.setCurrentBalance(newBalance);
         accountRepository.save(sourceAccount);
 
-        // 4. Calculate Rates and Dates
+        // Record DEBIT transaction for FD creation
+        Transaction debitTx = Transaction.builder()
+                .transactionId(UUID.randomUUID().toString())
+                .account(sourceAccount)
+                .transactionType(Transaction.TransactionType.DEBIT)
+                .amount(request.depositAmount())
+                .availableBalance(newBalance)
+                .description("Fixed Deposit Booking - Tenure: " + request.tenureYears() + " Yrs")
+                .build();
+
+        transactionRepository.save(debitTx);
+
+        // Save Fixed Deposit details
         BigDecimal interestRate = getInterestRateForTenure(request.tenureYears());
         BigDecimal maturityAmount = calculateCompoundInterest(request.depositAmount(), interestRate, request.tenureYears());
         LocalDate depositDate = LocalDate.now();
-        LocalDate maturityDate = depositDate.plusYears(request.tenureYears());
 
-        // 5. Save Fixed Deposit
         FixedDeposit fd = FixedDeposit.builder()
                 .fdNumber(generateUniqueFdNumber())
                 .user(currentUser)
@@ -94,7 +106,7 @@ public class FixedDepositService {
                 .interestRate(interestRate)
                 .tenureYears(request.tenureYears())
                 .depositDate(depositDate)
-                .maturityDate(maturityDate)
+                .maturityDate(depositDate.plusYears(request.tenureYears()))
                 .maturityAmount(maturityAmount)
                 .status(FixedDeposit.FdStatus.ACTIVE)
                 .build();
@@ -117,7 +129,6 @@ public class FixedDepositService {
         FixedDeposit fd = fdRepository.findByFdNumber(fdNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Fixed Deposit not found"));
 
-        // Authorization check: Owner or ADMIN
         if (!currentUser.getRole().equals(User.Role.ADMIN) && !fd.getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not authorized to view this Fixed Deposit");
         }
@@ -125,7 +136,6 @@ public class FixedDepositService {
         return mapToResponse(fd);
     }
 
-    // Helper Methods
     private void validateTenure(Integer years) {
         if (years == null || (years != 1 && years != 3 && years != 5)) {
             throw new IllegalArgumentException("Invalid tenure! Allowed tenure options are 1, 3, or 5 years.");
@@ -142,10 +152,9 @@ public class FixedDepositService {
     }
 
     private BigDecimal calculateCompoundInterest(BigDecimal principal, BigDecimal annualRate, int years) {
-        // Compound Quarterly Formula: A = P * (1 + r / 400)^(4 * t)
         double p = principal.doubleValue();
         double r = annualRate.doubleValue() / 100.0;
-        int n = 4; // Quarterly compounding
+        int n = 4;
         double amount = p * Math.pow(1 + (r / n), n * years);
 
         return BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP);

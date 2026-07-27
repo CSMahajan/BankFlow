@@ -2,6 +2,7 @@ package com.bankflow.repository;
 
 import com.bankflow.entity.Transaction;
 import com.bankflow.entity.Transaction.TransactionType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,20 +16,57 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    // Fetch last 10 transactions for a specific account
-    List<Transaction> findTop10ByAccountIdOrderByTransactionDateDesc(Long accountId);
+    // --- By Account Number ---
 
-    // Filter transactions by date range
-    List<Transaction> findByAccountIdAndTransactionDateBetweenOrderByTransactionDateDesc(
-            Long accountId, LocalDateTime startDate, LocalDateTime endDate);
-
-    // Sum total credits for an account
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.account.id = :accountId AND t.transactionType = :type")
-    BigDecimal sumAmountByAccountIdAndTransactionType(@Param("accountId") Long accountId, @Param("type") TransactionType type);
-
-    // Global transaction search for admins by account number
+    // 1. Missing Method: Fetch transactions using account number string directly
     List<Transaction> findByAccountAccountNumberOrderByTransactionDateDesc(String accountNumber);
 
-    List<Transaction> findByAccountIdInOrderByTransactionDateDesc(List<Long> accountIds, Pageable pageable);
+    // --- Single-Account ID Queries ---
 
+    List<Transaction> findTop10ByAccountIdOrderByTransactionDateDesc(Long accountId);
+
+    List<Transaction> findByAccountIdAndTransactionDateBetweenOrderByTransactionDateDesc(
+            Long accountId,
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    );
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.account.id = :accountId
+          AND t.transactionType = :type
+    """)
+    BigDecimal sumAmountByAccountIdAndTransactionType(
+            @Param("accountId") Long accountId,
+            @Param("type") TransactionType type
+    );
+
+    // --- Multi-Account Queries (Aggregated Dashboard) ---
+
+    Page<Transaction> findByAccountIdInOrderByTransactionDateDesc(List<Long> accountIds, Pageable pageable);
+
+    List<Transaction> findTop10ByAccountIdInOrderByTransactionDateDesc(List<Long> accountIds);
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.account.id IN :accountIds
+          AND t.transactionType = :type
+          AND t.transactionDate >= :startDate
+          AND t.transactionDate <= :endDate
+    """)
+    BigDecimal sumAmountByAccountIdsAndTypeAndDateRange(
+            @Param("accountIds") List<Long> accountIds,
+            @Param("type") TransactionType type,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+    Page<Transaction> findByAccountIdInAndTransactionDateBetweenOrderByTransactionDateDesc(
+            List<Long> accountIds,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable
+    );
 }

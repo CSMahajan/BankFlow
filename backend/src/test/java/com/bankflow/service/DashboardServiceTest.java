@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -135,7 +136,7 @@ class DashboardServiceTest {
         when(fdRepository.findByUserId(mockUser.getId())).thenReturn(List.of(mockFd));
         when(loanRepository.findByUserId(mockUser.getId())).thenReturn(List.of(mockLoan));
         when(transactionRepository.findByAccountIdInOrderByTransactionDateDesc(eq(List.of(10L)), any(Pageable.class)))
-                .thenReturn(List.of(mockTransaction));
+                .thenReturn(new PageImpl<>(List.of(mockTransaction)));
 
         DashboardSummaryResponse response = dashboardService.getDashboardSummary();
 

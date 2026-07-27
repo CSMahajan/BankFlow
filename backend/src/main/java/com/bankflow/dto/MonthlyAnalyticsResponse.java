@@ -1,4 +1,9 @@
 package com.bankflow.dto;
 
-public class MonthlyAnalyticsResponse {
-}
+import java.math.BigDecimal;
+
+public record MonthlyAnalyticsResponse(
+        BigDecimal totalIncome,
+        BigDecimal totalExpense,
+        BigDecimal netCashFlow
+) {}

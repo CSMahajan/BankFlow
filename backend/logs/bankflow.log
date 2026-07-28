@@ -726,3 +726,318 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 2026-07-28 22:07:58.528 [http-nio-8080-exec-10] [7b82e355] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
 2026-07-28 22:07:58.530 [http-nio-8080-exec-10] [7b82e355] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
 2026-07-28 22:07:58.532 [http-nio-8080-exec-10] [7b82e355] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 22:11:59.125 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:11:59.128 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:11:59.128 [http-nio-8080-exec-1] [c6c9b14a] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:11:59.132 [http-nio-8080-exec-1] [c6c9b14a] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:11:59.135 [http-nio-8080-exec-1] [c6c9b14a] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:11:59.136 [http-nio-8080-exec-1] [c6c9b14a] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 22:12:07.224 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:07.226 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:07.227 [http-nio-8080-exec-2] [188015eb] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:07.228 [http-nio-8080-exec-2] [188015eb] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:07.239 [http-nio-8080-exec-2] [188015eb] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:07.241 [http-nio-8080-exec-2] [188015eb] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [14 ms]
+2026-07-28 22:12:07.244 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:07.247 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:07.247 [http-nio-8080-exec-3] [c815a923] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:07.249 [http-nio-8080-exec-3] [c815a923] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:07.251 [http-nio-8080-exec-3] [c815a923] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:07.254 [http-nio-8080-exec-3] [c815a923] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 22:12:27.295 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:27.298 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.299 [http-nio-8080-exec-4] [eac483d3] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:27.301 [http-nio-8080-exec-4] [eac483d3] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.303 [http-nio-8080-exec-4] [eac483d3] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.304 [http-nio-8080-exec-4] [eac483d3] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 22:12:27.307 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:27.310 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.310 [http-nio-8080-exec-5] [31ce45b8] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:27.313 [http-nio-8080-exec-5] [31ce45b8] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.315 [http-nio-8080-exec-5] [31ce45b8] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.317 [http-nio-8080-exec-5] [31ce45b8] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 22:12:27.561 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:27.563 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.564 [http-nio-8080-exec-6] [4319f59a] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:27.565 [http-nio-8080-exec-6] [4319f59a] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.568 [http-nio-8080-exec-6] [4319f59a] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.570 [http-nio-8080-exec-6] [4319f59a] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 22:12:27.572 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:27.575 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.575 [http-nio-8080-exec-7] [5990786f] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:27.577 [http-nio-8080-exec-7] [5990786f] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.580 [http-nio-8080-exec-7] [5990786f] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:27.582 [http-nio-8080-exec-7] [5990786f] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 22:12:38.978 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:38.982 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:38.983 [http-nio-8080-exec-8] [95bd88cb] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:38.984 [http-nio-8080-exec-8] [95bd88cb] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:38.986 [http-nio-8080-exec-8] [95bd88cb] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:38.987 [http-nio-8080-exec-8] [95bd88cb] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [4 ms]
+2026-07-28 22:12:38.989 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:12:38.991 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:38.991 [http-nio-8080-exec-9] [83afe984] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:12:38.993 [http-nio-8080-exec-9] [83afe984] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:38.994 [http-nio-8080-exec-9] [83afe984] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:12:38.995 [http-nio-8080-exec-9] [83afe984] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [4 ms]
+2026-07-28 22:14:21.914 [http-nio-8080-exec-10] [c60d1efa] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/v3/api-docs?_=1785257061904] via [GET]
+2026-07-28 22:14:21.927 [http-nio-8080-exec-10] [c60d1efa] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /v3/api-docs] Status [200] in [13 ms]
+2026-07-28 22:15:43.133 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/transactions/dashboard/BF9231590130]
+2026-07-28 22:15:43.136 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:15:43.137 [http-nio-8080-exec-2] [a45cfd69] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/transactions/dashboard/BF9231590130] via [GET]
+2026-07-28 22:15:43.139 [http-nio-8080-exec-2] [a45cfd69] DEBUG c.b.service.TransactionService - Generating dashboard summary for account [BF9231590130]
+2026-07-28 22:15:43.161 [http-nio-8080-exec-2] [a45cfd69] INFO  c.b.service.TransactionService - Dashboard summary generated for account [BF9231590130]. Balance: [Rs. 62506.00], Recent Tx Count: [1]
+2026-07-28 22:15:43.166 [http-nio-8080-exec-2] [a45cfd69] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/transactions/dashboard/BF9231590130] Status [200] in [29 ms]
+2026-07-28 22:15:51.345 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:15:51.348 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:15:51.348 [http-nio-8080-exec-3] [146cec39] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:15:51.349 [http-nio-8080-exec-3] [146cec39] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:15:51.372 [http-nio-8080-exec-3] [146cec39] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [24 ms]
+2026-07-28 22:19:13.992 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:13.995 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:13.995 [http-nio-8080-exec-6] [cbc45911] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:13.998 [http-nio-8080-exec-6] [cbc45911] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:14.000 [http-nio-8080-exec-6] [cbc45911] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:14.002 [http-nio-8080-exec-6] [cbc45911] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 22:19:14.004 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:14.006 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:14.006 [http-nio-8080-exec-7] [fdc4fc84] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:14.008 [http-nio-8080-exec-7] [fdc4fc84] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:14.009 [http-nio-8080-exec-7] [fdc4fc84] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:14.017 [http-nio-8080-exec-7] [fdc4fc84] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [11 ms]
+2026-07-28 22:19:15.266 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:15.269 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:15.269 [http-nio-8080-exec-8] [07b45082] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:15.271 [http-nio-8080-exec-8] [07b45082] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:15.273 [http-nio-8080-exec-8] [07b45082] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:15.274 [http-nio-8080-exec-8] [07b45082] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 22:19:15.276 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:15.279 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:15.279 [http-nio-8080-exec-9] [16f0b575] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:15.282 [http-nio-8080-exec-9] [16f0b575] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:15.284 [http-nio-8080-exec-9] [16f0b575] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:15.286 [http-nio-8080-exec-9] [16f0b575] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 22:19:25.646 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:25.649 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.649 [http-nio-8080-exec-10] [e2ba426c] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:25.651 [http-nio-8080-exec-10] [e2ba426c] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.652 [http-nio-8080-exec-10] [e2ba426c] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.654 [http-nio-8080-exec-10] [e2ba426c] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 22:19:25.657 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:25.659 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.659 [http-nio-8080-exec-1] [a8c8a8d1] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:25.660 [http-nio-8080-exec-1] [a8c8a8d1] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.662 [http-nio-8080-exec-1] [a8c8a8d1] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.663 [http-nio-8080-exec-1] [a8c8a8d1] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [4 ms]
+2026-07-28 22:19:25.886 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:25.890 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.890 [http-nio-8080-exec-2] [9bba1238] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:25.894 [http-nio-8080-exec-2] [9bba1238] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.897 [http-nio-8080-exec-2] [9bba1238] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.898 [http-nio-8080-exec-2] [9bba1238] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 22:19:25.901 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:19:25.903 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.903 [http-nio-8080-exec-3] [46d76e42] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:19:25.906 [http-nio-8080-exec-3] [46d76e42] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.909 [http-nio-8080-exec-3] [46d76e42] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:19:25.910 [http-nio-8080-exec-3] [46d76e42] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 22:21:00.218 [SpringApplicationShutdownHook] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-28 22:21:00.221 [tomcat-shutdown] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-07-28 22:21:00.226 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-07-28 22:21:00.227 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-07-28 22:21:01.409 [background-preinit] [SYSTEM] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2026-07-28 22:21:01.422 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Starting BankflowApplication using Java 21.0.12 with PID 18291 (/Users/chaitanyamahajan/Documents/BankFlow/backend/target/classes started by chaitanyamahajan in /Users/chaitanyamahajan/Documents/BankFlow/backend)
+2026-07-28 22:21:01.422 [main] [SYSTEM] DEBUG com.bankflow.BankflowApplication - Running with Spring Boot v3.4.7, Spring v6.2.8
+2026-07-28 22:21:01.422 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 22:21:01.672 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 22:21:01.697 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 21 ms. Found 8 JPA repository interfaces.
+2026-07-28 22:21:01.862 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-28 22:21:01.866 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-28 22:21:01.866 [main] [SYSTEM] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-28 22:21:01.866 [main] [SYSTEM] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-07-28 22:21:01.881 [main] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-28 22:21:01.881 [main] [SYSTEM] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 448 ms
+2026-07-28 22:21:01.927 [main] [SYSTEM] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-28 22:21:01.942 [main] [SYSTEM] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-07-28 22:21:01.955 [main] [SYSTEM] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-28 22:21:02.032 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-07-28 22:21:02.060 [main] [SYSTEM] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@578b2dec
+2026-07-28 22:21:02.060 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-07-28 22:21:02.082 [main] [SYSTEM] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.14
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-28 22:21:02.378 [main] [SYSTEM] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 22:21:02.700 [main] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-07-28 22:21:02.700 [main] [SYSTEM] DEBUG com.bankflow.filter.LoggingFilter - Filter 'loggingFilter' configured for use
+2026-07-28 22:21:02.729 [main] [SYSTEM] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 22:21:03.088 [main] [SYSTEM] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-28 22:21:03.321 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-07-28 22:21:03.327 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-07-28 22:21:03.331 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Started BankflowApplication in 2.061 seconds (process running for 2.164)
+2026-07-28 22:21:08.705 [http-nio-8080-exec-1] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-28 22:21:08.705 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-28 22:21:08.706 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-07-28 22:21:08.757 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:21:08.765 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:08.766 [http-nio-8080-exec-1] [f340a446] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:21:08.773 [http-nio-8080-exec-1] [f340a446] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:08.807 [http-nio-8080-exec-1] [f340a446] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [40 ms]
+2026-07-28 22:21:13.961 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:21:13.965 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:13.966 [http-nio-8080-exec-2] [ee4f4d86] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:21:13.969 [http-nio-8080-exec-2] [ee4f4d86] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:13.970 [http-nio-8080-exec-2] [ee4f4d86] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:13.976 [http-nio-8080-exec-2] [ee4f4d86] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [10 ms]
+2026-07-28 22:21:13.978 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:21:13.982 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:13.982 [http-nio-8080-exec-3] [f9ea5412] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:21:13.984 [http-nio-8080-exec-3] [f9ea5412] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:13.989 [http-nio-8080-exec-3] [f9ea5412] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:13.995 [http-nio-8080-exec-3] [f9ea5412] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [13 ms]
+2026-07-28 22:21:15.995 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:21:15.999 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:16.000 [http-nio-8080-exec-4] [d5c1eee7] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:21:16.002 [http-nio-8080-exec-4] [d5c1eee7] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:16.003 [http-nio-8080-exec-4] [d5c1eee7] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:16.006 [http-nio-8080-exec-4] [d5c1eee7] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 22:21:16.009 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:21:16.012 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:16.012 [http-nio-8080-exec-5] [bb05cf81] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:21:16.015 [http-nio-8080-exec-5] [bb05cf81] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:16.018 [http-nio-8080-exec-5] [bb05cf81] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:16.020 [http-nio-8080-exec-5] [bb05cf81] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 22:21:23.348 [http-nio-8080-exec-6] [c206e046] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/auth/login] via [POST]
+2026-07-28 22:21:23.403 [http-nio-8080-exec-6] [c206e046] INFO  com.bankflow.service.UserService - Attempting authentication for email [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.473 [http-nio-8080-exec-6] [c206e046] INFO  com.bankflow.service.JwtService - Generating JWT token for user [ghtaerpg@gmail.com] with role [CUSTOMER]
+2026-07-28 22:21:23.477 [http-nio-8080-exec-6] [c206e046] DEBUG com.bankflow.service.JwtService - JWT token generated successfully for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.477 [http-nio-8080-exec-6] [c206e046] INFO  com.bankflow.service.UserService - User [ghtaerpg@gmail.com] authenticated successfully with role [CUSTOMER]
+2026-07-28 22:21:23.478 [http-nio-8080-exec-6] [c206e046] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/auth/login] Status [200] in [130 ms]
+2026-07-28 22:21:23.497 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:21:23.498 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.498 [http-nio-8080-exec-7] [221abb64] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:21:23.499 [http-nio-8080-exec-7] [221abb64] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.500 [http-nio-8080-exec-7] [221abb64] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.500 [http-nio-8080-exec-7] [221abb64] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [2 ms]
+2026-07-28 22:21:23.503 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:21:23.504 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.504 [http-nio-8080-exec-8] [0f7b6f08] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:21:23.505 [http-nio-8080-exec-8] [0f7b6f08] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.506 [http-nio-8080-exec-8] [0f7b6f08] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:21:23.507 [http-nio-8080-exec-8] [0f7b6f08] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [3 ms]
+2026-07-28 22:21:43.346 [SpringApplicationShutdownHook] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-28 22:21:43.349 [tomcat-shutdown] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-07-28 22:21:43.352 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-07-28 22:21:43.352 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-07-28 22:21:44.501 [background-preinit] [SYSTEM] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2026-07-28 22:21:44.513 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Starting BankflowApplication using Java 21.0.12 with PID 18321 (/Users/chaitanyamahajan/Documents/BankFlow/backend/target/classes started by chaitanyamahajan in /Users/chaitanyamahajan/Documents/BankFlow/backend)
+2026-07-28 22:21:44.513 [main] [SYSTEM] DEBUG com.bankflow.BankflowApplication - Running with Spring Boot v3.4.7, Spring v6.2.8
+2026-07-28 22:21:44.514 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 22:21:44.738 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 22:21:44.762 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 21 ms. Found 8 JPA repository interfaces.
+2026-07-28 22:21:44.916 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-28 22:21:44.919 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-28 22:21:44.919 [main] [SYSTEM] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-28 22:21:44.919 [main] [SYSTEM] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-07-28 22:21:44.934 [main] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-28 22:21:44.934 [main] [SYSTEM] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 411 ms
+2026-07-28 22:21:44.976 [main] [SYSTEM] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-28 22:21:44.993 [main] [SYSTEM] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-07-28 22:21:45.002 [main] [SYSTEM] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-28 22:21:45.072 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-07-28 22:21:45.098 [main] [SYSTEM] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@77ce8bc5
+2026-07-28 22:21:45.098 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-07-28 22:21:45.116 [main] [SYSTEM] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.14
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-28 22:21:45.396 [main] [SYSTEM] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 22:21:45.710 [main] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-07-28 22:21:45.710 [main] [SYSTEM] DEBUG com.bankflow.filter.LoggingFilter - Filter 'loggingFilter' configured for use
+2026-07-28 22:21:45.736 [main] [SYSTEM] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 22:21:46.085 [main] [SYSTEM] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-28 22:21:46.329 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-07-28 22:21:46.338 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-07-28 22:21:46.342 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Started BankflowApplication in 1.977 seconds (process running for 2.071)
+2026-07-28 22:22:01.531 [http-nio-8080-exec-2] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-28 22:22:01.531 [http-nio-8080-exec-2] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-28 22:22:01.531 [http-nio-8080-exec-2] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2026-07-28 22:22:01.584 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:22:01.584 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:22:01.591 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.591 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.592 [http-nio-8080-exec-1] [5453014d] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:22:01.592 [http-nio-8080-exec-2] [d9479a8a] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:22:01.600 [http-nio-8080-exec-2] [d9479a8a] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.600 [http-nio-8080-exec-1] [5453014d] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.602 [http-nio-8080-exec-2] [d9479a8a] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.622 [http-nio-8080-exec-2] [d9479a8a] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [29 ms]
+2026-07-28 22:22:01.622 [http-nio-8080-exec-1] [5453014d] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [30 ms]
+2026-07-28 22:22:01.625 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:22:01.625 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:22:01.628 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.628 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.628 [http-nio-8080-exec-1] [de2c9e64] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:22:01.628 [http-nio-8080-exec-4] [a682e3ce] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:22:01.629 [http-nio-8080-exec-1] [de2c9e64] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.629 [http-nio-8080-exec-4] [a682e3ce] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.630 [http-nio-8080-exec-1] [de2c9e64] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.631 [http-nio-8080-exec-1] [de2c9e64] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [3 ms]
+2026-07-28 22:22:01.636 [http-nio-8080-exec-4] [a682e3ce] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [8 ms]
+2026-07-28 22:22:01.638 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:22:01.640 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.640 [http-nio-8080-exec-5] [7e7fc7b5] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:22:01.642 [http-nio-8080-exec-5] [7e7fc7b5] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:01.649 [http-nio-8080-exec-5] [7e7fc7b5] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [9 ms]
+2026-07-28 22:22:03.972 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:22:03.973 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:22:03.976 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:03.976 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:03.976 [http-nio-8080-exec-7] [bf37f4ee] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:22:03.976 [http-nio-8080-exec-6] [0df1ac75] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:22:03.986 [http-nio-8080-exec-7] [bf37f4ee] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:03.986 [http-nio-8080-exec-6] [0df1ac75] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:03.990 [http-nio-8080-exec-6] [0df1ac75] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:03.992 [http-nio-8080-exec-6] [0df1ac75] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [16 ms]
+2026-07-28 22:22:03.995 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:22:03.998 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:03.998 [http-nio-8080-exec-8] [db3e6da0] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:22:04.000 [http-nio-8080-exec-8] [db3e6da0] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:04.000 [http-nio-8080-exec-7] [bf37f4ee] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [24 ms]
+2026-07-28 22:22:04.002 [http-nio-8080-exec-8] [db3e6da0] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:04.004 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:22:04.004 [http-nio-8080-exec-8] [db3e6da0] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 22:22:04.006 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:04.006 [http-nio-8080-exec-9] [86ab8676] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:22:04.008 [http-nio-8080-exec-9] [86ab8676] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:04.015 [http-nio-8080-exec-9] [86ab8676] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [9 ms]
+2026-07-28 22:22:05.190 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:22:05.190 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:22:05.193 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.193 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.194 [http-nio-8080-exec-2] [82d69b8c] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:22:05.194 [http-nio-8080-exec-10] [e9098765] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:22:05.195 [http-nio-8080-exec-10] [e9098765] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.195 [http-nio-8080-exec-2] [82d69b8c] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.197 [http-nio-8080-exec-10] [e9098765] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.199 [http-nio-8080-exec-10] [e9098765] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 22:22:05.202 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:22:05.206 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.207 [http-nio-8080-exec-3] [f2256690] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:22:05.209 [http-nio-8080-exec-3] [f2256690] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.211 [http-nio-8080-exec-3] [f2256690] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.213 [http-nio-8080-exec-3] [f2256690] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 22:22:05.214 [http-nio-8080-exec-2] [82d69b8c] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [20 ms]
+2026-07-28 22:22:05.216 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/dashboard/summary]
+2026-07-28 22:22:05.219 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.220 [http-nio-8080-exec-1] [3055caae] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/dashboard/summary] via [GET]
+2026-07-28 22:22:05.221 [http-nio-8080-exec-1] [3055caae] INFO  c.bankflow.service.DashboardService - Fetching aggregated dashboard summary for user [ghtaerpg@gmail.com]
+2026-07-28 22:22:05.229 [http-nio-8080-exec-1] [3055caae] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/dashboard/summary] Status [200] in [9 ms]

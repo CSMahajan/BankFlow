@@ -1,24 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AccountsView from '../components/AccountsView';
 import FdCalculatorCard from '../components/FdCalculatorCard';
 import FdManagementView from '../components/FdManagementView';
 import CreateAccountModal from '../components/CreateAccountModal';
+import API from '../api/axios'; // 🟢 Import your configured API instance
 
-const Dashboard = ({ userRole, onLogout, userName }) => {
+const Dashboard = ({ userRole, onLogout }) => {
   const [activeTab, setActiveTab] = useState('accounts');
-  const [fdSubTab, setFdSubTab] = useState('calculator'); // 'calculator' or 'open'
+  const [fdSubTab, setFdSubTab] = useState('calculator');
   const [fdDraftConfig, setFdDraftConfig] = useState(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  
+  // 🟢 Add state for fetched customer name
+  const [customerName, setCustomerName] = useState(
+    localStorage.getItem('fullName') || localStorage.getItem('name') || 'Customer'
+  );
 
-  // Fallback chain for actual user profile name
-  const displayName =
-    userName ||
-    localStorage.getItem('fullName') ||
-    localStorage.getItem('name') ||
-    localStorage.getItem('username') ||
-    localStorage.getItem('email')?.split('@')[0] ||
-    'Customer';
+  // 🟢 Fetch summary data on load to grab correct customerName from backend
+  useEffect(() => {
+    const fetchDashboardSummary = async () => {
+      try {
+        const response = await API.get('/dashboard/summary');
+        if (response.data && response.data.customerName) {
+          setCustomerName(response.data.customerName);
+          localStorage.setItem('fullName', response.data.customerName); // cache it
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard summary name:', err);
+      }
+    };
+    fetchDashboardSummary();
+  }, []);
 
   const roleDisplay = userRole || localStorage.getItem('userRole') || 'CUSTOMER';
 
@@ -86,9 +99,9 @@ const Dashboard = ({ userRole, onLogout, userName }) => {
         {/* User Footer */}
         <div style={styles.sidebarFooter}>
           <div style={styles.userProfile}>
-            <div style={styles.avatar}>{displayName.charAt(0).toUpperCase()}</div>
+            <div style={styles.avatar}>{customerName.charAt(0).toUpperCase()}</div>
             <div style={styles.userInfo}>
-              <strong style={styles.userName}>{displayName}</strong>
+              <strong style={styles.userName}>{customerName}</strong>
               <span style={styles.roleBadge}>{roleDisplay}</span>
             </div>
           </div>
@@ -104,7 +117,7 @@ const Dashboard = ({ userRole, onLogout, userName }) => {
           <div>
             <h1 style={styles.headerTitle}>Dashboard</h1>
             <p style={styles.headerSubtitle}>
-              Welcome back, <strong>{displayName}</strong>! Manage your accounts & investments.
+              Welcome back, <strong>{customerName}</strong>! Manage your accounts & investments.
             </p>
           </div>
 

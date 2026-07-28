@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import API from '../api/axios';
 
-const AccountsCard = ({ totalBalance, accountCount, fdInvestment }) => {
-  // Format numbers nicely as INR
+const AccountsCard = () => {
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const response = await API.get('/dashboard/summary');
+        setSummary(response.data);
+      } catch (err) {
+        console.error('Failed to fetch dashboard summary:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSummary();
+  }, []);
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -10,11 +27,13 @@ const AccountsCard = ({ totalBalance, accountCount, fdInvestment }) => {
     }).format(amount || 0);
   };
 
+  if (loading) return <div style={{ color: '#6b7280', fontSize: '14px' }}>Loading summary...</div>;
+
   return (
     <div style={styles.card}>
       <div style={styles.header}>
         <h3 style={styles.title}>Your Accounts</h3>
-        <span style={styles.countBadge}>{accountCount || 1} Active</span>
+        <span style={styles.countBadge}>{summary?.activeAccountsCount || 1} Active</span>
       </div>
 
       <div style={styles.accountList}>
@@ -22,11 +41,11 @@ const AccountsCard = ({ totalBalance, accountCount, fdInvestment }) => {
         <div style={styles.accountItem}>
           <div style={styles.iconBox}>🏦</div>
           <div style={styles.accountInfo}>
-            <div style={styles.accountName}>Primary Account Balance</div>
+            <div style={styles.accountName}>Total Account Balance</div>
             <div style={styles.accountType}>Savings / Current</div>
           </div>
           <div style={styles.accountBalance}>
-            {formatCurrency(totalBalance)}
+            {formatCurrency(summary?.totalAccountBalance)}
           </div>
         </div>
 
@@ -35,10 +54,10 @@ const AccountsCard = ({ totalBalance, accountCount, fdInvestment }) => {
           <div style={styles.iconBox}>🪙</div>
           <div style={styles.accountInfo}>
             <div style={styles.accountName}>Fixed Deposits (FD)</div>
-            <div style={styles.accountType}>Investments</div>
+            <div style={styles.accountType}>{summary?.activeFdCount || 0} Active FDs</div>
           </div>
           <div style={{ ...styles.accountBalance, color: '#0d6360' }}>
-            {formatCurrency(fdInvestment)}
+            {formatCurrency(summary?.totalFdInvestment)}
           </div>
         </div>
       </div>

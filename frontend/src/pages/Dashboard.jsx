@@ -1,63 +1,167 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import AccountsView from '../components/AccountsView';
+import FdCalculatorCard from '../components/FdCalculatorCard';
+import FdManagementView from '../components/FdManagementView';
+import CreateAccountModal from '../components/CreateAccountModal';
 
-const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const Dashboard = ({ userRole, onLogout, userName }) => {
+  const [activeTab, setActiveTab] = useState('accounts');
+  const [fdSubTab, setFdSubTab] = useState('calculator'); // 'calculator' or 'open'
+  const [fdDraftConfig, setFdDraftConfig] = useState(null);
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const token = localStorage.getItem('token'); 
+  // Fallback chain for actual user profile name
+  const displayName =
+    userName ||
+    localStorage.getItem('fullName') ||
+    localStorage.getItem('name') ||
+    localStorage.getItem('username') ||
+    localStorage.getItem('email')?.split('@')[0] ||
+    'Customer';
 
-        const response = await axios.get('/api/v1/dashboard/summary', {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : '',
-            'Content-Type': 'application/json',
-          },
-        });
+  const roleDisplay = userRole || localStorage.getItem('userRole') || 'CUSTOMER';
 
-        console.log('API Response Data:', response.data); // Log data to console for inspection
-        setDashboardData(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to fetch dashboard data:', err);
-        setError('Unable to load dashboard data.');
-        setLoading(false);
-      }
-    };
+  const handleOpenFdFromCalc = (config) => {
+    setFdDraftConfig(config);
+    setFdSubTab('open');
+    setActiveTab('fd');
+  };
 
-    fetchDashboardData();
-  }, []);
-
-  if (loading) {
-    return <div style={{ padding: '20px' }}>Loading Dashboard...</div>;
-  }
-
-  if (error) {
-    return <div style={{ padding: '20px', color: 'red' }}>{error}</div>;
-  }
+  const handleAccountCreated = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>Dashboard Summary</h1>
-      
-      {/* Safely renders the API JSON response on the screen */}
-      {dashboardData ? (
-        <pre style={{ 
-          backgroundColor: '#f4f4f4', 
-          padding: '15px', 
-          borderRadius: '5px',
-          overflowX: 'auto' 
-        }}>
-          {JSON.stringify(dashboardData, null, 2)}
-        </pre>
-      ) : (
-        <p>No data returned from backend.</p>
-      )}
+    <div style={styles.layout}>
+      {/* Sidebar Navigation */}
+      <aside style={styles.sidebar}>
+        <div style={styles.sidebarTop}>
+          <div style={styles.brand}>🏦 BankFlow</div>
+          <nav style={styles.nav}>
+            <button
+              style={{
+                ...styles.navBtn,
+                backgroundColor: activeTab === 'accounts' ? '#0d6360' : 'transparent',
+                color: activeTab === 'accounts' ? '#ffffff' : '#374151',
+              }}
+              onClick={() => setActiveTab('accounts')}
+            >
+              💳 Accounts & Overview
+            </button>
+
+            {/* Consolidated Fixed Deposits Section */}
+            <div style={styles.sidebarGroup}>
+              <div style={styles.groupHeader}>🪙 Fixed Deposits</div>
+              <button
+                style={{
+                  ...styles.subNavLink,
+                  backgroundColor: activeTab === 'fd' && fdSubTab === 'calculator' ? '#e6f2f1' : 'transparent',
+                  color: activeTab === 'fd' && fdSubTab === 'calculator' ? '#0d6360' : '#4b5563',
+                }}
+                onClick={() => {
+                  setActiveTab('fd');
+                  setFdSubTab('calculator');
+                }}
+              >
+                📊 FD Calculator
+              </button>
+              <button
+                style={{
+                  ...styles.subNavLink,
+                  backgroundColor: activeTab === 'fd' && fdSubTab === 'open' ? '#e6f2f1' : 'transparent',
+                  color: activeTab === 'fd' && fdSubTab === 'open' ? '#0d6360' : '#4b5563',
+                }}
+                onClick={() => {
+                  setActiveTab('fd');
+                  setFdSubTab('open');
+                }}
+              >
+                📄 Open New FD
+              </button>
+            </div>
+          </nav>
+        </div>
+
+        {/* User Footer */}
+        <div style={styles.sidebarFooter}>
+          <div style={styles.userProfile}>
+            <div style={styles.avatar}>{displayName.charAt(0).toUpperCase()}</div>
+            <div style={styles.userInfo}>
+              <strong style={styles.userName}>{displayName}</strong>
+              <span style={styles.roleBadge}>{roleDisplay}</span>
+            </div>
+          </div>
+          <button style={styles.logoutBtn} onClick={onLogout} title="Log Out">
+            🚪 Log Out
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main style={styles.mainContent}>
+        <header style={styles.topHeader}>
+          <div>
+            <h1 style={styles.headerTitle}>Dashboard</h1>
+            <p style={styles.headerSubtitle}>
+              Welcome back, <strong>{displayName}</strong>! Manage your accounts & investments.
+            </p>
+          </div>
+
+          <button style={styles.headerAccountBtn} onClick={() => setIsAccountModalOpen(true)}>
+            + Open New Bank Account
+          </button>
+        </header>
+
+        {/* Views */}
+        {activeTab === 'accounts' && <AccountsView key={refreshKey} />}
+
+        {activeTab === 'fd' && fdSubTab === 'calculator' && (
+          <FdCalculatorCard onOpenFd={handleOpenFdFromCalc} />
+        )}
+
+        {activeTab === 'fd' && fdSubTab === 'open' && (
+          <FdManagementView
+            initialConfig={fdDraftConfig}
+            onFdCreated={() => {
+              setActiveTab('accounts');
+              setRefreshKey((prev) => prev + 1);
+            }}
+          />
+        )}
+      </main>
+
+      <CreateAccountModal
+        isOpen={isAccountModalOpen}
+        onClose={() => setIsAccountModalOpen(false)}
+        onAccountCreated={handleAccountCreated}
+      />
     </div>
   );
+};
+
+const styles = {
+  layout: { display: 'flex', minHeight: '100vh', backgroundColor: '#f9fafb' },
+  sidebar: { width: '260px', backgroundColor: '#ffffff', borderRight: '1px solid #eef0ec', padding: '24px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' },
+  sidebarTop: { display: 'flex', flexDirection: 'column', gap: '24px' },
+  brand: { fontSize: '20px', fontWeight: '800', fontFamily: 'Georgia, serif', color: '#0d6360' },
+  nav: { display: 'flex', flexDirection: 'column', gap: '8px' },
+  navBtn: { border: 'none', padding: '12px 16px', borderRadius: '8px', textAlign: 'left', fontWeight: '600', fontSize: '14px', cursor: 'pointer' },
+  sidebarGroup: { display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' },
+  groupHeader: { fontSize: '12px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', padding: '4px 12px' },
+  subNavLink: { border: 'none', padding: '10px 16px 10px 24px', borderRadius: '6px', textAlign: 'left', fontWeight: '600', fontSize: '13px', cursor: 'pointer' },
+  sidebarFooter: { borderTop: '1px solid #eef0ec', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' },
+  userProfile: { display: 'flex', alignItems: 'center', gap: '10px' },
+  avatar: { width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#0d6360', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '15px' },
+  userInfo: { display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' },
+  userName: { fontSize: '14px', color: '#111827', fontWeight: '700', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  roleBadge: { fontSize: '11px', fontWeight: '700', color: '#0d6360', backgroundColor: '#e6f2f1', padding: '2px 6px', borderRadius: '4px', width: 'fit-content', textTransform: 'uppercase' },
+  logoutBtn: { border: '1px solid #fee2e2', padding: '10px', borderRadius: '8px', backgroundColor: '#fef2f2', cursor: 'pointer', fontWeight: '600', color: '#dc2626', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' },
+  mainContent: { flex: 1, padding: '32px' },
+  topHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', paddingBottom: '16px', borderBottom: '1px solid #eef0ec' },
+  headerTitle: { margin: 0, fontSize: '24px', fontFamily: 'Georgia, serif', color: '#111827' },
+  headerSubtitle: { margin: '4px 0 0 0', fontSize: '13px', color: '#6b7280' },
+  headerAccountBtn: { backgroundColor: '#0d6360', color: '#ffffff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: '700', fontSize: '14px', cursor: 'pointer' },
 };
 
 export default Dashboard;

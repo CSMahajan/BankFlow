@@ -73,10 +73,10 @@ public class FixedDepositService {
                 currentUser.getEmail(), request.sourceAccountNumber(), request.depositAmount(), request.tenureYears());
 
         // Validate minimum deposit constraint
-        if (request.depositAmount().compareTo(MIN_FD_AMOUNT) <= 0) {
-            log.warn("FD creation failed: Requested amount [Rs. {}] is not strictly greater than threshold [Rs. 10000.00]",
+        if (request.depositAmount().compareTo(MIN_FD_AMOUNT) < 0) {
+            log.warn("FD creation failed: Requested amount [Rs. {}] is not greater than threshold [Rs. 10000.00]",
                     request.depositAmount());
-            throw new IllegalArgumentException("Deposit amount must be strictly greater than Rs. 10,000");
+            throw new IllegalArgumentException("Deposit amount must be minimum Rs. 10,000");
         }
         validateTenure(request.tenureYears());
 

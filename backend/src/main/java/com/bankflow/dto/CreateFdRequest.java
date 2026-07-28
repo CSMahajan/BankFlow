@@ -10,7 +10,7 @@ public record CreateFdRequest(
         String sourceAccountNumber,
 
         @NotNull(message = "Deposit amount is required")
-        @DecimalMin(value = "10000.01", message = "Deposit amount must be greater than Rs. 10,000")
+        @DecimalMin(value = "10000.00", message = "Deposit amount must be minimum Rs. 10,000")
         BigDecimal depositAmount,
 
         @NotNull(message = "Tenure is required")

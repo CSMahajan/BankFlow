@@ -2,13 +2,13 @@ import axios from 'axios';
 
 // Create a configured Axios instance
 const API = axios.create({
-  baseURL: 'http://localhost:8080/api/v1', // Update port if your Spring Boot app runs elsewhere
+  baseURL: '/api/v1', // Proxies cleanly to http://localhost:8080/api/v1 via Vite
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request Interceptor: Attach JWT token if present in localStorage
+// Request Interceptor: Automatically attaches Bearer token if available
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');

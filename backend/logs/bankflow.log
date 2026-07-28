@@ -1,23 +1,22 @@
-2026-07-26 22:59:22.482 [background-preinit] [SYSTEM] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
-2026-07-26 22:59:22.497 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Starting BankflowApplication using Java 21.0.12 with PID 66007 (/Users/chaitanyamahajan/Documents/Codex/2026-07-26/my/outputs/BankFlow/backend/target/classes started by chaitanyamahajan in /Users/chaitanyamahajan/Documents/Codex/2026-07-26/my/outputs/BankFlow/backend)
-2026-07-26 22:59:22.498 [main] [SYSTEM] DEBUG com.bankflow.BankflowApplication - Running with Spring Boot v3.4.7, Spring v6.2.8
-2026-07-26 22:59:22.498 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - No active profile set, falling back to 1 default profile: "default"
-2026-07-26 22:59:22.730 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-07-26 22:59:22.748 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 15 ms. Found 4 JPA repository interfaces.
-2026-07-26 22:59:22.917 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2026-07-26 22:59:22.921 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-2026-07-26 22:59:22.922 [main] [SYSTEM] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2026-07-26 22:59:22.922 [main] [SYSTEM] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
-2026-07-26 22:59:22.942 [main] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2026-07-26 22:59:22.942 [main] [SYSTEM] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 433 ms
-2026-07-26 22:59:22.988 [main] [SYSTEM] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-07-26 22:59:23.006 [main] [SYSTEM] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
-2026-07-26 22:59:23.020 [main] [SYSTEM] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-2026-07-26 22:59:23.096 [main] [SYSTEM] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-07-26 22:59:23.104 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2026-07-26 22:59:23.140 [main] [SYSTEM] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@351ede23
-2026-07-26 22:59:23.141 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2026-07-26 22:59:23.165 [main] [SYSTEM] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+2026-07-28 21:36:40.268 [background-preinit] [SYSTEM] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2026-07-28 21:36:40.283 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Starting BankflowApplication using Java 26.0.1 with PID 16478 (/Users/chaitanyamahajan/Documents/BankFlow/backend/target/classes started by chaitanyamahajan in /Users/chaitanyamahajan/Documents/BankFlow/backend)
+2026-07-28 21:36:40.283 [main] [SYSTEM] DEBUG com.bankflow.BankflowApplication - Running with Spring Boot v3.4.7, Spring v6.2.8
+2026-07-28 21:36:40.284 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 21:36:40.539 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 21:36:40.561 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18 ms. Found 8 JPA repository interfaces.
+2026-07-28 21:36:40.726 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-28 21:36:40.731 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-28 21:36:40.731 [main] [SYSTEM] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-28 21:36:40.732 [main] [SYSTEM] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-07-28 21:36:40.747 [main] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-28 21:36:40.748 [main] [SYSTEM] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 447 ms
+2026-07-28 21:36:40.800 [main] [SYSTEM] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-28 21:36:40.819 [main] [SYSTEM] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-07-28 21:36:40.829 [main] [SYSTEM] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-28 21:36:40.926 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-07-28 21:36:40.956 [main] [SYSTEM] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2beee3e8
+2026-07-28 21:36:40.957 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-07-28 21:36:40.980 [main] [SYSTEM] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 16.14
@@ -25,35 +24,705 @@
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-07-26 22:59:23.427 [main] [SYSTEM] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-07-26 22:59:23.571 [main] [SYSTEM] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-07-26 22:59:23.699 [main] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
-2026-07-26 22:59:23.699 [main] [SYSTEM] DEBUG com.bankflow.filter.LoggingFilter - Filter 'loggingFilter' configured for use
-2026-07-26 22:59:23.726 [main] [SYSTEM] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-07-26 22:59:24.030 [main] [SYSTEM] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-07-26 22:59:24.264 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
-2026-07-26 22:59:24.269 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2026-07-26 22:59:24.272 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Started BankflowApplication in 1.919 seconds (process running for 2.007)
-2026-07-26 22:59:30.505 [http-nio-8080-exec-1] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-07-26 22:59:30.505 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2026-07-26 22:59:30.506 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
-2026-07-26 22:59:30.565 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/transfers]
-2026-07-26 22:59:30.574 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
-2026-07-26 22:59:30.575 [http-nio-8080-exec-1] [cb129908] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/transfers] via [POST]
-2026-07-26 22:59:30.616 [http-nio-8080-exec-1] [cb129908] INFO  c.b.service.FundTransferService - Initiating fund transfer request by user [ghtaerpg@gmail.com] from account [BF5891164768] to target [BF8490652259] for amount [Rs. 32]
-2026-07-26 22:59:30.632 [http-nio-8080-exec-1] [cb129908] INFO  c.b.service.FundTransferService - Fund transfer successful. Ref: [TRF-4799AD1F], Source New Balance: [Rs. 89971315.07], Target New Balance: [Rs. 4762.00]
-2026-07-26 22:59:30.647 [http-nio-8080-exec-1] [cb129908] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/transfers] Status [200] in [72 ms]
-2026-07-26 22:59:40.170 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [sysadmin@gmail.com] at URI [/api/v1/transactions/admin/search/BF5891164768]
-2026-07-26 22:59:40.174 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_ADMIN] for user [sysadmin@gmail.com]
-2026-07-26 22:59:40.175 [http-nio-8080-exec-2] [2755ec24] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/transactions/admin/search/BF5891164768] via [GET]
-2026-07-26 22:59:40.192 [http-nio-8080-exec-2] [2755ec24] INFO  c.b.service.TransactionService - ADMIN action: User [sysadmin@gmail.com] requesting full transaction history for account [BF5891164768]
-2026-07-26 22:59:40.209 [http-nio-8080-exec-2] [2755ec24] INFO  c.b.service.TransactionService - ADMIN lookup completed. Retried [6] transactions for account [BF5891164768]
-2026-07-26 22:59:40.218 [http-nio-8080-exec-2] [2755ec24] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/transactions/admin/search/BF5891164768] Status [200] in [43 ms]
-2026-07-26 23:00:12.174 [http-nio-8080-exec-3] [c06ab0da] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/v3/api-docs?_=1785087012170] via [GET]
-2026-07-26 23:00:12.313 [http-nio-8080-exec-3] [c06ab0da] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 126 ms
-2026-07-26 23:00:12.319 [http-nio-8080-exec-3] [c06ab0da] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /v3/api-docs] Status [200] in [145 ms]
-2026-07-26 23:02:27.011 [SpringApplicationShutdownHook] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2026-07-26 23:02:27.015 [tomcat-shutdown] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-2026-07-26 23:02:27.019 [SpringApplicationShutdownHook] [SYSTEM] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-07-26 23:02:27.020 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-2026-07-26 23:02:27.021 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-07-28 21:36:41.290 [main] [SYSTEM] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 21:36:41.625 [main] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-07-28 21:36:41.625 [main] [SYSTEM] DEBUG com.bankflow.filter.LoggingFilter - Filter 'loggingFilter' configured for use
+2026-07-28 21:36:41.651 [main] [SYSTEM] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 21:36:41.996 [main] [SYSTEM] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-28 21:36:42.243 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-07-28 21:36:42.247 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-07-28 21:36:42.250 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Started BankflowApplication in 2.15 seconds (process running for 2.279)
+2026-07-28 21:36:57.149 [SpringApplicationShutdownHook] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-28 21:36:57.152 [tomcat-shutdown] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-07-28 21:36:57.155 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-07-28 21:36:57.156 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-07-28 21:36:58.448 [background-preinit] [SYSTEM] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2026-07-28 21:36:58.462 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Starting BankflowApplication using Java 21.0.12 with PID 16511 (/Users/chaitanyamahajan/Documents/BankFlow/backend/target/classes started by chaitanyamahajan in /Users/chaitanyamahajan/Documents/BankFlow/backend)
+2026-07-28 21:36:58.462 [main] [SYSTEM] DEBUG com.bankflow.BankflowApplication - Running with Spring Boot v3.4.7, Spring v6.2.8
+2026-07-28 21:36:58.462 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 21:36:58.708 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 21:36:58.732 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 21 ms. Found 8 JPA repository interfaces.
+2026-07-28 21:36:58.900 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-28 21:36:58.903 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-28 21:36:58.904 [main] [SYSTEM] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-28 21:36:58.904 [main] [SYSTEM] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-07-28 21:36:58.920 [main] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-28 21:36:58.920 [main] [SYSTEM] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 447 ms
+2026-07-28 21:36:58.966 [main] [SYSTEM] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-28 21:36:58.983 [main] [SYSTEM] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-07-28 21:36:58.993 [main] [SYSTEM] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-28 21:36:59.070 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-07-28 21:36:59.101 [main] [SYSTEM] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@39afe59f
+2026-07-28 21:36:59.101 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-07-28 21:36:59.121 [main] [SYSTEM] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.14
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-28 21:36:59.419 [main] [SYSTEM] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 21:36:59.795 [main] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-07-28 21:36:59.795 [main] [SYSTEM] DEBUG com.bankflow.filter.LoggingFilter - Filter 'loggingFilter' configured for use
+2026-07-28 21:36:59.823 [main] [SYSTEM] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 21:37:00.182 [main] [SYSTEM] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-28 21:37:00.417 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-07-28 21:37:00.423 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-07-28 21:37:00.427 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Started BankflowApplication in 2.13 seconds (process running for 2.242)
+2026-07-28 21:41:55.536 [http-nio-8080-exec-1] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-28 21:41:55.536 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-28 21:41:55.539 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2026-07-28 21:41:55.600 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:55.611 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:55.612 [http-nio-8080-exec-1] [d5e17552] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:55.620 [http-nio-8080-exec-1] [d5e17552] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:55.624 [http-nio-8080-exec-1] [d5e17552] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:55.643 [http-nio-8080-exec-1] [d5e17552] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [31 ms]
+2026-07-28 21:41:55.653 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:55.654 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:55.655 [http-nio-8080-exec-2] [41b84ed4] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:55.655 [http-nio-8080-exec-2] [41b84ed4] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:55.656 [http-nio-8080-exec-2] [41b84ed4] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:55.657 [http-nio-8080-exec-2] [41b84ed4] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [2 ms]
+2026-07-28 21:41:56.903 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:56.907 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:56.907 [http-nio-8080-exec-3] [7d70b520] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:56.911 [http-nio-8080-exec-3] [7d70b520] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:56.915 [http-nio-8080-exec-3] [7d70b520] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:56.916 [http-nio-8080-exec-3] [7d70b520] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [9 ms]
+2026-07-28 21:41:56.919 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:56.924 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:56.925 [http-nio-8080-exec-4] [174b2332] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:56.928 [http-nio-8080-exec-4] [174b2332] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:56.931 [http-nio-8080-exec-4] [174b2332] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:56.932 [http-nio-8080-exec-4] [174b2332] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 21:41:57.442 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:57.445 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.446 [http-nio-8080-exec-5] [51346b30] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:57.455 [http-nio-8080-exec-5] [51346b30] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.458 [http-nio-8080-exec-5] [51346b30] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.460 [http-nio-8080-exec-5] [51346b30] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [14 ms]
+2026-07-28 21:41:57.463 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:57.466 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.467 [http-nio-8080-exec-6] [5c74fd42] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:57.471 [http-nio-8080-exec-6] [5c74fd42] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.475 [http-nio-8080-exec-6] [5c74fd42] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.476 [http-nio-8080-exec-6] [5c74fd42] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [9 ms]
+2026-07-28 21:41:57.674 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:57.678 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.678 [http-nio-8080-exec-7] [3e39ca76] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:57.681 [http-nio-8080-exec-7] [3e39ca76] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.683 [http-nio-8080-exec-7] [3e39ca76] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.686 [http-nio-8080-exec-7] [3e39ca76] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 21:41:57.690 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:57.694 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.695 [http-nio-8080-exec-8] [1cd8fa9c] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:57.698 [http-nio-8080-exec-8] [1cd8fa9c] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.700 [http-nio-8080-exec-8] [1cd8fa9c] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.702 [http-nio-8080-exec-8] [1cd8fa9c] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 21:41:57.860 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:57.863 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.863 [http-nio-8080-exec-9] [0317bb79] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:57.865 [http-nio-8080-exec-9] [0317bb79] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.868 [http-nio-8080-exec-9] [0317bb79] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.870 [http-nio-8080-exec-9] [0317bb79] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 21:41:57.872 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:57.876 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.876 [http-nio-8080-exec-10] [33d25821] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:57.880 [http-nio-8080-exec-10] [33d25821] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.883 [http-nio-8080-exec-10] [33d25821] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:57.885 [http-nio-8080-exec-10] [33d25821] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [9 ms]
+2026-07-28 21:41:58.057 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:58.061 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:58.061 [http-nio-8080-exec-1] [8e26208e] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:58.064 [http-nio-8080-exec-1] [8e26208e] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:58.065 [http-nio-8080-exec-1] [8e26208e] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:58.067 [http-nio-8080-exec-1] [8e26208e] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 21:41:58.069 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:41:58.073 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:58.074 [http-nio-8080-exec-2] [5a885a64] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:41:58.076 [http-nio-8080-exec-2] [5a885a64] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:58.078 [http-nio-8080-exec-2] [5a885a64] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:41:58.080 [http-nio-8080-exec-2] [5a885a64] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 21:42:06.265 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/fd/create]
+2026-07-28 21:42:06.269 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:42:06.270 [http-nio-8080-exec-3] [ebf50aa2] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/fd/create] via [POST]
+2026-07-28 21:42:06.319 [http-nio-8080-exec-3] [ebf50aa2] WARN  c.b.exception.GlobalExceptionHandler - Validation Error Handled: [sourceAccountNumber: Source account number is required, tenureYears: Tenure is required, depositAmount: Deposit amount is required]
+2026-07-28 21:42:06.323 [http-nio-8080-exec-3] [ebf50aa2] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/fd/create] Status [400] in [53 ms]
+2026-07-28 21:43:33.021 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/fd/create]
+2026-07-28 21:43:33.024 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:43:33.024 [http-nio-8080-exec-4] [6cfbd3c3] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/fd/create] via [POST]
+2026-07-28 21:43:33.028 [http-nio-8080-exec-4] [6cfbd3c3] INFO  c.b.service.FixedDepositService - Initiating FD booking for user [ghtaerpg@gmail.com] from account [BF5891164768] with deposit [Rs. 24045.93] for [3] years
+2026-07-28 21:43:33.062 [http-nio-8080-exec-4] [6cfbd3c3] INFO  c.b.service.FixedDepositService - Source account [BF5891164768] debited [Rs. 24045.93] for FD creation. Ref: [FD-DEBIT-843A86AC], New Balance: [Rs. 87452842.32]
+2026-07-28 21:43:33.065 [http-nio-8080-exec-4] [6cfbd3c3] DEBUG c.b.service.FixedDepositService - Generated unique FD number: [FD9108696614]
+2026-07-28 21:43:33.067 [http-nio-8080-exec-4] [6cfbd3c3] INFO  c.b.service.FixedDepositService - Fixed Deposit successfully booked. FD Number: [FD9108696614], User: [ghtaerpg@gmail.com], Maturity Amount: [Rs. 29611.10]
+2026-07-28 21:43:33.074 [http-nio-8080-exec-4] [6cfbd3c3] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/fd/create] Status [201] in [50 ms]
+2026-07-28 21:44:21.922 [http-nio-8080-exec-5] [d428df48] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/v3/api-docs?_=1785255261914] via [GET]
+2026-07-28 21:44:22.095 [http-nio-8080-exec-5] [d428df48] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 160 ms
+2026-07-28 21:44:22.103 [http-nio-8080-exec-5] [d428df48] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /v3/api-docs] Status [200] in [182 ms]
+2026-07-28 21:47:15.491 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:47:15.495 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:47:15.495 [http-nio-8080-exec-8] [504370eb] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:47:15.497 [http-nio-8080-exec-8] [504370eb] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:47:15.498 [http-nio-8080-exec-8] [504370eb] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:47:15.500 [http-nio-8080-exec-8] [504370eb] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 21:47:15.502 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:47:15.505 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:47:15.505 [http-nio-8080-exec-9] [2a32cfca] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:47:15.508 [http-nio-8080-exec-9] [2a32cfca] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:47:15.509 [http-nio-8080-exec-9] [2a32cfca] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:47:15.511 [http-nio-8080-exec-9] [2a32cfca] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 21:47:51.987 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/v1/fd/create]
+2026-07-28 21:47:51.993 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:47:51.993 [http-nio-8080-exec-10] [17038d4f] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/v1/fd/create] via [POST]
+2026-07-28 21:47:52.002 [http-nio-8080-exec-10] [17038d4f] ERROR c.b.exception.GlobalExceptionHandler - Unhandled Internal Server Error
+org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/v1/v1/fd/create.
+	at org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)
+	at org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.bankflow.filter.LoggingFilter.doFilterInternal(LoggingFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at com.bankflow.filter.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:84)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-07-28 21:47:52.005 [http-nio-8080-exec-10] [17038d4f] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/v1/fd/create] Status [500] in [12 ms]
+2026-07-28 21:48:16.931 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/fd/create]
+2026-07-28 21:48:16.936 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:16.937 [http-nio-8080-exec-1] [eeff617b] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/fd/create] via [POST]
+2026-07-28 21:48:16.941 [http-nio-8080-exec-1] [eeff617b] INFO  c.b.service.FixedDepositService - Initiating FD booking for user [ghtaerpg@gmail.com] from account [BF5891164768] with deposit [Rs. 12345] for [5] years
+2026-07-28 21:48:16.946 [http-nio-8080-exec-1] [eeff617b] INFO  c.b.service.FixedDepositService - Source account [BF5891164768] debited [Rs. 12345] for FD creation. Ref: [FD-DEBIT-22C3F9D7], New Balance: [Rs. 87440497.32]
+2026-07-28 21:48:16.948 [http-nio-8080-exec-1] [eeff617b] DEBUG c.b.service.FixedDepositService - Generated unique FD number: [FD5182104092]
+2026-07-28 21:48:16.951 [http-nio-8080-exec-1] [eeff617b] INFO  c.b.service.FixedDepositService - Fixed Deposit successfully booked. FD Number: [FD5182104092], User: [ghtaerpg@gmail.com], Maturity Amount: [Rs. 17899.61]
+2026-07-28 21:48:16.958 [http-nio-8080-exec-1] [eeff617b] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/fd/create] Status [201] in [21 ms]
+2026-07-28 21:48:18.173 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:48:18.177 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:18.178 [http-nio-8080-exec-2] [3cd380b5] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:48:18.179 [http-nio-8080-exec-2] [3cd380b5] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:18.181 [http-nio-8080-exec-2] [3cd380b5] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:18.183 [http-nio-8080-exec-2] [3cd380b5] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 21:48:18.187 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:48:18.190 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:18.191 [http-nio-8080-exec-3] [79dc35f5] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:48:18.192 [http-nio-8080-exec-3] [79dc35f5] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:18.194 [http-nio-8080-exec-3] [79dc35f5] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:18.196 [http-nio-8080-exec-3] [79dc35f5] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 21:48:27.832 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:48:27.837 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:27.838 [http-nio-8080-exec-4] [d81a7dab] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:48:27.841 [http-nio-8080-exec-4] [d81a7dab] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:27.843 [http-nio-8080-exec-4] [d81a7dab] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:27.845 [http-nio-8080-exec-4] [d81a7dab] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 21:48:27.850 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:48:27.852 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:27.853 [http-nio-8080-exec-5] [5a8896ad] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:48:27.855 [http-nio-8080-exec-5] [5a8896ad] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:27.856 [http-nio-8080-exec-5] [5a8896ad] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:48:27.857 [http-nio-8080-exec-5] [5a8896ad] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [4 ms]
+2026-07-28 21:51:29.334 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/transfers]
+2026-07-28 21:51:29.338 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:51:29.338 [http-nio-8080-exec-6] [3c01b933] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/transfers] via [POST]
+2026-07-28 21:51:29.346 [http-nio-8080-exec-6] [3c01b933] INFO  c.b.service.FundTransferService - Initiating fund transfer request by user [ghtaerpg@gmail.com] from account [BF5891164768] to target [BF8490652259] for amount [Rs. 32]
+2026-07-28 21:51:29.351 [http-nio-8080-exec-6] [3c01b933] INFO  c.b.service.FundTransferService - Fund transfer successful. Ref: [TRF-DF75B4C8], Source New Balance: [Rs. 87440465.32], Target New Balance: [Rs. 5125.00]
+2026-07-28 21:51:29.354 [http-nio-8080-exec-6] [3c01b933] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/transfers] Status [200] in [16 ms]
+2026-07-28 21:51:30.181 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/transfers]
+2026-07-28 21:51:30.184 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:51:30.184 [http-nio-8080-exec-7] [8e4f0f02] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/transfers] via [POST]
+2026-07-28 21:51:30.187 [http-nio-8080-exec-7] [8e4f0f02] INFO  c.b.service.FundTransferService - Initiating fund transfer request by user [ghtaerpg@gmail.com] from account [BF5891164768] to target [BF8490652259] for amount [Rs. 32]
+2026-07-28 21:51:30.194 [http-nio-8080-exec-7] [8e4f0f02] INFO  c.b.service.FundTransferService - Fund transfer successful. Ref: [TRF-6BEDBBB9], Source New Balance: [Rs. 87440433.32], Target New Balance: [Rs. 5157.00]
+2026-07-28 21:51:30.196 [http-nio-8080-exec-7] [8e4f0f02] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/transfers] Status [200] in [12 ms]
+2026-07-28 21:52:20.786 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:52:20.788 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:52:20.788 [http-nio-8080-exec-8] [ad75ddfc] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:52:20.791 [http-nio-8080-exec-8] [ad75ddfc] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:52:20.792 [http-nio-8080-exec-8] [ad75ddfc] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:52:20.793 [http-nio-8080-exec-8] [ad75ddfc] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 21:52:20.800 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:52:20.802 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:52:20.802 [http-nio-8080-exec-9] [5294ee5b] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:52:20.803 [http-nio-8080-exec-9] [5294ee5b] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:52:20.805 [http-nio-8080-exec-9] [5294ee5b] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:52:20.806 [http-nio-8080-exec-9] [5294ee5b] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [4 ms]
+2026-07-28 21:54:21.904 [http-nio-8080-exec-2] [6a284170] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/v3/api-docs?_=1785255861897] via [GET]
+2026-07-28 21:54:21.915 [http-nio-8080-exec-2] [6a284170] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /v3/api-docs] Status [200] in [11 ms]
+2026-07-28 21:54:59.600 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:54:59.606 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:54:59.606 [http-nio-8080-exec-3] [1e58b357] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:54:59.608 [http-nio-8080-exec-3] [1e58b357] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:54:59.611 [http-nio-8080-exec-3] [1e58b357] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:54:59.613 [http-nio-8080-exec-3] [1e58b357] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 21:54:59.616 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:54:59.618 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:54:59.619 [http-nio-8080-exec-4] [8e32ca9d] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:54:59.621 [http-nio-8080-exec-4] [8e32ca9d] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:54:59.623 [http-nio-8080-exec-4] [8e32ca9d] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:54:59.624 [http-nio-8080-exec-4] [8e32ca9d] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 21:55:45.664 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/transfers]
+2026-07-28 21:55:45.669 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:55:45.670 [http-nio-8080-exec-6] [e5daaf61] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/transfers] via [POST]
+2026-07-28 21:55:45.674 [http-nio-8080-exec-6] [e5daaf61] INFO  c.b.service.FundTransferService - Initiating fund transfer request by user [ghtaerpg@gmail.com] from account [BF2735113476] to target [BF9231590130] for amount [Rs. 2506]
+2026-07-28 21:55:45.680 [http-nio-8080-exec-6] [e5daaf61] INFO  c.b.service.FundTransferService - Fund transfer successful. Ref: [TRF-065DC28C], Source New Balance: [Rs. 27492.60], Target New Balance: [Rs. 62506.00]
+2026-07-28 21:55:45.686 [http-nio-8080-exec-6] [e5daaf61] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/transfers] Status [200] in [16 ms]
+2026-07-28 21:55:45.691 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:55:45.694 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:55:45.695 [http-nio-8080-exec-7] [1849617b] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:55:45.697 [http-nio-8080-exec-7] [1849617b] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:55:45.699 [http-nio-8080-exec-7] [1849617b] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:55:45.703 [http-nio-8080-exec-7] [1849617b] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 21:56:14.700 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 21:56:14.705 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:56:14.705 [http-nio-8080-exec-8] [79a91a2f] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 21:56:14.710 [http-nio-8080-exec-8] [79a91a2f] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:56:14.714 [http-nio-8080-exec-8] [79a91a2f] DEBUG com.bankflow.service.AccountService - Retrieved [5] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 21:56:14.716 [http-nio-8080-exec-8] [79a91a2f] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [11 ms]
+2026-07-28 21:56:29.152 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/create]
+2026-07-28 21:56:29.155 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 21:56:29.156 [http-nio-8080-exec-9] [48568884] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/create] via [POST]
+2026-07-28 21:56:29.157 [http-nio-8080-exec-9] [48568884] ERROR c.b.exception.GlobalExceptionHandler - Unhandled Internal Server Error
+org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'POST' is not supported
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.handleNoMatch(RequestMappingInfoHandlerMapping.java:267)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lookupHandlerMethod(AbstractHandlerMethodMapping.java:441)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.getHandlerInternal(AbstractHandlerMethodMapping.java:382)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:127)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:68)
+	at org.springframework.web.servlet.handler.AbstractHandlerMapping.getHandler(AbstractHandlerMapping.java:509)
+	at org.springframework.web.servlet.DispatcherServlet.getHandler(DispatcherServlet.java:1284)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1065)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.bankflow.filter.LoggingFilter.doFilterInternal(LoggingFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at com.bankflow.filter.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:84)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-07-28 21:56:29.158 [http-nio-8080-exec-9] [48568884] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/accounts/create] Status [500] in [2 ms]
+2026-07-28 21:59:29.089 [SpringApplicationShutdownHook] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-28 21:59:29.093 [tomcat-shutdown] [SYSTEM] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-07-28 21:59:29.098 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-07-28 21:59:29.098 [SpringApplicationShutdownHook] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-07-28 21:59:30.363 [background-preinit] [SYSTEM] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2026-07-28 21:59:30.380 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Starting BankflowApplication using Java 21.0.12 with PID 17733 (/Users/chaitanyamahajan/Documents/BankFlow/backend/target/classes started by chaitanyamahajan in /Users/chaitanyamahajan/Documents/BankFlow/backend)
+2026-07-28 21:59:30.381 [main] [SYSTEM] DEBUG com.bankflow.BankflowApplication - Running with Spring Boot v3.4.7, Spring v6.2.8
+2026-07-28 21:59:30.381 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 21:59:30.639 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 21:59:30.663 [main] [SYSTEM] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 20 ms. Found 8 JPA repository interfaces.
+2026-07-28 21:59:30.827 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-28 21:59:30.831 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-28 21:59:30.831 [main] [SYSTEM] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-28 21:59:30.831 [main] [SYSTEM] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-07-28 21:59:30.846 [main] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-28 21:59:30.846 [main] [SYSTEM] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 454 ms
+2026-07-28 21:59:30.892 [main] [SYSTEM] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-28 21:59:30.911 [main] [SYSTEM] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-07-28 21:59:30.921 [main] [SYSTEM] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-28 21:59:30.996 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-07-28 21:59:31.025 [main] [SYSTEM] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4fafd27e
+2026-07-28 21:59:31.026 [main] [SYSTEM] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-07-28 21:59:31.046 [main] [SYSTEM] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.14
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-28 21:59:31.342 [main] [SYSTEM] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 21:59:31.667 [main] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2026-07-28 21:59:31.667 [main] [SYSTEM] DEBUG com.bankflow.filter.LoggingFilter - Filter 'loggingFilter' configured for use
+2026-07-28 21:59:31.693 [main] [SYSTEM] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 21:59:32.058 [main] [SYSTEM] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-28 21:59:32.316 [main] [SYSTEM] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-07-28 21:59:32.323 [main] [SYSTEM] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-07-28 21:59:32.326 [main] [SYSTEM] INFO  com.bankflow.BankflowApplication - Started BankflowApplication in 2.12 seconds (process running for 2.228)
+2026-07-28 22:00:15.269 [http-nio-8080-exec-1] [SYSTEM] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-28 22:00:15.269 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-28 22:00:15.270 [http-nio-8080-exec-1] [SYSTEM] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-07-28 22:00:15.323 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/create]
+2026-07-28 22:00:15.331 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:00:15.332 [http-nio-8080-exec-1] [e843206b] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/create] via [POST]
+2026-07-28 22:00:15.365 [http-nio-8080-exec-1] [e843206b] INFO  com.bankflow.service.AccountService - Initiating account creation for user [ghtaerpg@gmail.com] of type [SAVINGS] in branch [Magarpatta, Pune]
+2026-07-28 22:00:15.371 [http-nio-8080-exec-1] [e843206b] DEBUG com.bankflow.service.AccountService - Generated unique account number: [BF4208726085]
+2026-07-28 22:00:15.380 [http-nio-8080-exec-1] [e843206b] INFO  com.bankflow.service.AccountService - Account successfully created. Number: [BF4208726085], ID: [11], Initial Balance: [Rs. 40000000]
+2026-07-28 22:00:15.382 [http-nio-8080-exec-1] [e843206b] INFO  com.bankflow.service.AccountService - Initial deposit transaction created with Ref: [DEP-66919595] for Account [BF4208726085]
+2026-07-28 22:00:15.393 [http-nio-8080-exec-1] [e843206b] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/accounts/create] Status [201] in [61 ms]
+2026-07-28 22:00:54.695 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/create]
+2026-07-28 22:00:54.699 [http-nio-8080-exec-2] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:00:54.699 [http-nio-8080-exec-2] [fa30e5a5] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/create] via [POST]
+2026-07-28 22:00:54.705 [http-nio-8080-exec-2] [fa30e5a5] WARN  c.b.exception.GlobalExceptionHandler - Validation Error Handled: [branchName: Branch name is required]
+2026-07-28 22:00:54.714 [http-nio-8080-exec-2] [fa30e5a5] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/accounts/create] Status [400] in [15 ms]
+2026-07-28 22:04:04.750 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/create]
+2026-07-28 22:04:04.760 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:04.761 [http-nio-8080-exec-4] [2698e6da] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/create] via [POST]
+2026-07-28 22:04:04.766 [http-nio-8080-exec-4] [2698e6da] INFO  com.bankflow.service.AccountService - Initiating account creation for user [ghtaerpg@gmail.com] of type [SAVINGS] in branch [Kathe Galli Nashik]
+2026-07-28 22:04:04.767 [http-nio-8080-exec-4] [2698e6da] DEBUG com.bankflow.service.AccountService - Generated unique account number: [BF4142874476]
+2026-07-28 22:04:04.769 [http-nio-8080-exec-4] [2698e6da] INFO  com.bankflow.service.AccountService - Account successfully created. Number: [BF4142874476], ID: [12], Initial Balance: [Rs. 2346246]
+2026-07-28 22:04:04.771 [http-nio-8080-exec-4] [2698e6da] INFO  com.bankflow.service.AccountService - Initial deposit transaction created with Ref: [DEP-CEF035C0] for Account [BF4142874476]
+2026-07-28 22:04:04.773 [http-nio-8080-exec-4] [2698e6da] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/accounts/create] Status [201] in [12 ms]
+2026-07-28 22:04:04.785 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:04:04.791 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:04.792 [http-nio-8080-exec-5] [93d0589e] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:04:04.797 [http-nio-8080-exec-5] [93d0589e] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:04.807 [http-nio-8080-exec-5] [93d0589e] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:04.813 [http-nio-8080-exec-5] [93d0589e] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [21 ms]
+2026-07-28 22:04:04.817 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:04:04.821 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:04.821 [http-nio-8080-exec-6] [128df3d6] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:04:04.823 [http-nio-8080-exec-6] [128df3d6] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:04.825 [http-nio-8080-exec-6] [128df3d6] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:04.827 [http-nio-8080-exec-6] [128df3d6] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 22:04:14.242 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:04:14.247 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:14.247 [http-nio-8080-exec-7] [e0051959] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:04:14.250 [http-nio-8080-exec-7] [e0051959] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:14.253 [http-nio-8080-exec-7] [e0051959] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:14.255 [http-nio-8080-exec-7] [e0051959] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 22:04:14.259 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:04:14.262 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:14.263 [http-nio-8080-exec-8] [6fa1e3de] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:04:14.265 [http-nio-8080-exec-8] [6fa1e3de] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:14.267 [http-nio-8080-exec-8] [6fa1e3de] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:04:14.268 [http-nio-8080-exec-8] [6fa1e3de] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 22:04:21.909 [http-nio-8080-exec-9] [a6a96234] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/v3/api-docs?_=1785256461897] via [GET]
+2026-07-28 22:04:22.112 [http-nio-8080-exec-9] [a6a96234] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 187 ms
+2026-07-28 22:04:22.120 [http-nio-8080-exec-9] [a6a96234] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /v3/api-docs] Status [200] in [211 ms]
+2026-07-28 22:05:09.949 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:05:09.955 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:05:09.955 [http-nio-8080-exec-10] [088afb5e] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:05:09.958 [http-nio-8080-exec-10] [088afb5e] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:05:09.961 [http-nio-8080-exec-10] [088afb5e] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:05:09.963 [http-nio-8080-exec-10] [088afb5e] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 22:05:10.578 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:05:10.581 [http-nio-8080-exec-1] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:05:10.582 [http-nio-8080-exec-1] [eb42c841] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:05:10.584 [http-nio-8080-exec-1] [eb42c841] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:05:10.586 [http-nio-8080-exec-1] [eb42c841] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:05:10.587 [http-nio-8080-exec-1] [eb42c841] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [5 ms]
+2026-07-28 22:07:02.427 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:07:02.430 [http-nio-8080-exec-3] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:02.430 [http-nio-8080-exec-3] [245ca581] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:07:02.433 [http-nio-8080-exec-3] [245ca581] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:02.436 [http-nio-8080-exec-3] [245ca581] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:02.437 [http-nio-8080-exec-3] [245ca581] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [7 ms]
+2026-07-28 22:07:02.440 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:07:02.444 [http-nio-8080-exec-4] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:02.444 [http-nio-8080-exec-4] [4247b60a] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:07:02.447 [http-nio-8080-exec-4] [4247b60a] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:02.450 [http-nio-8080-exec-4] [4247b60a] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:02.452 [http-nio-8080-exec-4] [4247b60a] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 22:07:21.040 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/v1/fd/create]
+2026-07-28 22:07:21.044 [http-nio-8080-exec-5] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:21.044 [http-nio-8080-exec-5] [0ec0006f] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/v1/fd/create] via [POST]
+2026-07-28 22:07:21.053 [http-nio-8080-exec-5] [0ec0006f] ERROR c.b.exception.GlobalExceptionHandler - Unhandled Internal Server Error
+org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/v1/v1/fd/create.
+	at org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)
+	at org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.bankflow.filter.LoggingFilter.doFilterInternal(LoggingFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at com.bankflow.filter.JwtAuthenticationFilter.doFilterInternal(JwtAuthenticationFilter.java:84)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1769)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-07-28 22:07:21.056 [http-nio-8080-exec-5] [0ec0006f] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/v1/fd/create] Status [500] in [12 ms]
+2026-07-28 22:07:40.220 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/fd/create]
+2026-07-28 22:07:40.227 [http-nio-8080-exec-6] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:40.228 [http-nio-8080-exec-6] [1f413e7c] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/fd/create] via [POST]
+2026-07-28 22:07:40.239 [http-nio-8080-exec-6] [1f413e7c] INFO  c.b.service.FixedDepositService - Initiating FD booking for user [ghtaerpg@gmail.com] from account [BF5891164768] with deposit [Rs. 10000] for [3] years
+2026-07-28 22:07:40.245 [http-nio-8080-exec-6] [1f413e7c] INFO  c.b.service.FixedDepositService - Source account [BF5891164768] debited [Rs. 10000] for FD creation. Ref: [FD-DEBIT-52CCF527], New Balance: [Rs. 87430433.32]
+2026-07-28 22:07:40.253 [http-nio-8080-exec-6] [1f413e7c] DEBUG c.b.service.FixedDepositService - Generated unique FD number: [FD4636145359]
+2026-07-28 22:07:40.256 [http-nio-8080-exec-6] [1f413e7c] INFO  c.b.service.FixedDepositService - Fixed Deposit successfully booked. FD Number: [FD4636145359], User: [ghtaerpg@gmail.com], Maturity Amount: [Rs. 12314.39]
+2026-07-28 22:07:40.264 [http-nio-8080-exec-6] [1f413e7c] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [POST /api/v1/fd/create] Status [201] in [36 ms]
+2026-07-28 22:07:41.480 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:07:41.485 [http-nio-8080-exec-7] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:41.485 [http-nio-8080-exec-7] [e1bd4315] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:07:41.489 [http-nio-8080-exec-7] [e1bd4315] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:41.493 [http-nio-8080-exec-7] [e1bd4315] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:41.496 [http-nio-8080-exec-7] [e1bd4315] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [11 ms]
+2026-07-28 22:07:41.499 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:07:41.504 [http-nio-8080-exec-8] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:41.504 [http-nio-8080-exec-8] [6d947af0] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:07:41.506 [http-nio-8080-exec-8] [6d947af0] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:41.509 [http-nio-8080-exec-8] [6d947af0] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:41.510 [http-nio-8080-exec-8] [6d947af0] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]
+2026-07-28 22:07:58.505 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:07:58.509 [http-nio-8080-exec-9] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:58.510 [http-nio-8080-exec-9] [9734c7f5] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:07:58.512 [http-nio-8080-exec-9] [9734c7f5] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:58.516 [http-nio-8080-exec-9] [9734c7f5] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:58.518 [http-nio-8080-exec-9] [9734c7f5] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [8 ms]
+2026-07-28 22:07:58.523 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - Authenticating request for user [ghtaerpg@gmail.com] at URI [/api/v1/accounts/my-accounts]
+2026-07-28 22:07:58.526 [http-nio-8080-exec-10] [SYSTEM] DEBUG c.b.filter.JwtAuthenticationFilter - SecurityContext successfully populated with authority [ROLE_CUSTOMER] for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:58.526 [http-nio-8080-exec-10] [7b82e355] INFO  com.bankflow.filter.LoggingFilter - HTTP Request Started: [/api/v1/accounts/my-accounts] via [GET]
+2026-07-28 22:07:58.528 [http-nio-8080-exec-10] [7b82e355] DEBUG com.bankflow.service.AccountService - Fetching all accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:58.530 [http-nio-8080-exec-10] [7b82e355] DEBUG com.bankflow.service.AccountService - Retrieved [7] accounts for user [ghtaerpg@gmail.com]
+2026-07-28 22:07:58.532 [http-nio-8080-exec-10] [7b82e355] INFO  com.bankflow.filter.LoggingFilter - HTTP Response Completed: [GET /api/v1/accounts/my-accounts] Status [200] in [6 ms]

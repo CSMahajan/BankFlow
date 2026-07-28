@@ -21,7 +21,7 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/accounts")
+    @PostMapping("/accounts/create")
     @ResponseStatus(HttpStatus.CREATED)
     public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest request) {
         return accountService.createAccount(request);

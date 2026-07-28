@@ -22,7 +22,7 @@ public class FixedDepositController {
         return ResponseEntity.ok(fdService.calculateMaturity(request));
     }
 
-    @PostMapping
+    @PostMapping("create")
     @ResponseStatus(HttpStatus.CREATED)
     public FdResponse createFixedDeposit(@Valid @RequestBody CreateFdRequest request) {
         return fdService.createFixedDeposit(request);

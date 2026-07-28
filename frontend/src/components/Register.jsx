@@ -1,55 +1,57 @@
 import React, { useState } from 'react';
 import API from '../api/axios';
 
-const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
-  const [role, setRole] = useState('CUSTOMER'); // Visual tab state ('CUSTOMER' or 'ADMIN')
+const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
+  const [role, setRole] = useState('CUSTOMER'); // 'CUSTOMER' or 'ADMIN'
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [adminToken, setAdminToken] = useState(''); // Required for admin creation
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccessMsg(null);
 
     try {
-      // Both Customer and Admin use the exact same login endpoint
-      const response = await API.post('/auth/login', {
-        email: email,
-        password: password,
-      });
-
-      const data = response.data;
-
-      const token =
-        data.token ||
-        data.accessToken ||
-        data.jwt;
-
-      const userRole =
-        data.role ||
-        data.userRole ||
-        role;
-
-      const fullName =
-        data.fullName ||
-        data.name ||
-        data.username ||
-        '';
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('userRole', userRole);
-
-      if (fullName) {
-        localStorage.setItem('fullName', fullName);
+      if (role === 'CUSTOMER') {
+        // Customer Register Endpoint
+        await API.post('/auth/register', {
+          email,
+          fullName,
+          password,
+        });
+      } else {
+        // Admin Register Endpoint (requires Super Admin Bearer token)
+        await API.post(
+          '/admin/users/create-admin',
+          {
+            email,
+            fullName,
+            password,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${adminToken.trim()}`,
+            },
+          }
+        );
       }
 
-      onLoginSuccess();
+      setLoading(false);
+      setSuccessMsg('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        onRegisterSuccess();
+      }, 1500);
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('Registration error:', err);
       setError(
-        err.response?.data?.message || 'Invalid email or password. Please try again.'
+        err.response?.data?.message ||
+          'Failed to register. Please check your inputs or authorization token.'
       );
       setLoading(false);
     }
@@ -60,7 +62,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
       <div style={styles.card}>
         <div style={styles.header}>
           <h2 style={styles.brand}>🏦 BankFlow</h2>
-          <p style={styles.subtitle}>Sign in to your account</p>
+          <p style={styles.subtitle}>Create a new account</p>
         </div>
 
         {/* Role Selection Tabs */}
@@ -74,7 +76,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
             }}
             onClick={() => setRole('CUSTOMER')}
           >
-            👤 Customer Login
+            👤 Customer Register
           </button>
           <button
             type="button"
@@ -85,13 +87,26 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
             }}
             onClick={() => setRole('ADMIN')}
           >
-            🛡️ Admin Login
+            🛡️ Admin Register
           </button>
         </div>
 
         {error && <div style={styles.errorBox}>⚠️ {error}</div>}
+        {successMsg && <div style={styles.successBox}>✅ {successMsg}</div>}
 
-        <form onSubmit={handleLogin} style={styles.form}>
+        <form onSubmit={handleRegister} style={styles.form}>
+          <div style={styles.field}>
+            <label style={styles.label}>Full Name</label>
+            <input
+              type="text"
+              placeholder="e.g. Firstname Lastname"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              style={styles.input}
+            />
+          </div>
+
           <div style={styles.field}>
             <label style={styles.label}>Email Address</label>
             <input
@@ -116,16 +131,32 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
             />
           </div>
 
+          {/* Super Admin Token Field (Only shown for Admin Registration) */}
+          {role === 'ADMIN' && (
+            <div style={styles.field}>
+              <label style={styles.label}>Super Admin Bearer Token</label>
+              <textarea
+                placeholder="Paste Super Admin token here..."
+                value={adminToken}
+                onChange={(e) => setAdminToken(e.target.value)}
+                required
+                rows={3}
+                style={{ ...styles.input, resize: 'vertical', fontFamily: 'monospace', fontSize: '12px' }}
+              />
+              <span style={styles.helperText}>Required to authorize new admin creation.</span>
+            </div>
+          )}
+
           <button type="submit" disabled={loading} style={styles.submitBtn}>
-            {loading ? 'Signing in...' : `Sign In as ${role === 'ADMIN' ? 'Admin' : 'Customer'}`}
+            {loading ? 'Creating Account...' : `Register as ${role === 'ADMIN' ? 'Admin' : 'Customer'}`}
           </button>
         </form>
 
-        {/* Register Prompt */}
+        {/* Login Prompt */}
         <div style={styles.footerPrompt}>
-          <span>Don't have an account?</span>
-          <button type="button" onClick={onSwitchToRegister} style={styles.linkBtn}>
-            Register here
+          <span>Already have an account?</span>
+          <button type="button" onClick={onSwitchToLogin} style={styles.linkBtn}>
+            Sign in here
           </button>
         </div>
       </div>
@@ -135,7 +166,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
 
 const styles = {
   container: { display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f9fafb', padding: '16px' },
-  card: { backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '420px', border: '1px solid #eef0ec', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' },
+  card: { backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '440px', border: '1px solid #eef0ec', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' },
   header: { textAlign: 'center', marginBottom: '24px' },
   brand: { fontSize: '24px', fontWeight: '800', fontFamily: 'Georgia, serif', color: '#0d6360', margin: '0 0 6px 0' },
   subtitle: { fontSize: '14px', color: '#6b7280', margin: 0 },
@@ -145,10 +176,12 @@ const styles = {
   field: { display: 'flex', flexDirection: 'column', gap: '6px' },
   label: { fontSize: '13px', fontWeight: '700', color: '#374151' },
   input: { padding: '11px 14px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', outline: 'none' },
+  helperText: { fontSize: '11px', color: '#6b7280' },
   submitBtn: { backgroundColor: '#0d6360', color: '#ffffff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: '700', fontSize: '14px', cursor: 'pointer', marginTop: '4px' },
   errorBox: { backgroundColor: '#fee2e2', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' },
+  successBox: { backgroundColor: '#dcfce7', color: '#15803d', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' },
   footerPrompt: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', marginTop: '20px', fontSize: '13px', color: '#6b7280' },
   linkBtn: { background: 'none', border: 'none', color: '#0d6360', fontWeight: '700', cursor: 'pointer', padding: 0, fontSize: '13px' },
 };
 
-export default Login;
+export default Register;

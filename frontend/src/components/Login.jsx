@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import API from '../api/axios';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
   const [role, setRole] = useState('CUSTOMER'); // Visual tab state ('CUSTOMER' or 'ADMIN')
@@ -7,7 +8,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -106,14 +107,53 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
 
           <div style={styles.field}>
             <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={styles.input}
-            />
+
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            >
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  ...styles.input,
+                  width: "100%",
+                  paddingRight: "48px",
+                  boxSizing: "border-box",
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "14px",
+                  transform: "translateY(-50%)",
+                  border: "none",
+                  background: "transparent",
+                  padding: 0,
+                  margin: 0,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#6b7280",
+                }}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon style={{ width: 22, height: 22 }} />
+                ) : (
+                  <EyeIcon style={{ width: 22, height: 22 }} />
+                )}
+              </button>
+            </div>
           </div>
 
           <button type="submit" disabled={loading} style={styles.submitBtn}>

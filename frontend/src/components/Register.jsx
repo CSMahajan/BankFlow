@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import API from '../api/axios';
+import { Eye, EyeOff } from "lucide-react";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
   const [role, setRole] = useState('CUSTOMER'); // 'CUSTOMER' or 'ADMIN'
@@ -10,6 +12,8 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showAdminToken, setShowAdminToken] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -51,7 +55,7 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
       console.error('Registration error:', err);
       setError(
         err.response?.data?.message ||
-          'Failed to register. Please check your inputs or authorization token.'
+        'Failed to register. Please check your inputs or authorization token.'
       );
       setLoading(false);
     }
@@ -121,29 +125,106 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
 
           <div style={styles.field}>
             <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={styles.input}
-            />
+
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            >
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  ...styles.input,
+                  width: "100%",
+                  paddingRight: "48px",
+                  boxSizing: "border-box",
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "14px",
+                  transform: "translateY(-50%)",
+                  border: "none",
+                  background: "transparent",
+                  padding: 0,
+                  margin: 0,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#6b7280",
+                }}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon style={{ width: 22, height: 22 }} />
+                ) : (
+                  <EyeIcon style={{ width: 22, height: 22 }} />
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Super Admin Token Field (Only shown for Admin Registration) */}
           {role === 'ADMIN' && (
             <div style={styles.field}>
-              <label style={styles.label}>Super Admin Bearer Token</label>
-              <textarea
-                placeholder="Paste Super Admin token here..."
-                value={adminToken}
-                onChange={(e) => setAdminToken(e.target.value)}
-                required
-                rows={3}
-                style={{ ...styles.input, resize: 'vertical', fontFamily: 'monospace', fontSize: '12px' }}
-              />
-              <span style={styles.helperText}>Required to authorize new admin creation.</span>
+              <label style={styles.label}>Password</label>
+
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                }}
+              >
+                <input
+                  type={showAdminToken ? "text" : "password"}
+                  placeholder="super-admin-token"
+                  value={adminToken}
+                  onChange={(e) => setAdminToken(e.target.value)}
+                  required
+                  style={{
+                    ...styles.input,
+                    width: "100%",
+                    paddingRight: "48px",
+                    boxSizing: "border-box",
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowAdminToken(!showAdminToken)}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    right: "14px",
+                    transform: "translateY(-50%)",
+                    border: "none",
+                    background: "transparent",
+                    padding: 0,
+                    margin: 0,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#6b7280",
+                  }}
+                >
+                  {showAdminToken ? (
+                    <EyeSlashIcon style={{ width: 22, height: 22 }} />
+                  ) : (
+                    <EyeIcon style={{ width: 22, height: 22 }} />
+                  )}
+                </button>
+              </div>
             </div>
           )}
 

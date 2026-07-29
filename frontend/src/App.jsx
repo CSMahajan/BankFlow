@@ -21,10 +21,15 @@ function App() {
   }, [token, userRole, userName]);
 
   const handleLoginSuccess = () => {
-    setToken(localStorage.getItem('token'));
-    setUserRole(localStorage.getItem('userRole') || 'CUSTOMER');
-    setUserName(localStorage.getItem('fullName') || '');
+    const storedToken = localStorage.getItem('token');
+    const storedRole = localStorage.getItem('userRole') || 'CUSTOMER';
+    const storedName = localStorage.getItem('fullName') || '';
+
+    setToken(storedToken);
+    setUserRole(storedRole);
+    setUserName(storedName);
   };
+
 
   const handleLogout = () => {
     localStorage.clear();

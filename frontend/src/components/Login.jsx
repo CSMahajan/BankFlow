@@ -3,49 +3,54 @@ import API from '../api/axios';
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
-  const [role, setRole] = useState('CUSTOMER'); // Visual tab state ('CUSTOMER' or 'ADMIN')
+  const [role, setRole] = useState('CUSTOMER');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Both Customer and Admin use the exact same login endpoint
       const response = await API.post('/auth/login', {
         email: email,
         password: password,
       });
 
       const data = response.data;
+      const token = data.token || data.accessToken || data.jwt;
+      const userRole = data.role || data.userRole || role;
 
-      const token =
-        data.token ||
-        data.accessToken ||
-        data.jwt;
+      // 1. Check if backend sent name directly
+      let userFullName = data.fullName || data.name || data.username;
 
-      const userRole =
-        data.role ||
-        data.userRole ||
-        role;
+      // 2. If missing, format email intelligently
+      if (!userFullName && (data.email || email)) {
+        const emailStr = data.email || email;
+        const handle = emailStr.split('@')[0]; // e.g. "john.doe" or "adminfirstlastname"
 
-      const fullName =
-        data.fullName ||
-        data.name ||
-        data.username ||
-        '';
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('userRole', userRole);
-
-      if (fullName) {
-        localStorage.setItem('fullName', fullName);
+        if (handle.includes('.')) {
+          // If format is "first.last@gmail.com"
+          userFullName = handle
+            .split('.')
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' '); // Output: "John Doe"
+        } else {
+          // Format "adminfirstlastname" -> "Adminfirstlastname"
+          userFullName = handle.charAt(0).toUpperCase() + handle.slice(1);
+        }
       }
 
+      // 3. Save to localStorage immediately
+      localStorage.setItem('token', token);
+      localStorage.setItem('userRole', userRole);
+      localStorage.setItem('fullName', userFullName);
+
+      // 4. Trigger parent state update
       onLoginSuccess();
     } catch (err) {
       console.error('Login error:', err);
@@ -55,6 +60,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
       setLoading(false);
     }
   };
+
 
   return (
     <div style={styles.container}>
@@ -108,12 +114,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
           <div style={styles.field}>
             <label style={styles.label}>Password</label>
 
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-              }}
-            >
+            <div style={{ position: "relative", width: "100%" }}>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
@@ -161,7 +162,6 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
           </button>
         </form>
 
-        {/* Register Prompt */}
         <div style={styles.footerPrompt}>
           <span>Don't have an account?</span>
           <button type="button" onClick={onSwitchToRegister} style={styles.linkBtn}>

@@ -1,14 +1,14 @@
 package com.bankflow.service;
 
-import com.bankflow.dto.AuthResponse;
-import com.bankflow.dto.CreateAdminRequest;
-import com.bankflow.dto.LoginRequest;
-import com.bankflow.dto.RegisterRequest;
+import com.bankflow.dto.*;
 import com.bankflow.entity.User;
+import com.bankflow.exception.ResourceNotFoundException;
 import com.bankflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +67,7 @@ public class UserService {
         log.info("User [{}] authenticated successfully with role [{}]", user.getEmail(), user.getRole());
 
         // 4. Return token and user metadata
-        return new AuthResponse(token, user.getEmail(), user.getRole().name());
+        return new AuthResponse(token, user.getEmail(), user.getRole().name(), user.getFullName());
     }
 
     @Transactional
@@ -90,5 +90,43 @@ public class UserService {
 
         User savedAdmin = userRepository.save(adminUser);
         log.info("ADMIN account created successfully. User ID: [{}], Email: [{}]", savedAdmin.getId(), savedAdmin.getEmail());
+    }
+
+    @Transactional
+    public void updateCustomerProfile(UpdateProfileRequest request) {
+        User currentUser = getAuthenticatedUser();
+        log.info("Updating profile details for user [{}]. New Name: [{}]", currentUser.getEmail(), request.fullName());
+
+        currentUser.setFullName(request.fullName());
+        userRepository.save(currentUser);
+
+        log.info("Profile updated successfully for user [{}]", currentUser.getEmail());
+    }
+
+    @Transactional(readOnly = true)
+    public UserMeResponse getCurrentUser(String email) {
+        log.info("Fetching profile for email [{}]", email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("Profile fetch failed: No user found for email [{}]", email);
+                    return new ResourceNotFoundException("User not found for email: " + email);
+                });
+
+        return new UserMeResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getRole().name()
+        );
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> {
+                    log.error("Authentication Context Error: User [{}] not found in database", auth.getName());
+                    return new IllegalArgumentException("Authenticated user not found");
+                });
     }
 }

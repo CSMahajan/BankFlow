@@ -133,17 +133,6 @@ public class AccountService {
         );
     }
 
-    @Transactional
-    public void updateCustomerProfile(UpdateProfileRequest request) {
-        User currentUser = getAuthenticatedUser();
-        log.info("Updating profile details for user [{}]. New Name: [{}]", currentUser.getEmail(), request.fullName());
-
-        currentUser.setFullName(request.fullName());
-        userRepository.save(currentUser);
-
-        log.info("Profile updated successfully for user [{}]", currentUser.getEmail());
-    }
-
     @Transactional(readOnly = true)
     public List<AccountResponse> getAllAccountsForAdmin() {
         User currentUser = getAuthenticatedUser();

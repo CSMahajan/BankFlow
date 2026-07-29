@@ -1,11 +1,9 @@
 package com.bankflow.service;
 
-import com.bankflow.dto.AuthResponse;
-import com.bankflow.dto.CreateAdminRequest;
-import com.bankflow.dto.LoginRequest;
-import com.bankflow.dto.RegisterRequest;
+import com.bankflow.dto.*;
 import com.bankflow.entity.User;
 import com.bankflow.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -38,6 +39,18 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @AfterEach
+    void tearDown() {
+        // Clear context after each test to avoid polluting other tests
+        SecurityContextHolder.clearContext();
+    }
+
     private User mockUser;
     private User mockAdminUser;
 
@@ -59,6 +72,15 @@ class UserServiceTest {
                 .role(User.Role.ADMIN)
                 .build();
     }
+
+    private void mockAuthenticatedUser(User user) {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(authentication.getName()).thenReturn(user.getEmail());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+    }
+
 
     // ==========================================
     // REGISTER CUSTOMER TESTS
@@ -94,6 +116,18 @@ class UserServiceTest {
         assertEquals("Email is already registered", ex.getMessage());
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Update Customer Profile Success")
+    void updateCustomerProfile_Success() {
+        mockAuthenticatedUser(mockUser);
+        UpdateProfileRequest request = new UpdateProfileRequest("John Updated Doe");
+
+        userService.updateCustomerProfile(request);
+
+        assertEquals("John Updated Doe", mockUser.getFullName());
+        verify(userRepository, times(1)).save(mockUser);
     }
 
     // ==========================================

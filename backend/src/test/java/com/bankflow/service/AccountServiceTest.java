@@ -252,22 +252,6 @@ class AccountServiceTest {
     }
 
     // ==========================================
-    // UPDATE CUSTOMER PROFILE TESTS
-    // ==========================================
-
-    @Test
-    @DisplayName("Update Customer Profile Success")
-    void updateCustomerProfile_Success() {
-        mockAuthenticatedUser(mockUser);
-        UpdateProfileRequest request = new UpdateProfileRequest("John Updated Doe");
-
-        accountService.updateCustomerProfile(request);
-
-        assertEquals("John Updated Doe", mockUser.getFullName());
-        verify(userRepository, times(1)).save(mockUser);
-    }
-
-    // ==========================================
     // ADMIN GET ALL ACCOUNTS TESTS
     // ==========================================
 

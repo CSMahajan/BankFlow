@@ -1,4 +1,8 @@
 package com.bankflow.dto;
 
-public class UserMeResponse {
-}
+public record UserMeResponse(
+        Long id,
+        String fullName,
+        String email,
+        String role
+) {}

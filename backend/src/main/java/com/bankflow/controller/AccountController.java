@@ -42,12 +42,6 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAvailableBalance(accountNumber));
     }
 
-    @PutMapping("/users/profile")
-    public ResponseEntity<Void> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
-        accountService.updateCustomerProfile(request);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/admin/accounts/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AccountResponse>> getAllAccountsForAdmin() {

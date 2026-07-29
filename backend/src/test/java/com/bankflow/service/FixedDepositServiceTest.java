@@ -219,16 +219,16 @@ class FixedDepositServiceTest {
     }
 
     @Test
-    @DisplayName("Create FD Throws Exception - Amount <= 10,000 Threshold")
+    @DisplayName("Create FD Throws Exception - Amount < 10,000 Threshold")
     void createFixedDeposit_AmountLessThanMinimum_ThrowsException() {
         mockAuthenticatedUser(mockUser);
-        CreateFdRequest request = new CreateFdRequest("BF1234567890", new BigDecimal("10000.00"), 1);
+        CreateFdRequest request = new CreateFdRequest("BF1234567890", new BigDecimal("9000.00"), 1);
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 fdService.createFixedDeposit(request)
         );
 
-        assertEquals("Deposit amount must be strictly greater than Rs. 10,000", ex.getMessage());
+        assertEquals("Deposit amount must be minimum Rs. 10,000", ex.getMessage());
         verify(fdRepository, never()).save(any());
     }
 

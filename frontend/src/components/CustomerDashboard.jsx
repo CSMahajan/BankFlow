@@ -3,15 +3,19 @@ import AccountsView from '../components/AccountsView';
 import FdCalculatorCard from '../components/FdCalculatorCard';
 import FdManagementView from '../components/FdManagementView';
 import ViewFds from '../components/ViewFds';
+import DashboardOverview from '../components/DashboardOverview';
 import CreateAccountModal from '../components/CreateAccountModal';
 import API from '../api/axios';
 
 const CustomerDashboard = ({ userRole, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('accounts');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [fdSubTab, setFdSubTab] = useState('calculator');
   const [fdDraftConfig, setFdDraftConfig] = useState(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [accounts, setAccounts] = useState([]);
+  const [loadingAccounts, setLoadingAccounts] = useState(true);
+  const [accountsError, setAccountsError] = useState(null);
 
   const [customerName, setCustomerName] = useState(
     localStorage.getItem('fullName') || localStorage.getItem('name') || 'Customer'
@@ -44,6 +48,25 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     setRefreshKey((prev) => prev + 1);
   };
 
+  const fetchAccounts = async () => {
+    setLoadingAccounts(true);
+    setAccountsError(null);
+
+    try {
+      const response = await API.get('/accounts/my-accounts');
+      setAccounts(response.data || []);
+    } catch (err) {
+      console.error(err);
+      setAccountsError('Unable to load accounts.');
+    } finally {
+      setLoadingAccounts(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
+
   return (
     <div style={styles.layout}>
       {/* Sidebar Navigation */}
@@ -54,14 +77,23 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             <button
               style={{
                 ...styles.navBtn,
+                backgroundColor: activeTab === 'dashboard' ? '#0d6360' : 'transparent',
+                color: activeTab === 'dashboard' ? '#ffffff' : '#374151',
+              }}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              🏠 Dashboard
+            </button>
+            <button
+              style={{
+                ...styles.navBtn,
                 backgroundColor: activeTab === 'accounts' ? '#0d6360' : 'transparent',
                 color: activeTab === 'accounts' ? '#ffffff' : '#374151',
               }}
               onClick={() => setActiveTab('accounts')}
             >
-              💳 Accounts & Overview
+              💳 Accounts
             </button>
-
             <div style={styles.sidebarGroup}>
               <div style={styles.groupHeader}>🪙 Fixed Deposits</div>
               <button
@@ -143,8 +175,22 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
           </button>
         </header>
 
-        {activeTab === 'accounts' && <AccountsView key={refreshKey} />}
+        {activeTab === 'dashboard' && (
+          <DashboardOverview
+            accounts={accounts}
+            refreshAccounts={fetchAccounts}
+          />
+        )}
 
+        {activeTab === 'accounts' && (
+          <AccountsView
+            key={refreshKey}
+            accounts={accounts}
+            loading={loadingAccounts}
+            error={accountsError}
+            refreshAccounts={fetchAccounts}
+          />
+        )}
         {activeTab === 'fd' && fdSubTab === 'calculator' && (
           <FdCalculatorCard onOpenFd={handleOpenFdFromCalc} />
         )}

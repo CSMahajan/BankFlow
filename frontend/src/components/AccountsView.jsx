@@ -1,30 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import API from '../api/axios';
-import TransferModal from './TransferModal'; // 🟢 1. Import your TransferModal component
+import React from 'react';
+import BalanceSummaryCard from './BalanceSummaryCard';
 
-const AccountsView = () => {
-  const [accounts, setAccounts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isTransferOpen, setIsTransferOpen] = useState(false); // 🟢 2. State to manage modal visibility
-
-  const fetchAccounts = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await API.get('/accounts/my-accounts');
-      setAccounts(response.data || []);
-    } catch (err) {
-      console.error('Failed to fetch accounts:', err);
-      setError('Unable to load your accounts.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAccounts();
-  }, []);
+const AccountsView = ({
+  accounts,
+  loading,
+  error,
+  refreshAccounts,
+}) => {
 
   const formatCurrency = (val) =>
     new Intl.NumberFormat('en-IN', {
@@ -40,21 +22,10 @@ const AccountsView = () => {
   return (
     <div style={styles.container}>
       {/* Summary & Quick Actions Header */}
-      <div style={styles.summaryCard}>
-        <div>
-          <span style={styles.summaryLabel}>Total Consolidated Balance</span>
-          <h2 style={styles.summaryAmount}>{formatCurrency(totalBalance)}</h2>
-        </div>
-        <div style={styles.quickActions}>
-          {/* 🟢 3. Trigger modal open on button click */}
-          <button style={styles.actionBtnPrimary} onClick={() => setIsTransferOpen(true)}>
-            💸 Transfer Funds
-          </button>
-          <button style={styles.actionBtnSecondary} onClick={fetchAccounts}>
-            🔄 Refresh
-          </button>
-        </div>
-      </div>
+      <BalanceSummaryCard
+        accounts={accounts}
+        refreshAccounts={refreshAccounts}
+      />
 
       {error && <div style={styles.errorBox}>⚠️ {error}</div>}
 
@@ -119,14 +90,6 @@ const AccountsView = () => {
           </div>
         </div>
       )}
-
-      {/* 🟢 4. Include the TransferModal component here */}
-      <TransferModal
-        isOpen={isTransferOpen}
-        onClose={() => setIsTransferOpen(false)}
-        accounts={accounts}
-        onTransferSuccess={fetchAccounts}
-      />
     </div>
   );
 };

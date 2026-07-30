@@ -7,7 +7,9 @@ const LoanDetailsModal = ({
     isOpen,
     onClose,
     loan,
-    repayments
+    repayments,
+    repaymentLoading,
+    repaymentError
 }) => {
     if (!isOpen || !loan) return null;
 
@@ -246,10 +248,16 @@ const LoanDetailsModal = ({
                 </div>
                 <hr style={{ margin: '24px 0' }} />
 
-                <h3 style={{ marginBottom: '12px' }}>Repayment History</h3>
+                <h3 style={{ marginBottom: '12px' }}>
+                    Repayment History ({repayments.length})
+                </h3>
 
-                {repayments.length === 0 ? (
-                    <p>No repayment history available.</p>
+                {repaymentLoading ? (
+                    <p>Loading repayment history...</p>
+                ) : repaymentError ? (
+                    <p style={{ color: '#dc2626' }}>{repaymentError}</p>
+                ) : repayments.length === 0 ? (
+                    <p>No EMI payments have been made yet.</p>
                 ) : (
                     <table
                         style={{

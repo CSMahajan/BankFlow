@@ -12,6 +12,8 @@ const LoansView = ({ accounts }) => {
     const [selectedLoan, setSelectedLoan] = useState(null);
     const [isApplyLoanModalOpen, setIsApplyLoanModalOpen] = useState(false);
     const [repayments, setRepayments] = useState([]);
+    const [repaymentLoading, setRepaymentLoading] = useState(false);
+    const [repaymentError, setRepaymentError] = useState('');
     const [loans, setLoans] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -61,12 +63,18 @@ const LoansView = ({ accounts }) => {
 
     const fetchRepayments = async (loanNumber) => {
         try {
+            setRepaymentLoading(true);
+            setRepaymentError('');
+            setRepayments([]);
+
             const response = await API.get(`/loans/${loanNumber}/repayments`);
 
             setRepayments(response.data);
         } catch (err) {
             console.error(err);
-            alert('Failed to load repayment history.');
+            setRepaymentError('Failed to load repayment history.');
+        } finally {
+            setRepaymentLoading(false);
         }
     };
 
@@ -206,9 +214,13 @@ const LoansView = ({ accounts }) => {
                 onClose={() => {
                     setIsLoanDetailsModalOpen(false);
                     setSelectedLoan(null);
+                    setRepayments([]);
+                    setRepaymentError('');
                 }}
                 loan={selectedLoan}
                 repayments={repayments}
+                repaymentLoading={repaymentLoading}
+                repaymentError={repaymentError}
             />
         </div>
     );

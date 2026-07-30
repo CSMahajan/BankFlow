@@ -33,6 +33,14 @@ const DashboardSummaryCard = () => {
         return <div>{error}</div>;
     }
 
+    const formattedDueDate = summary.nextEmiDueDate
+        ? new Date(summary.nextEmiDueDate).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+        })
+        : '-';
+
     return (
         <div
             style={{
@@ -141,6 +149,30 @@ const DashboardSummaryCard = () => {
                     </div>
                 )}
             </div>
+            {summary.activeLoanCount > 0 && (
+                <div
+                    style={{
+                        marginTop: '28px',
+                        padding: '16px',
+                        border: '1px solid #fde68a',
+                        backgroundColor: '#fffbeb',
+                        borderRadius: '12px',
+                    }}
+                >
+                    <h3 style={{ margin: '0 0 12px 0' }}>
+                        Upcoming EMI
+                    </h3>
+
+                    <div>
+                        <strong>Due Date:</strong> {formattedDueDate}
+                    </div>
+
+                    <div style={{ marginTop: '8px' }}>
+                        <strong>Amount:</strong> ₹
+                        {Number(summary.nextEmiAmount).toLocaleString('en-IN')}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

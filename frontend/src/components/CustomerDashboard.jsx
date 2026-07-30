@@ -204,7 +204,9 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
         )}
 
         {activeTab === 'loans' && (
-          <LoansView />
+          <LoansView
+            accounts={accounts}
+          />
         )}
 
         {activeTab === 'fd' && fdSubTab === 'calculator' && (

@@ -18,3 +18,8 @@ export const createBankAccount = async (accountData) => {
   const response = await API.post('/accounts/create', accountData);
   return response.data;
 };
+
+export const applyLoan = async (loanData) => {
+  const response = await API.post('/loans/apply', loanData);
+  return response.data;
+};

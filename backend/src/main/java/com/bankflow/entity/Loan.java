@@ -70,6 +70,6 @@ public class Loan {
     }
 
     public enum LoanStatus {
-        PENDING, APPROVED, REJECTED, ACTIVE, PAID_OFF
+        PENDING, REJECTED, ACTIVE, PAID_OFF
     }
 }

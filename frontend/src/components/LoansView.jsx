@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import ApplyLoanModal from './ApplyLoanModal';
 import API from '../api/axios';
 
-const LoansView = () => {
+const LoansView = ({ accounts }) => {
+    const [isApplyLoanModalOpen, setIsApplyLoanModalOpen] = useState(false);
     const [selectedLoanNumber, setSelectedLoanNumber] = useState(null);
     const [repayments, setRepayments] = useState([]);
     const [loans, setLoans] = useState([]);
@@ -38,19 +40,19 @@ const LoansView = () => {
         };
     };
 
-    useEffect(() => {
-        const fetchLoans = async () => {
-            try {
-                const response = await API.get('/loans/my-loans');
-                setLoans(response.data);
-            } catch (err) {
-                console.error(err);
-                setError('Failed to load loans.');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchLoans = async () => {
+        try {
+            const response = await API.get('/loans/my-loans');
+            setLoans(response.data);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to load loans.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchLoans();
     }, []);
 
@@ -77,7 +79,22 @@ const LoansView = () => {
     return (
         <div>
             <h2>My Loans</h2>
-
+            <div style={{ marginBottom: '20px' }}>
+                <button
+                    onClick={() => setIsApplyLoanModalOpen(true)}
+                    style={{
+                        backgroundColor: '#0d6360',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '10px 18px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                    }}
+                >
+                    + Apply for Loan
+                </button>
+            </div>
             {loans.length === 0 ? (
                 <p>No loans found.</p>
             ) : (
@@ -185,6 +202,12 @@ const LoansView = () => {
                     </div>
                 ))
             )}
+            <ApplyLoanModal
+                isOpen={isApplyLoanModalOpen}
+                onClose={() => setIsApplyLoanModalOpen(false)}
+                accounts={accounts}
+                onLoanApplied={fetchLoans}
+            />
         </div>
     );
 };

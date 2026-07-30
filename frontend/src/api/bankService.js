@@ -23,3 +23,8 @@ export const applyLoan = async (loanData) => {
   const response = await API.post('/loans/apply', loanData);
   return response.data;
 };
+
+export const payEmi = async (paymentData) => {
+    const response = await API.post('/loans/pay-emi', paymentData);
+    return response.data;
+};

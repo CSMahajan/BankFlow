@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ApplyLoanModal from './ApplyLoanModal';
+import PayEmiModal from './PayEmiModal';
 import API from '../api/axios';
 
 const LoansView = ({ accounts }) => {
+    const [isPayEmiModalOpen, setIsPayEmiModalOpen] = useState(false);
+    const [selectedLoan, setSelectedLoan] = useState(null);
     const [isApplyLoanModalOpen, setIsApplyLoanModalOpen] = useState(false);
     const [selectedLoanNumber, setSelectedLoanNumber] = useState(null);
     const [repayments, setRepayments] = useState([]);
@@ -44,6 +47,10 @@ const LoansView = ({ accounts }) => {
         try {
             const response = await API.get('/loans/my-loans');
             setLoans(response.data);
+
+            if (selectedLoanNumber) {
+                await fetchRepayments(selectedLoanNumber);
+            }
         } catch (err) {
             console.error(err);
             setError('Failed to load loans.');
@@ -55,6 +62,11 @@ const LoansView = ({ accounts }) => {
     useEffect(() => {
         fetchLoans();
     }, []);
+
+    const openPayEmiModal = (loan) => {
+        setSelectedLoan(loan);
+        setIsPayEmiModalOpen(true);
+    };
 
     const fetchRepayments = async (loanNumber) => {
         try {
@@ -145,20 +157,41 @@ const LoansView = ({ accounts }) => {
                         )}
 
                         {loan.status === 'ACTIVE' && (
-                            <button
+                            <div
                                 style={{
-                                    marginTop: '12px',
-                                    padding: '8px 14px',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    backgroundColor: '#0d6360',
-                                    color: '#fff',
-                                    cursor: 'pointer'
+                                    display: 'flex',
+                                    gap: '10px',
+                                    marginTop: '12px'
                                 }}
-                                onClick={() => fetchRepayments(loan.loanNumber)}
                             >
-                                View Repayments
-                            </button>
+                                <button
+                                    style={{
+                                        padding: '8px 14px',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        backgroundColor: '#0d6360',
+                                        color: '#fff',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => openPayEmiModal(loan)}
+                                >
+                                    Pay EMI
+                                </button>
+
+                                <button
+                                    style={{
+                                        padding: '8px 14px',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        backgroundColor: '#0d6360',
+                                        color: '#fff',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => fetchRepayments(loan.loanNumber)}
+                                >
+                                    View Repayments
+                                </button>
+                            </div>
                         )}
                         {selectedLoanNumber === loan.loanNumber && (
                             <div style={{ marginTop: '16px' }}>
@@ -207,6 +240,16 @@ const LoansView = ({ accounts }) => {
                 onClose={() => setIsApplyLoanModalOpen(false)}
                 accounts={accounts}
                 onLoanApplied={fetchLoans}
+            />
+            <PayEmiModal
+                isOpen={isPayEmiModalOpen}
+                onClose={() => {
+                    setIsPayEmiModalOpen(false);
+                    setSelectedLoan(null);
+                }}
+                loan={selectedLoan}
+                accounts={accounts}
+                onPaymentSuccess={fetchLoans}
             />
         </div>
     );

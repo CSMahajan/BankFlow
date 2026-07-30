@@ -1,5 +1,6 @@
 import React from 'react';
 import BalanceSummaryCard from './BalanceSummaryCard';
+import DashboardSummaryCard from './DashboardSummaryCard';
 
 const DashboardOverview = ({
     accounts,
@@ -12,7 +13,7 @@ const DashboardOverview = ({
                 refreshAccounts={refreshAccounts}
             />
 
-            {/* Future dashboard widgets will go here */}
+            <DashboardSummaryCard />
         </div>
     );
 };

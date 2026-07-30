@@ -5,6 +5,7 @@ import FdManagementView from '../components/FdManagementView';
 import ViewFds from '../components/ViewFds';
 import DashboardOverview from '../components/DashboardOverview';
 import CreateAccountModal from '../components/CreateAccountModal';
+import LoansView from '../components/LoansView';
 import API from '../api/axios';
 
 const CustomerDashboard = ({ userRole, onLogout }) => {
@@ -93,6 +94,16 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
               onClick={() => setActiveTab('accounts')}
             >
               💳 Accounts
+            </button>
+            <button
+              style={{
+                ...styles.navBtn,
+                backgroundColor: activeTab === 'loans' ? '#0d6360' : 'transparent',
+                color: activeTab === 'loans' ? '#ffffff' : '#374151',
+              }}
+              onClick={() => setActiveTab('loans')}
+            >
+              🏠 Loans
             </button>
             <div style={styles.sidebarGroup}>
               <div style={styles.groupHeader}>🪙 Fixed Deposits</div>
@@ -191,6 +202,11 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             refreshAccounts={fetchAccounts}
           />
         )}
+
+        {activeTab === 'loans' && (
+          <LoansView />
+        )}
+
         {activeTab === 'fd' && fdSubTab === 'calculator' && (
           <FdCalculatorCard onOpenFd={handleOpenFdFromCalc} />
         )}

@@ -80,6 +80,67 @@ const DashboardSummaryCard = () => {
                     </div>
                 </div>
             </div>
+            <div style={{ marginTop: '28px' }}>
+                <h3 style={{ margin: '0 0 16px 0' }}>
+                    Recent Transactions
+                </h3>
+
+                {summary.recentTransactions.length === 0 ? (
+                    <div>No recent transactions.</div>
+                ) : (
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                        }}
+                    >
+                        {summary.recentTransactions.map((txn) => (
+                            <div
+                                key={txn.transactionId}
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '12px',
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '10px',
+                                    backgroundColor: '#f9fafb',
+                                }}
+                            >
+                                <div>
+                                    <div style={{ fontWeight: '600' }}>
+                                        {txn.description}
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            fontSize: '12px',
+                                            color: '#6b7280',
+                                            marginTop: '4px',
+                                        }}
+                                    >
+                                        {txn.accountNumber}
+                                    </div>
+                                </div>
+
+                                <div
+                                    style={{
+                                        fontWeight: '700',
+                                        color:
+                                            txn.transactionType === 'CREDIT'
+                                                ? '#15803d'
+                                                : '#dc2626',
+                                    }}
+                                >
+                                    {txn.transactionType === 'CREDIT' ? '+' : '-'}
+                                    ₹{Number(txn.amount).toLocaleString('en-IN')}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

@@ -1,7 +1,12 @@
 .DS_Store
 .idea/
 *.iml
+*.log
 backend/target/
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+backend/logs/bankflow-2026-07-29.log
+backend/logs/bankflow.log
+backend/logs/bankflow.log
+backend/logs/bankflow.log

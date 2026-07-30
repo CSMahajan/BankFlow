@@ -171,7 +171,7 @@ const LoanDetailsModal = ({
                                 color: '#111827'
                             }}
                         >
-                            ₹{loan.remainingBalance}
+                            {formatCurrency(loan.remainingBalance)}
                         </div>
 
                         <div
@@ -195,12 +195,12 @@ const LoanDetailsModal = ({
                     >
                         <SummaryCard
                             title="Monthly EMI"
-                            value={`₹${loan.monthlyEmi}`}
+                            value={formatCurrency(loan.monthlyEmi)}
                         />
 
                         <SummaryCard
                             title="Next Due"
-                            value={loan.nextDueDate}
+                            value={formatDate(loan.nextDueDate)}
                         />
 
                         <SummaryCard
@@ -232,7 +232,7 @@ const LoanDetailsModal = ({
 
                     <DetailRow
                         label="Principal Amount"
-                        value={`₹${loan.principalAmount}`}
+                        value={formatCurrency(loan.principalAmount)}
                     />
 
 
@@ -243,7 +243,7 @@ const LoanDetailsModal = ({
 
                     <DetailRow
                         label="Start Date"
-                        value={loan.startDate}
+                        value={formatDate(loan.startDate)}
                     />
                 </div>
                 <hr style={{ margin: '24px 0' }} />

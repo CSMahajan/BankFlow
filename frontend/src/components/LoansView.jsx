@@ -1,33 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import ApplyLoanModal from './ApplyLoanModal';
 import PayEmiModal from './PayEmiModal';
+import LoanDetailsModal from './LoanDetailsModal';
+import { formatCurrency, formatDate } from '../utils/formatUtils';
+import { tableHeader, tableCell } from '../styles/tableStyles';
 import API from '../api/axios';
 
 const LoansView = ({ accounts }) => {
     const [isPayEmiModalOpen, setIsPayEmiModalOpen] = useState(false);
+    const [isLoanDetailsModalOpen, setIsLoanDetailsModalOpen] = useState(false);
     const [selectedLoan, setSelectedLoan] = useState(null);
     const [isApplyLoanModalOpen, setIsApplyLoanModalOpen] = useState(false);
-    const [selectedLoanNumber, setSelectedLoanNumber] = useState(null);
     const [repayments, setRepayments] = useState([]);
     const [loans, setLoans] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const formatCurrency = (amount) =>
-        new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR'
-        }).format(amount);
-
-    const formatDate = (date) => {
-        if (!date) return '-';
-
-        return new Date(date).toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        });
-    };
 
     const getStatusStyle = (status) => {
         return {
@@ -47,10 +34,6 @@ const LoansView = ({ accounts }) => {
         try {
             const response = await API.get('/loans/my-loans');
             setLoans(response.data);
-
-            if (selectedLoanNumber) {
-                await fetchRepayments(selectedLoanNumber);
-            }
         } catch (err) {
             console.error(err);
             setError('Failed to load loans.');
@@ -68,11 +51,18 @@ const LoansView = ({ accounts }) => {
         setIsPayEmiModalOpen(true);
     };
 
+    const openLoanDetailsModal = async (loan) => {
+        setSelectedLoan(loan);
+        setRepayments([]);
+        setIsLoanDetailsModalOpen(true);
+
+        await fetchRepayments(loan.loanNumber);
+    };
+
     const fetchRepayments = async (loanNumber) => {
         try {
             const response = await API.get(`/loans/${loanNumber}/repayments`);
 
-            setSelectedLoanNumber(loanNumber);
             setRepayments(response.data);
         } catch (err) {
             console.error(err);
@@ -173,11 +163,10 @@ const LoansView = ({ accounts }) => {
                                         color: '#fff',
                                         cursor: 'pointer'
                                     }}
-                                    onClick={() => openPayEmiModal(loan)}
+                                    onClick={() => openLoanDetailsModal(loan)}
                                 >
-                                    Pay EMI
+                                    Loan Details
                                 </button>
-
                                 <button
                                     style={{
                                         padding: '8px 14px',
@@ -187,49 +176,10 @@ const LoansView = ({ accounts }) => {
                                         color: '#fff',
                                         cursor: 'pointer'
                                     }}
-                                    onClick={() => fetchRepayments(loan.loanNumber)}
+                                    onClick={() => openPayEmiModal(loan)}
                                 >
-                                    View Repayments
+                                    Pay EMI
                                 </button>
-                            </div>
-                        )}
-                        {selectedLoanNumber === loan.loanNumber && (
-                            <div style={{ marginTop: '16px' }}>
-                                <h4>Repayment History</h4>
-
-                                {repayments.length === 0 ? (
-                                    <p>No repayment history available.</p>
-                                ) : (
-                                    <table
-                                        style={{
-                                            width: '100%',
-                                            borderCollapse: 'collapse',
-                                            marginTop: '10px'
-                                        }}
-                                    >
-                                        <thead>
-                                            <tr style={{ backgroundColor: '#f3f4f6' }}>
-                                                <th style={tableHeader}>Payment Date</th>
-                                                <th style={tableHeader}>EMI Paid</th>
-                                                <th style={tableHeader}>Principal</th>
-                                                <th style={tableHeader}>Interest</th>
-                                                <th style={tableHeader}>Remaining Balance</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            {repayments.map((repayment) => (
-                                                <tr key={repayment.id}>
-                                                    <td style={tableCell}>{formatDate(repayment.paymentDate)}</td>
-                                                    <td style={tableCell}>{formatCurrency(repayment.amountPaid)}</td>
-                                                    <td style={tableCell}>{formatCurrency(repayment.principalComponent)}</td>
-                                                    <td style={tableCell}>{formatCurrency(repayment.interestComponent)}</td>
-                                                    <td style={tableCell}>{formatCurrency(repayment.remainingLoanBalance)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                )}
                             </div>
                         )}
                     </div>
@@ -251,20 +201,17 @@ const LoansView = ({ accounts }) => {
                 accounts={accounts}
                 onPaymentSuccess={fetchLoans}
             />
+            <LoanDetailsModal
+                isOpen={isLoanDetailsModalOpen}
+                onClose={() => {
+                    setIsLoanDetailsModalOpen(false);
+                    setSelectedLoan(null);
+                }}
+                loan={selectedLoan}
+                repayments={repayments}
+            />
         </div>
     );
-};
-
-const tableHeader = {
-    border: '1px solid #ddd',
-    padding: '10px',
-    textAlign: 'left',
-    fontWeight: '600'
-};
-
-const tableCell = {
-    border: '1px solid #ddd',
-    padding: '10px'
 };
 
 export default LoansView;

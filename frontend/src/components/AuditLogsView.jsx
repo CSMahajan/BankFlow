@@ -11,6 +11,7 @@ const AuditLogsView = () => {
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("ALL");
     const [moduleFilter, setModuleFilter] = useState("ALL");
+    const [actionFilter, setActionFilter] = useState("ALL");
 
     useEffect(() => {
         loadLogs();
@@ -170,10 +171,15 @@ const AuditLogsView = () => {
             moduleFilter === "ALL" ||
             moduleActions[moduleFilter].includes(log.action);
 
+        const matchesAction =
+            actionFilter === "ALL" ||
+            log.action === actionFilter;
+
         return (
             matchesSearch &&
             matchesRole &&
-            matchesModule
+            matchesModule &&
+            matchesAction
         );
     });
 
@@ -188,130 +194,83 @@ const AuditLogsView = () => {
                 style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "12px",
-                    marginBottom: "16px",
+                    gap: "16px",
                     flexWrap: "wrap",
-                }}
-            >
-                <input
-                    type="text"
-                    placeholder="🔍 Search user or description..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    style={{
-                        width: "340px",
-                        padding: "10px 14px",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        outline: "none",
-                    }}
-                />
-            </div>
-
-            {/* Role Filter */}
-
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    marginBottom: "16px",
-                    flexWrap: "wrap",
-                }}
-            >
-
-                <strong
-                    style={{
-                        minWidth: "70px",
-                        color: "#475569",
-                    }}
-                >
-                    Role
-                </strong>
-
-                {["ALL", "CUSTOMER", "ADMIN"].map((role) => (
-                    <button
-                        key={role}
-                        onClick={() => setRoleFilter(role)}
-                        style={{
-                            padding: "8px 16px",
-                            borderRadius: "20px",
-                            border: "1px solid #cbd5e1",
-                            cursor: "pointer",
-                            backgroundColor:
-                                roleFilter === role ? "#1e293b" : "#ffffff",
-                            color:
-                                roleFilter === role ? "#ffffff" : "#334155",
-                            fontWeight: "600",
-                        }}
-                    >
-                        {role === "ALL"
-                            ? "All"
-                            : role === "CUSTOMER"
-                                ? "Customers"
-                                : "Admins"}
-                    </button>
-                ))}
-
-            </div>
-
-            {/* Module Filter */}
-
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "12px",
                     marginBottom: "24px",
                 }}
             >
 
-                <strong
-                    style={{
-                        minWidth: "70px",
-                        color: "#475569",
-                        paddingTop: "8px",
-                    }}
-                >
-                    Module
-                </strong>
+                {/* Search */}
 
-                <div
+                <input
+                    type="text"
+                    placeholder="🔍 Search by user email or description..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                     style={{
-                        display: "flex",
-                        gap: "10px",
-                        flexWrap: "wrap",
+                        flex: "1",
+                        minWidth: "300px",
+                        padding: "12px 16px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "10px",
+                        fontSize: "14px",
                     }}
+                />
+
+                {/* Role */}
+
+                <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    style={styles.filterSelect}
                 >
-                    {[
-                        ["ALL", "All"],
-                        ["LOANS", "Loans"],
-                        ["ACCOUNTS", "Accounts"],
-                        ["FIXED_DEPOSITS", "Fixed Deposits"],
-                        ["TRANSFERS", "Transfers"],
-                        ["PROFILE", "Profile"],
-                        ["LOGIN", "Login"],
-                    ].map(([value, label]) => (
-                        <button
-                            key={value}
-                            onClick={() => setModuleFilter(value)}
-                            style={{
-                                padding: "8px 16px",
-                                borderRadius: "20px",
-                                border: "1px solid #cbd5e1",
-                                cursor: "pointer",
-                                backgroundColor:
-                                    moduleFilter === value ? "#0d6360" : "#ffffff",
-                                color:
-                                    moduleFilter === value ? "#ffffff" : "#374151",
-                                fontWeight: "600",
-                            }}
-                        >
-                            {label}
-                        </button>
-                    ))}
-                </div>
+                    <option value="ALL">All Roles</option>
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+
+                {/* Module */}
+
+                <select
+                    value={moduleFilter}
+                    onChange={(e) => setModuleFilter(e.target.value)}
+                    style={styles.filterSelect}
+                >
+                    <option value="ALL">All Modules</option>
+                    <option value="LOGIN">Login</option>
+                    <option value="ACCOUNTS">Accounts</option>
+                    <option value="LOANS">Loans</option>
+                    <option value="FIXED_DEPOSITS">Fixed Deposits</option>
+                    <option value="TRANSFERS">Transfers</option>
+                    <option value="PROFILE">Profile</option>
+                </select>
+
+                <select
+                    value={actionFilter}
+                    onChange={(e) => setActionFilter(e.target.value)}
+                    style={styles.filterSelect}
+                >
+                    <option value="ALL">All Actions</option>
+                    <option value="LOGIN">Login</option>
+                    <option value="ACCOUNT_CREATED">Account Created</option>
+                    <option value="MONEY_TRANSFER">Money Transfer</option>
+                    <option value="LOAN_APPLIED">Loan Applied</option>
+                    <option value="LOAN_APPROVED">Loan Approved</option>
+                    <option value="LOAN_REJECTED">Loan Rejected</option>
+                    <option value="EMI_PAID">EMI Paid</option>
+                    <option value="FD_CREATED">FD Created</option>
+                    <option value="FD_CLOSED">FD Closed</option>
+                    <option value="PROFILE_UPDATED">Profile Updated</option>
+                </select>
+
+                {/* Refresh */}
+
+                <button
+                    onClick={loadLogs}
+                    style={styles.refreshButton}
+                >
+                    ↻ Refresh
+                </button>
 
             </div>
 
@@ -320,13 +279,14 @@ const AuditLogsView = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: "16px",
+                    marginBottom: "18px",
                 }}
             >
+
                 <div
                     style={{
                         color: "#64748b",
-                        fontSize: "14px",
+                        fontSize: "15px",
                     }}
                 >
                     Showing <strong>{filteredLogs.length}</strong> of{" "}
@@ -339,18 +299,11 @@ const AuditLogsView = () => {
                             setSearch("");
                             setRoleFilter("ALL");
                             setModuleFilter("ALL");
+                            setActionFilter("ALL");
                         }}
-                        style={{
-                            padding: "8px 14px",
-                            border: "1px solid #cbd5e1",
-                            borderRadius: "8px",
-                            backgroundColor: "#fff",
-                            cursor: "pointer",
-                            fontWeight: "600",
-                            color: "#475569",
-                        }}
+                        style={styles.clearButton}
                     >
-                        Clear Filters
+                        ✕ Clear Filters
                     </button>
                 )}
             </div>
@@ -497,6 +450,39 @@ const AuditLogsView = () => {
 
     );
 
+};
+
+const styles = {
+
+    filterSelect: {
+        padding: "12px 16px",
+        borderRadius: "10px",
+        border: "1px solid #d1d5db",
+        backgroundColor: "#ffffff",
+        fontSize: "14px",
+        minWidth: "170px",
+        cursor: "pointer",
+    },
+
+    refreshButton: {
+        padding: "12px 22px",
+        borderRadius: "10px",
+        border: "1px solid #22c55e",
+        backgroundColor: "#ffffff",
+        color: "#16a34a",
+        fontWeight: "700",
+        cursor: "pointer",
+    },
+
+    clearButton: {
+        padding: "10px 18px",
+        borderRadius: "10px",
+        border: "1px solid #c7d2fe",
+        backgroundColor: "#ffffff",
+        color: "#2563eb",
+        fontWeight: "700",
+        cursor: "pointer",
+    }
 };
 
 export default AuditLogsView;

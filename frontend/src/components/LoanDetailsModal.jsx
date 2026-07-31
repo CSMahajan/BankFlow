@@ -2,6 +2,7 @@ import React from 'react';
 import modalStyles from '../styles/modalStyles';
 import { formatCurrency, formatDate } from '../utils/formatUtils';
 import { tableHeader, tableCell } from '../styles/tableStyles';
+import { getLoanStatusStyle } from '../utils/loanStatusUtils';
 
 const LoanDetailsModal = ({
     isOpen,
@@ -11,6 +12,8 @@ const LoanDetailsModal = ({
     repaymentLoading,
     repaymentError
 }) => {
+
+    console.log("Loan Details:", loan);
     if (!isOpen || !loan) return null;
 
     const DetailRow = ({ label, value }) => (
@@ -49,62 +52,6 @@ const LoanDetailsModal = ({
             </div>
         </div>
     );
-
-    const getStatusBadgeStyle = (status) => {
-        switch (status) {
-            case 'ACTIVE':
-                return {
-                    backgroundColor: '#dcfce7',
-                    color: '#15803d'
-                };
-
-            case 'PENDING':
-                return {
-                    backgroundColor: '#fef3c7',
-                    color: '#b45309'
-                };
-
-            case 'APPROVED':
-                return {
-                    backgroundColor: '#dbeafe',
-                    color: '#1d4ed8'
-                };
-
-            case 'CLOSED':
-                return {
-                    backgroundColor: '#e5e7eb',
-                    color: '#4b5563'
-                };
-
-            case 'REJECTED':
-                return {
-                    backgroundColor: '#fee2e2',
-                    color: '#b91c1c'
-                };
-
-            default:
-                return {
-                    backgroundColor: '#f3f4f6',
-                    color: '#374151'
-                };
-        }
-    };
-
-    const formatCurrency = (amount) =>
-        new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR'
-        }).format(amount);
-
-    const formatDate = (date) => {
-        if (!date) return '-';
-
-        return new Date(date).toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        });
-    };
 
     return (
         <div style={modalStyles.overlay}>
@@ -152,7 +99,7 @@ const LoanDetailsModal = ({
                                 borderRadius: '999px',
                                 fontWeight: '600',
                                 fontSize: '13px',
-                                ...getStatusBadgeStyle(loan.status)
+                                ...getLoanStatusStyle(loan.status)
                             }}
                         >
                             {loan.status}
@@ -245,6 +192,32 @@ const LoanDetailsModal = ({
                         label="Start Date"
                         value={formatDate(loan.startDate)}
                     />
+
+                    {loan.status === "REJECTED" && loan.rejectionRemarks && (
+                        <div
+                            style={{
+                                gridColumn: "1 / -1",
+                                padding: "12px",
+                                backgroundColor: "#fef2f2",
+                                border: "1px solid #fecaca",
+                                borderRadius: "8px"
+                            }}
+                        >
+                            <strong style={{ color: "#b91c1c" }}>
+                                Rejection Reason
+                            </strong>
+
+                            <p
+                                style={{
+                                    marginTop: "8px",
+                                    marginBottom: 0,
+                                    color: "#374151"
+                                }}
+                            >
+                                {loan.rejectionRemarks}
+                            </p>
+                        </div>
+                    )}
                 </div>
                 <hr style={{ margin: '24px 0' }} />
 

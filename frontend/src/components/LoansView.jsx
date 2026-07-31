@@ -3,7 +3,7 @@ import ApplyLoanModal from './ApplyLoanModal';
 import PayEmiModal from './PayEmiModal';
 import LoanDetailsModal from './LoanDetailsModal';
 import { formatCurrency, formatDate } from '../utils/formatUtils';
-import { tableHeader, tableCell } from '../styles/tableStyles';
+import { getLoanStatusStyle } from '../utils/loanStatusUtils';
 import API from '../api/axios';
 
 const LoansView = ({ accounts }) => {
@@ -17,20 +17,6 @@ const LoansView = ({ accounts }) => {
     const [loans, setLoans] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const getStatusStyle = (status) => {
-        return {
-            display: 'inline-block',
-            padding: '4px 10px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: '600',
-            backgroundColor:
-                status === 'ACTIVE' ? '#dcfce7' : '#fef3c7',
-            color:
-                status === 'ACTIVE' ? '#166534' : '#92400e'
-        };
-    };
 
     const fetchLoans = async () => {
         try {
@@ -131,7 +117,7 @@ const LoansView = ({ accounts }) => {
                                 {loan.loanType} Loan
                             </h3>
 
-                            <span style={getStatusStyle(loan.status)}>
+                            <span style={getLoanStatusStyle(loan.status)}>
                                 {loan.status}
                             </span>
                         </div>
@@ -154,27 +140,28 @@ const LoansView = ({ accounts }) => {
                             </p>
                         )}
 
-                        {loan.status === 'ACTIVE' && (
-                            <div
+                        <div
+                            style={{
+                                display: 'flex',
+                                gap: '10px',
+                                marginTop: '12px'
+                            }}
+                        >
+                            <button
                                 style={{
-                                    display: 'flex',
-                                    gap: '10px',
-                                    marginTop: '12px'
+                                    padding: '8px 14px',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    backgroundColor: '#0d6360',
+                                    color: '#fff',
+                                    cursor: 'pointer'
                                 }}
+                                onClick={() => openLoanDetailsModal(loan)}
                             >
-                                <button
-                                    style={{
-                                        padding: '8px 14px',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        backgroundColor: '#0d6360',
-                                        color: '#fff',
-                                        cursor: 'pointer'
-                                    }}
-                                    onClick={() => openLoanDetailsModal(loan)}
-                                >
-                                    Loan Details
-                                </button>
+                                Loan Details
+                            </button>
+
+                            {loan.status === 'ACTIVE' && (
                                 <button
                                     style={{
                                         padding: '8px 14px',
@@ -188,8 +175,8 @@ const LoansView = ({ accounts }) => {
                                 >
                                     Pay EMI
                                 </button>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 ))
             )}

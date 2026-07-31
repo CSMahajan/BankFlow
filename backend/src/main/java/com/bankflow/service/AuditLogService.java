@@ -40,6 +40,17 @@ public class AuditLogService {
         auditLogRepository.save(auditLog);
     }
 
+    public void log(User user, AuditAction action, String description) {
+        AuditLog auditLog = AuditLog.builder()
+                .action(action)
+                .performedBy(user.getEmail())
+                .role(user.getRole())
+                .description(description)
+                .build();
+
+        auditLogRepository.save(auditLog);
+    }
+
     public Page<AuditLogResponse> getAuditLogs(int page, int size) {
 
         PageRequest pageable = PageRequest.of(

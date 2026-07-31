@@ -3,6 +3,7 @@ package com.bankflow.service;
 import com.bankflow.dto.FundTransferRequest;
 import com.bankflow.dto.FundTransferResponse;
 import com.bankflow.entity.Account;
+import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.Transaction;
 import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
@@ -28,6 +29,7 @@ public class FundTransferService {
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public FundTransferResponse transferFunds(FundTransferRequest request) {
@@ -112,7 +114,15 @@ public class FundTransferService {
 
         log.info("Fund transfer successful. Ref: [{}], Source New Balance: [Rs. {}], Target New Balance: [Rs. {}]",
                 txRef, newSourceBalance, newTargetBalance);
-
+        auditLogService.log(
+                AuditAction.MONEY_TRANSFER,
+                "Transferred ₹" +
+                        request.amount() +
+                        " from " +
+                        sourceAccount.getAccountNumber() +
+                        " to " +
+                        targetAccount.getAccountNumber()
+        );
         return new FundTransferResponse(
                 txRef,
                 sourceAccount.getAccountNumber(),

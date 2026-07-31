@@ -3,8 +3,8 @@ package com.bankflow.service;
 import com.bankflow.dto.AccountResponse;
 import com.bankflow.dto.BalanceResponse;
 import com.bankflow.dto.CreateAccountRequest;
-import com.bankflow.dto.UpdateProfileRequest;
 import com.bankflow.entity.Account;
+import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.Transaction;
 import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
@@ -31,6 +31,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final AuditLogService auditLogService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Transactional
@@ -54,7 +55,14 @@ public class AccountService {
         Account savedAccount = accountRepository.save(account);
         log.info("Account successfully created. Number: [{}], ID: [{}], Initial Balance: [Rs. {}]",
                 accountNumber, savedAccount.getId(), initialDeposit);
-
+        auditLogService.log(
+                AuditAction.ACCOUNT_CREATED,
+                "Opened " +
+                        savedAccount.getAccountType() +
+                        " Account (" +
+                        savedAccount.getAccountNumber() +
+                        ")"
+        );
         // Record initial deposit transaction if amount is greater than zero
         if (initialDeposit.compareTo(BigDecimal.ZERO) > 0) {
             String txId = "DEP-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();

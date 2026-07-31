@@ -1,6 +1,7 @@
 package com.bankflow.service;
 
 import com.bankflow.dto.*;
+import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.User;
 import com.bankflow.exception.ResourceNotFoundException;
 import com.bankflow.repository.AccountRepository;
@@ -24,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuditLogService auditLogService;
     private final AccountRepository accountRepository;
 
     @Transactional
@@ -48,7 +50,6 @@ public class UserService {
         log.info("Customer registered successfully. User ID: [{}], Email: [{}]", savedUser.getId(), savedUser.getEmail());
     }
 
-    @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         log.info("Attempting authentication for email [{}]", request.email());
 
@@ -70,6 +71,13 @@ public class UserService {
 
         log.info("User [{}] authenticated successfully with role [{}]", user.getEmail(), user.getRole());
 
+        //****IMPORTANT---> DO NOT REMOVE BELOW COMMENT
+        //Below is special case for auditing because before logging in we don't have security context of authenticated user
+        auditLogService.log(
+                user,
+                AuditAction.LOGIN,
+                "User logged in successfully"
+        );
         // 4. Return token and user metadata
         return new AuthResponse(token, user.getEmail(), user.getRole().name(), user.getFullName());
     }
@@ -122,6 +130,10 @@ public class UserService {
         userRepository.save(currentUser);
 
         log.info("Profile updated successfully for user [{}]", currentUser.getEmail());
+        auditLogService.log(
+                AuditAction.PROFILE_UPDATED,
+                "Updated profile information"
+        );
     }
 
     @Transactional(readOnly = true)

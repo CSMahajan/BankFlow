@@ -40,6 +40,9 @@ class UserServiceTest {
     private UserService userService;
 
     @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
     private Authentication authentication;
 
     @Mock

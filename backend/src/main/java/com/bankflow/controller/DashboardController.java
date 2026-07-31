@@ -1,5 +1,6 @@
 package com.bankflow.controller;
 
+import com.bankflow.dto.AdminDashboardSummaryResponse;
 import com.bankflow.dto.DashboardSummaryResponse;
 import com.bankflow.dto.MonthlyAnalyticsResponse;
 import com.bankflow.dto.TransactionResponse;
@@ -7,6 +8,7 @@ import com.bankflow.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +30,12 @@ public class DashboardController {
     @GetMapping("/analytics/monthly")
     public ResponseEntity<MonthlyAnalyticsResponse> getCurrentMonthAnalytics() {
         return ResponseEntity.ok(dashboardService.getCurrentMonthAnalytics());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin-summary")
+    public ResponseEntity<AdminDashboardSummaryResponse> getAdminDashboardSummary() {
+        return ResponseEntity.ok(dashboardService.getAdminDashboardSummary());
     }
 
     @GetMapping("/transactions")

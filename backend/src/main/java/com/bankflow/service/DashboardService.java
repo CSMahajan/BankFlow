@@ -1,5 +1,6 @@
 package com.bankflow.service;
 
+import com.bankflow.dto.AdminDashboardSummaryResponse;
 import com.bankflow.dto.DashboardSummaryResponse;
 import com.bankflow.dto.MonthlyAnalyticsResponse;
 import com.bankflow.dto.TransactionResponse;
@@ -137,6 +138,19 @@ public class DashboardService {
         BigDecimal netCashFlow = income.subtract(expense);
 
         return new MonthlyAnalyticsResponse(income, expense, netCashFlow);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminDashboardSummaryResponse getAdminDashboardSummary() {
+
+        return new AdminDashboardSummaryResponse(
+                userRepository.count(),
+                accountRepository.count(),
+                loanRepository.countByStatus(Loan.LoanStatus.ACTIVE),
+                loanRepository.countByStatus(Loan.LoanStatus.PENDING),
+                fdRepository.countByStatus(FixedDeposit.FdStatus.ACTIVE),
+                accountRepository.getTotalDeposits()
+        );
     }
 
     @Transactional(readOnly = true)

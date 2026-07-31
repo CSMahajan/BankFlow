@@ -57,10 +57,6 @@ export const fetchUsers = async () => {
   return response.data;
 };
 
-export const fetchAuditLogs = async (page = 0, size = 20) => {
-  const response = await API.get(
-    `/admin/audit-logs?page=${page}&size=${size}`
-  );
-
-  return response.data;
-};
+export const fetchAuditLogs = (page = 0, size = 10) =>
+  API.get(`/admin/audit-logs?page=${page}&size=${size}`)
+    .then(res => res.data);

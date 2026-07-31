@@ -12,19 +12,23 @@ const AuditLogsView = () => {
     const [roleFilter, setRoleFilter] = useState("ALL");
     const [moduleFilter, setModuleFilter] = useState("ALL");
     const [actionFilter, setActionFilter] = useState("ALL");
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
         loadLogs();
-    }, []);
+    }, [currentPage]);
 
     const loadLogs = async () => {
 
         try {
             setLoading(true);
 
-            const response = await fetchAuditLogs();
+            const response = await fetchAuditLogs(currentPage, 10);
 
             setLogs(response.content);
+
+            setTotalPages(response.totalPages);
 
         } catch (err) {
 
@@ -206,7 +210,10 @@ const AuditLogsView = () => {
                     type="text"
                     placeholder="🔍 Search by user email or description..."
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setCurrentPage(0);
+                    }}
                     style={{
                         flex: "1",
                         minWidth: "300px",
@@ -221,7 +228,10 @@ const AuditLogsView = () => {
 
                 <select
                     value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value)}
+                    onChange={(e) => {
+                        setRoleFilter(e.target.value);
+                        setCurrentPage(0);
+                    }}
                     style={styles.filterSelect}
                 >
                     <option value="ALL">All Roles</option>
@@ -233,7 +243,10 @@ const AuditLogsView = () => {
 
                 <select
                     value={moduleFilter}
-                    onChange={(e) => setModuleFilter(e.target.value)}
+                    onChange={(e) => {
+                        setModuleFilter(e.target.value);
+                        setCurrentPage(0);
+                    }}
                     style={styles.filterSelect}
                 >
                     <option value="ALL">All Modules</option>
@@ -247,7 +260,10 @@ const AuditLogsView = () => {
 
                 <select
                     value={actionFilter}
-                    onChange={(e) => setActionFilter(e.target.value)}
+                    onChange={(e) => {
+                        setActionFilter(e.target.value);
+                        setCurrentPage(0);
+                    }}
                     style={styles.filterSelect}
                 >
                     <option value="ALL">All Actions</option>
@@ -300,6 +316,7 @@ const AuditLogsView = () => {
                             setRoleFilter("ALL");
                             setModuleFilter("ALL");
                             setActionFilter("ALL");
+                            setCurrentPage(0);
                         }}
                         style={styles.clearButton}
                     >
@@ -446,6 +463,61 @@ const AuditLogsView = () => {
 
                 </table>
             </div>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    gap: "12px",
+                    marginTop: "20px",
+                    paddingTop: "20px",
+                    borderTop: "1px solid #e2e8f0",
+                }}
+            >
+
+                <button
+                    disabled={currentPage === 0}
+                    onClick={() => setCurrentPage(prev => prev - 1)}
+                    style={{
+                        ...styles.pageButton,
+                        opacity: currentPage === 0 ? 0.45 : 1,
+                        cursor: currentPage === 0 ? "not-allowed" : "pointer",
+                    }}
+                >
+                    ← Previous
+                </button>
+
+                <span
+                    style={{
+                        fontWeight: "600",
+                        color: "#475569",
+                    }}
+                >
+                    <span
+                        style={{
+                            fontWeight: "700",
+                            color: "#334155",
+                            minWidth: "110px",
+                            textAlign: "center",
+                        }}
+                    >
+                        Page {currentPage + 1} of {totalPages}
+                    </span>
+                </span>
+
+                <button
+                    disabled={currentPage === totalPages - 1}
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                    style={{
+                        ...styles.pageButton,
+                        opacity: currentPage === totalPages - 1 ? 0.45 : 1,
+                        cursor: currentPage === totalPages - 1 ? "not-allowed" : "pointer",
+                    }}
+                >
+                    Next →
+                </button>
+
+            </div>
         </PageCard>
 
     );
@@ -482,7 +554,17 @@ const styles = {
         color: "#2563eb",
         fontWeight: "700",
         cursor: "pointer",
-    }
+    },
+
+    pageButton: {
+        padding: "10px 18px",
+        borderRadius: "8px",
+        border: "1px solid #cbd5e1",
+        backgroundColor: "#ffffff",
+        cursor: "pointer",
+        fontWeight: "600",
+        color: "#334155",
+    },
 };
 
 export default AuditLogsView;

@@ -17,23 +17,33 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
   const [accounts, setAccounts] = useState([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
   const [accountsError, setAccountsError] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [loadingSummary, setLoadingSummary] = useState(true);
+  const [summaryError, setSummaryError] = useState(null);
 
-  const [customerName, setCustomerName] = useState(
-    localStorage.getItem('fullName') || localStorage.getItem('name') || 'Customer'
-  );
+  const customerName =
+    localStorage.getItem('fullName') ||
+    localStorage.getItem('name') ||
+    'Customer';
 
   useEffect(() => {
     const fetchDashboardSummary = async () => {
+      setLoadingSummary(true);
+      setSummaryError(null);
+
       try {
         const response = await API.get('/dashboard/summary');
-        if (response.data && response.data.customerName) {
-          setCustomerName(response.data.customerName);
-          localStorage.setItem('fullName', response.data.customerName);
-        }
+
+        setSummary(response.data);
+
       } catch (err) {
-        console.error('Failed to fetch dashboard summary name:', err);
+        console.error(err);
+        setSummaryError('Unable to load dashboard summary.');
+      } finally {
+        setLoadingSummary(false);
       }
     };
+
     fetchDashboardSummary();
   }, []);
 
@@ -190,6 +200,9 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
           <DashboardOverview
             accounts={accounts}
             refreshAccounts={fetchAccounts}
+            summary={summary}
+            loadingSummary={loadingSummary}
+            summaryError={summaryError}
           />
         )}
 

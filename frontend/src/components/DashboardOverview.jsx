@@ -6,6 +6,9 @@ import FinancialSummaryCard from './FinancialSummaryCard';
 const DashboardOverview = ({
     accounts,
     refreshAccounts,
+    summary,
+    loadingSummary,
+    summaryError,
 }) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -14,7 +17,11 @@ const DashboardOverview = ({
                 refreshAccounts={refreshAccounts}
             />
 
-            <DashboardSummaryCard />
+            <DashboardSummaryCard
+                summary={summary}
+                loading={loadingSummary}
+                error={summaryError}
+            />
 
             <FinancialSummaryCard />
         </div>

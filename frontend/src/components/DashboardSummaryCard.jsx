@@ -1,29 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import API from '../api/axios';
+import React from 'react';
 
-const DashboardSummaryCard = () => {
-    const [summary, setSummary] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const fetchSummary = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await API.get('/dashboard/summary');
-            setSummary(response.data);
-        } catch (err) {
-            console.error(err);
-            setError('Unable to load dashboard summary.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchSummary();
-    }, []);
+const DashboardSummaryCard = ({
+    summary,
+    loading,
+    error,
+}) => {
 
     if (loading) {
         return <div>Loading dashboard summary...</div>;

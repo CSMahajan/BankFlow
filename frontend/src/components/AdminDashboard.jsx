@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import LoanApprovalsView from './LoanApprovalsView';
 import AdminDashboardOverview from './AdminDashboardOverview';
+import UserManagementView from "./UserManagementView";
 import { fetchAdminDashboardSummary } from '../api/bankService';
 
 const AdminDashboard = ({ userRole, userName, onLogout }) => {
@@ -121,12 +122,7 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
         )}
 
         {activeTab === 'users' && (
-          <div style={styles.card}>
-            <h3>👥 User Management</h3>
-            <p style={styles.mutedText}>
-              View and manage customer and admin user accounts.
-            </p>
-          </div>
+          <UserManagementView />
         )}
 
         {activeTab === 'logs' && (

@@ -51,3 +51,8 @@ export const fetchAdminDashboardSummary = async () => {
   const response = await API.get('/dashboard/admin-summary');
   return response.data;
 };
+
+export const fetchUsers = async () => {
+  const response = await API.get("/users");
+  return response.data;
+};

@@ -25,6 +25,24 @@ export const applyLoan = async (loanData) => {
 };
 
 export const payEmi = async (paymentData) => {
-    const response = await API.post('/loans/pay-emi', paymentData);
-    return response.data;
+  const response = await API.post('/loans/pay-emi', paymentData);
+  return response.data;
+};
+
+export const fetchPendingLoans = async () => {
+  const response = await API.get('/loans/pending');
+  return response.data;
+};
+
+export const approveLoan = async (loanId) => {
+  const response = await API.put(`/loans/${loanId}/approve`);
+  return response.data;
+};
+
+export const rejectLoan = async (loanId, remarks) => {
+  const response = await API.put(
+    `/loans/${loanId}/reject`,
+    { remarks }
+  );
+  return response.data;
 };

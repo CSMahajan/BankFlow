@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import LoanApprovalsView from './LoanApprovalsView';
+import { fetchDashboardSummary } from '../api/bankService';
+
 const AdminDashboard = ({ userRole, userName, onLogout }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [adminName, setAdminName] = useState(
@@ -6,20 +9,25 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
   );
 
   useEffect(() => {
-    const fetchDashboardSummary = async () => {
+    const loadDashboardSummary = async () => {
       try {
-        const response = await API.get('/dashboard/summary');
+        const data = await fetchDashboardSummary();
+
         const resolvedName =
-          response.data?.fullName || response.data?.name || response.data?.customerName;
+          data?.fullName ??
+          data?.name ??
+          data?.customerName;
+
         if (resolvedName) {
           setAdminName(resolvedName);
-          localStorage.setItem('fullName', resolvedName);
+          localStorage.setItem("fullName", resolvedName);
         }
       } catch (err) {
-        console.error('Failed to fetch admin dashboard summary name:', err);
+        console.error("Failed to fetch admin dashboard summary:", err);
       }
     };
-    fetchDashboardSummary();
+
+    loadDashboardSummary();
   }, []);
 
   const roleDisplay = userRole || localStorage.getItem('userRole') || 'ADMIN';
@@ -40,6 +48,16 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
               onClick={() => setActiveTab('overview')}
             >
               📊 System Overview
+            </button>
+            <button
+              style={{
+                ...styles.navBtn,
+                backgroundColor: activeTab === 'loanApprovals' ? '#1e293b' : 'transparent',
+                color: activeTab === 'loanApprovals' ? '#ffffff' : '#374151',
+              }}
+              onClick={() => setActiveTab('loanApprovals')}
+            >
+              💰 Loan Approvals
             </button>
             <button
               style={{
@@ -99,6 +117,10 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
               Monitor key operational metrics, active user accounts, and system-wide stats.
             </p>
           </div>
+        )}
+
+        {activeTab === 'loanApprovals' && (
+          <LoanApprovalsView />
         )}
 
         {activeTab === 'users' && (

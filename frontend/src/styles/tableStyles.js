@@ -4,8 +4,8 @@ export const tableHeader = {
     textAlign: "left",
     fontWeight: "700",
     fontSize: "14px",
-    color: "#475569",
-    backgroundColor: "#f8fafc",
+    color: "#1e293b",
+    backgroundColor: "#dbeafe",
 };
 
 export const tableCell = {

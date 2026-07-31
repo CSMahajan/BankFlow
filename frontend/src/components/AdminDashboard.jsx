@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LoanApprovalsView from './LoanApprovalsView';
 import AdminDashboardOverview from './AdminDashboardOverview';
 import UserManagementView from "./UserManagementView";
+import AuditLogsView from "./AuditLogsView";
 import { fetchAdminDashboardSummary } from '../api/bankService';
 
 const AdminDashboard = ({ userRole, userName, onLogout }) => {
@@ -125,13 +126,8 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
           <UserManagementView />
         )}
 
-        {activeTab === 'logs' && (
-          <div style={styles.card}>
-            <h3>📋 System Audit Logs</h3>
-            <p style={styles.mutedText}>
-              Track activity logs and security events.
-            </p>
-          </div>
+        {activeTab === "logs" && (
+          <AuditLogsView />
         )}
       </main>
     </div>

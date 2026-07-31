@@ -1,14 +1,10 @@
 package com.bankflow.service;
 
 import com.bankflow.dto.*;
-import com.bankflow.entity.Account;
-import com.bankflow.entity.Loan;
+import com.bankflow.entity.*;
 import com.bankflow.entity.Loan.LoanStatus;
 import com.bankflow.entity.Loan.LoanType;
-import com.bankflow.entity.LoanRepayment;
-import com.bankflow.entity.Transaction;
 import com.bankflow.entity.Transaction.TransactionType;
-import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.LoanRepaymentRepository;
 import com.bankflow.repository.LoanRepository;
@@ -39,6 +35,7 @@ public class LoanService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final AuditLogService auditLogService;
 
     // Default Annual Interest Rates by Loan Type
     private static final BigDecimal PERSONAL_LOAN_RATE = new BigDecimal("12.00");
@@ -77,8 +74,12 @@ public class LoanService {
                 .build();
 
         Loan savedLoan = loanRepository.save(loan);
+        auditLogService.log(
+                AuditAction.LOAN_APPLIED,
+                "Applied for " + savedLoan.getLoanType()
+                        + " loan (" + savedLoan.getLoanNumber() + ")"
+        );
         log.info("Loan application submitted successfully. Loan ID: [{}], Status: [PENDING]", savedLoan.getId());
-
         return mapToLoanResponse(savedLoan);
     }
 
@@ -117,7 +118,10 @@ public class LoanService {
         loan.setStartDate(LocalDate.now());
         loan.setNextDueDate(LocalDate.now().plusMonths(1));
         Loan updatedLoan = loanRepository.save(loan);
-
+        auditLogService.log(
+                AuditAction.LOAN_APPROVED,
+                "Approved loan " + loan.getLoanNumber()
+        );
         log.info("Loan [{}] approved and disbursed [Rs. {}] to account [{}]",
                 loan.getLoanNumber(), loan.getPrincipalAmount(), account.getAccountNumber());
 
@@ -140,7 +144,10 @@ public class LoanService {
         loan.setRejectionRemarks(request.remarks());
 
         Loan updatedLoan = loanRepository.save(loan);
-
+        auditLogService.log(
+                AuditAction.LOAN_REJECTED,
+                "Rejected loan " + loan.getLoanNumber()
+        );
         log.info("Loan [{}] rejected", loan.getLoanNumber());
 
         return mapToLoanResponse(updatedLoan);
@@ -229,6 +236,10 @@ public class LoanService {
 
         LoanRepayment savedRepayment = repaymentRepository.save(repayment);
 
+        auditLogService.log(
+                AuditAction.EMI_PAID,
+                "Paid EMI for loan " + loan.getLoanNumber()
+        );
         return new RepaymentResponse(
                 savedRepayment.getId(),
                 loan.getLoanNumber(),

@@ -382,7 +382,14 @@ const AuditLogsView = () => {
                             <th style={tableHeader}>Time</th>
                             <th style={tableHeader}>User</th>
                             <th style={tableHeader}>Role</th>
-                            <th style={tableHeader}>Action</th>
+                            <th
+                                style={{
+                                    ...tableHeader,
+                                    minWidth: "220px",
+                                }}
+                            >
+                                Action
+                            </th>
                             <th style={tableHeader}>Description</th>
                         </tr>
 
@@ -448,13 +455,19 @@ const AuditLogsView = () => {
                                         </span>
                                     </td>
 
-                                    <td style={tableCell}>
+                                    <td
+                                        style={{
+                                            ...tableCell,
+                                            minWidth: "220px",
+                                        }}
+                                    >
                                         <span
                                             style={{
                                                 padding: "4px 10px",
                                                 borderRadius: "999px",
                                                 fontSize: "12px",
                                                 fontWeight: "600",
+                                                whiteSpace: "nowrap",
                                                 ...getActionBadgeStyle(log.action),
                                             }}
                                         >

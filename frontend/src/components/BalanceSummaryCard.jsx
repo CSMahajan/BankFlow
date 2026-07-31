@@ -96,7 +96,7 @@ const styles = {
     actionBtnSecondary: {
         backgroundColor: 'transparent',
         color: '#ffffff',
-        border: '1px solid rgba(255,255,255,0.4)',
+        border: '1px solid rgba(255,255,255,0.8)',
         padding: '10px 16px',
         borderRadius: '8px',
         fontWeight: '700',

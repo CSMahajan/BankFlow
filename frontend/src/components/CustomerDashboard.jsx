@@ -13,7 +13,6 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
   const [fdSubTab, setFdSubTab] = useState('calculator');
   const [fdDraftConfig, setFdDraftConfig] = useState(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [accounts, setAccounts] = useState([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
   const [accountsError, setAccountsError] = useState(null);
@@ -47,6 +46,25 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     fetchDashboardSummary();
   }, []);
 
+  const fetchDashboardSummary = async () => {
+    setLoadingSummary(true);
+    setSummaryError(null);
+
+    try {
+      const response = await API.get('/dashboard/summary');
+      setSummary(response.data);
+    } catch (err) {
+      console.error(err);
+      setSummaryError('Unable to load dashboard summary.');
+    } finally {
+      setLoadingSummary(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardSummary();
+  }, []);
+
   const roleDisplay = userRole || localStorage.getItem('userRole') || 'CUSTOMER';
 
   const handleOpenFdFromCalc = (config) => {
@@ -55,8 +73,9 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     setActiveTab('fd');
   };
 
-  const handleAccountCreated = () => {
-    setRefreshKey((prev) => prev + 1);
+  const handleAccountCreated = async () => {
+    await fetchAccounts();
+    await fetchDashboardSummary();
   };
 
   const fetchAccounts = async () => {
@@ -208,7 +227,6 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
 
         {activeTab === 'accounts' && (
           <AccountsView
-            key={refreshKey}
             accounts={accounts}
             loading={loadingAccounts}
             error={accountsError}

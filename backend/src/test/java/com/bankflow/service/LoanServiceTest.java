@@ -115,6 +115,7 @@ class LoanServiceTest {
                 .monthlyEmi(new BigDecimal("8721.98"))
                 .remainingBalance(new BigDecimal("100000.00"))
                 .status(LoanStatus.PENDING)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -145,8 +146,12 @@ class LoanServiceTest {
         when(loanRepository.save(any(Loan.class))).thenAnswer(invocation -> {
             Loan l = invocation.getArgument(0);
             l.setId(100L);
+            if (l.getCreatedAt() == null) {
+                l.setCreatedAt(LocalDateTime.now()); // Ensure newly saved entity isn't null
+            }
             return l;
         });
+
 
         LoanResponse response = loanService.applyForLoan(request);
 

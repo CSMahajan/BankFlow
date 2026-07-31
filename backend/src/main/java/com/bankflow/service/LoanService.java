@@ -1,9 +1,6 @@
 package com.bankflow.service;
 
-import com.bankflow.dto.ApplyLoanRequest;
-import com.bankflow.dto.LoanResponse;
-import com.bankflow.dto.PayEmiRequest;
-import com.bankflow.dto.RepaymentResponse;
+import com.bankflow.dto.*;
 import com.bankflow.entity.Account;
 import com.bankflow.entity.Loan;
 import com.bankflow.entity.Loan.LoanStatus;
@@ -128,6 +125,28 @@ public class LoanService {
     }
 
     @Transactional
+    public LoanResponse rejectLoan(Long loanId, RejectLoanRequest request) {
+        User admin = getAuthenticatedUser();
+        log.info("ADMIN [{}] rejecting loan ID [{}]", admin.getEmail(), loanId);
+
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new IllegalArgumentException("Loan application not found"));
+
+        if (loan.getStatus() != LoanStatus.PENDING) {
+            throw new IllegalStateException("Only loans in PENDING status can be rejected");
+        }
+
+        loan.setStatus(LoanStatus.REJECTED);
+        loan.setRejectionRemarks(request.remarks());
+
+        Loan updatedLoan = loanRepository.save(loan);
+
+        log.info("Loan [{}] rejected", loan.getLoanNumber());
+
+        return mapToLoanResponse(updatedLoan);
+    }
+
+    @Transactional
     public RepaymentResponse payEmi(PayEmiRequest request) {
         User currentUser = getAuthenticatedUser();
         log.info("User [{}] attempting EMI payment for loan [{}]", currentUser.getEmail(), request.loanNumber());
@@ -232,6 +251,14 @@ public class LoanService {
     }
 
     @Transactional(readOnly = true)
+    public List<LoanResponse> getPendingLoans() {
+        return loanRepository.findByStatus(LoanStatus.PENDING)
+                .stream()
+                .map(this::mapToLoanResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<RepaymentResponse> getRepaymentHistory(String loanNumber) {
         User currentUser = getAuthenticatedUser();
         Loan loan = loanRepository.findByLoanNumber(loanNumber)
@@ -291,6 +318,7 @@ public class LoanService {
                 loan.getId(),
                 loan.getLoanNumber(),
                 loan.getDisbursementAccount().getAccountNumber(),
+                loan.getUser().getFullName(),
                 loan.getLoanType(),
                 loan.getPrincipalAmount(),
                 loan.getAnnualInterestRate(),
@@ -298,6 +326,8 @@ public class LoanService {
                 loan.getMonthlyEmi(),
                 loan.getRemainingBalance(),
                 loan.getStatus(),
+                loan.getRejectionRemarks(),
+                loan.getCreatedAt().toLocalDate(),
                 loan.getStartDate(),
                 loan.getNextDueDate()
         );

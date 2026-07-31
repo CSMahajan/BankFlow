@@ -54,7 +54,11 @@ public class Loan {
     @Column(nullable = false)
     private LoanStatus status;
 
+    @Column(length = 500)
+    private String rejectionRemarks;
+
     private LocalDate startDate;
+
     private LocalDate nextDueDate;
 
     @Column(nullable = false, updatable = false)

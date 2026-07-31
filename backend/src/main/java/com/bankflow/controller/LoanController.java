@@ -1,9 +1,6 @@
 package com.bankflow.controller;
 
-import com.bankflow.dto.ApplyLoanRequest;
-import com.bankflow.dto.LoanResponse;
-import com.bankflow.dto.PayEmiRequest;
-import com.bankflow.dto.RepaymentResponse;
+import com.bankflow.dto.*;
 import com.bankflow.service.LoanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,11 +42,29 @@ public class LoanController {
         return ResponseEntity.ok(history);
     }
 
+    // ADMIN Endpoint: View Pending Loan Applications
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<LoanResponse>> getPendingLoans() {
+        List<LoanResponse> loans = loanService.getPendingLoans();
+        return ResponseEntity.ok(loans);
+    }
+
     // ADMIN Endpoint: Approve & Disburse Loan
     @PutMapping("/{loanId}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LoanResponse> approveAndDisburseLoan(@PathVariable Long loanId) {
         LoanResponse response = loanService.approveAndDisburseLoan(loanId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{loanId}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<LoanResponse> rejectLoan(
+            @PathVariable Long loanId,
+            @Valid @RequestBody RejectLoanRequest request) {
+
+        LoanResponse response = loanService.rejectLoan(loanId, request);
         return ResponseEntity.ok(response);
     }
 }

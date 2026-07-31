@@ -1,33 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import LoanApprovalsView from './LoanApprovalsView';
-import { fetchDashboardSummary } from '../api/bankService';
+import AdminDashboardOverview from './AdminDashboardOverview';
+import { fetchAdminDashboardSummary } from '../api/bankService';
 
 const AdminDashboard = ({ userRole, userName, onLogout }) => {
+  const [summary, setSummary] = useState(null);
+  const [loadingSummary, setLoadingSummary] = useState(true);
+  const [summaryError, setSummaryError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [adminName, setAdminName] = useState(
     userName || localStorage.getItem('fullName') || localStorage.getItem('name') || 'Admin User'
   );
 
   useEffect(() => {
-    const loadDashboardSummary = async () => {
+    const loadSummary = async () => {
       try {
-        const data = await fetchDashboardSummary();
-
-        const resolvedName =
-          data?.fullName ??
-          data?.name ??
-          data?.customerName;
-
-        if (resolvedName) {
-          setAdminName(resolvedName);
-          localStorage.setItem("fullName", resolvedName);
-        }
+        const data = await fetchAdminDashboardSummary();
+        setSummary(data);
       } catch (err) {
-        console.error("Failed to fetch admin dashboard summary:", err);
+        console.error(err);
+        setSummaryError('Unable to load admin dashboard.');
+      } finally {
+        setLoadingSummary(false);
       }
     };
 
-    loadDashboardSummary();
+    loadSummary();
   }, []);
 
   const roleDisplay = userRole || localStorage.getItem('userRole') || 'ADMIN';
@@ -111,12 +109,11 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
         </header>
 
         {activeTab === 'overview' && (
-          <div style={styles.card}>
-            <h3>📈 Bank Overview & Analytics</h3>
-            <p style={styles.mutedText}>
-              Monitor key operational metrics, active user accounts, and system-wide stats.
-            </p>
-          </div>
+          <AdminDashboardOverview
+            summary={summary}
+            loading={loadingSummary}
+            error={summaryError}
+          />
         )}
 
         {activeTab === 'loanApprovals' && (

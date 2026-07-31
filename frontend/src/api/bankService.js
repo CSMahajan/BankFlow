@@ -46,3 +46,8 @@ export const rejectLoan = async (loanId, remarks) => {
   );
   return response.data;
 };
+
+export const fetchAdminDashboardSummary = async () => {
+  const response = await API.get('/dashboard/admin-summary');
+  return response.data;
+};

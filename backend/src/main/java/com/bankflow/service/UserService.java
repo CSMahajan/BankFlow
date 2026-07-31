@@ -3,6 +3,7 @@ package com.bankflow.service;
 import com.bankflow.dto.*;
 import com.bankflow.entity.User;
 import com.bankflow.exception.ResourceNotFoundException;
+import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,7 +23,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService; // Injected to generate the JWT token
+    private final JwtService jwtService;
+    private final AccountRepository accountRepository;
 
     @Transactional
     public void registerCustomer(RegisterRequest request) {
@@ -90,6 +94,23 @@ public class UserService {
 
         User savedAdmin = userRepository.save(adminUser);
         log.info("ADMIN account created successfully. User ID: [{}], Email: [{}]", savedAdmin.getId(), savedAdmin.getEmail());
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserSummaryResponse> getAllUsers() {
+        log.info("Fetching all users for admin");
+
+        return userRepository.findAll()
+                .stream()
+                .map(user -> new UserSummaryResponse(
+                        user.getId(),
+                        user.getFullName(),
+                        user.getEmail(),
+                        user.getRole().name(),
+                        user.getCreatedAt(),
+                        accountRepository.countByUserId(user.getId())
+                ))
+                .toList();
     }
 
     @Transactional

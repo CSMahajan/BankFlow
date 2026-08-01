@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchPendingLoans, approveLoan, rejectLoan } from '../api/bankService';
 import { formatDate, formatCurrency } from '../utils/formatUtils';
 import modalStyles from "../styles/modalStyles";
+import toast from "react-hot-toast";
 
 const LoanApprovalsView = () => {
     const [pendingLoans, setPendingLoans] = useState([]);
@@ -43,10 +44,10 @@ const LoanApprovalsView = () => {
                 prevLoans.filter((loan) => loan.id !== loanId)
             );
 
-            alert('Loan approved successfully.');
+            toast.success('Loan approved successfully.');
         } catch (err) {
             console.error(err);
-            alert('Failed to approve loan.');
+            toast.error('Failed to approve loan.');
         }
     };
 
@@ -58,7 +59,7 @@ const LoanApprovalsView = () => {
 
     const confirmReject = async () => {
         if (!rejectionRemarks.trim()) {
-            alert("Rejection remarks are required.");
+            toast.error("Rejection remarks are required.");
             return;
         }
 
@@ -73,12 +74,12 @@ const LoanApprovalsView = () => {
             setSelectedLoanId(null);
             setRejectionRemarks("");
 
-            alert("Loan rejected successfully.");
+            toast.success("Loan rejected successfully.");
         } catch (error) {
             console.error(error);
             console.error(error.response?.data);
 
-            alert(
+            toast.error(
                 error.response?.data?.message ??
                 error.response?.data?.error ??
                 JSON.stringify(error.response?.data) ??

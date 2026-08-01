@@ -64,3 +64,31 @@ export const fetchAuditLogs = (page = 0, size = 10) =>
 export const fetchMyCards = () =>
   API.get("/cards/my-cards")
     .then(res => res.data);
+
+export const toggleCardStatus = async (cardId) => {
+  const response = await API.patch(`/cards/${cardId}/toggle-status`);
+  return response.data;
+};
+
+export const updateCardLimit = async (cardId, newLimit) => {
+  const response = await API.patch(
+    `/cards/${cardId}/limit`,
+    null,
+    {
+      params: {
+        newLimit,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const fetchMyAccounts = async () => {
+  const response = await API.get("/accounts/my-accounts");
+  return response.data;
+};
+
+export const issueCard = async (cardData) => {
+  const response = await API.post("/cards/issue", cardData);
+  return response.data;
+};

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './pages/Dashboard';
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -54,11 +55,31 @@ function App() {
   }
 
   return (
-    <Dashboard
-      userRole={userRole}
-      userName={userName}
-      onLogout={handleLogout}
-    />
+    <>
+      <Dashboard
+        userRole={userRole}
+        userName={userName}
+        onLogout={handleLogout}
+      />
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          success: {
+            duration: 4000,
+            style: {
+              borderLeft: "5px solid #22c55e",
+            },
+          },
+          error: {
+            duration: 5000,
+            style: {
+              borderLeft: "5px solid #ef4444",
+            },
+          },
+        }}
+      />
+    </>
   );
 }
 

@@ -123,6 +123,30 @@ const AuditLogsView = () => {
                     color: "#7e22ce",
                 };
 
+            case "CARD_ISSUED":
+                return {
+                    backgroundColor: "#dbeafe",
+                    color: "#1d4ed8",
+                };
+
+            case "CARD_FROZEN":
+                return {
+                    backgroundColor: "#fee2e2",
+                    color: "#b91c1c",
+                };
+
+            case "CARD_ACTIVATED":
+                return {
+                    backgroundColor: "#dcfce7",
+                    color: "#15803d",
+                };
+
+            case "CARD_LIMIT_UPDATED":
+                return {
+                    backgroundColor: "#fef3c7",
+                    color: "#92400e",
+                };
+
             default:
                 return {
                     backgroundColor: "#f3f4f6",
@@ -131,12 +155,42 @@ const AuditLogsView = () => {
         }
     };
 
+    const actionDisplayNames = {
+        LOGIN: "🔐 Login",
+
+        ACCOUNT_CREATED: "🏦 Account Created",
+
+        MONEY_TRANSFER: "💸 Money Transfer",
+
+        FD_CREATED: "💰 Fixed Deposit Created",
+        FD_CLOSED: "💰 Fixed Deposit Closed",
+
+        LOAN_APPLIED: "📄 Loan Applied",
+        LOAN_APPROVED: "✅ Loan Approved",
+        LOAN_REJECTED: "❌ Loan Rejected",
+        EMI_PAID: "💵 EMI Paid",
+
+        CARD_ISSUED: "💳 Card Issued",
+        CARD_FROZEN: "❄ Card Frozen",
+        CARD_ACTIVATED: "✅ Card Activated",
+        CARD_LIMIT_UPDATED: "✏ Daily Limit Updated",
+
+        PROFILE_UPDATED: "👤 Profile Updated",
+    };
+
+    const moduleDisplayNames = {
+        LOGIN: "🔐 Authentication",
+        ACCOUNTS: "🏦 Accounts",
+        TRANSFERS: "💸 Transfers",
+        FIXED_DEPOSITS: "💰 Fixed Deposits",
+        LOANS: "📄 Loans",
+        CARDS: "💳 Cards",
+        PROFILE: "👤 Profile",
+    };
+
     const moduleActions = {
-        LOANS: [
-            "LOAN_APPLIED",
-            "LOAN_APPROVED",
-            "LOAN_REJECTED",
-            "EMI_PAID",
+        LOGIN: [
+            "LOGIN",
         ],
 
         ACCOUNTS: [
@@ -152,12 +206,22 @@ const AuditLogsView = () => {
             "FD_CLOSED",
         ],
 
-        PROFILE: [
-            "PROFILE_UPDATED",
+        LOANS: [
+            "LOAN_APPLIED",
+            "LOAN_APPROVED",
+            "LOAN_REJECTED",
+            "EMI_PAID",
         ],
 
-        LOGIN: [
-            "LOGIN",
+        CARDS: [
+            "CARD_ISSUED",
+            "CARD_FROZEN",
+            "CARD_ACTIVATED",
+            "CARD_LIMIT_UPDATED",
+        ],
+
+        PROFILE: [
+            "PROFILE_UPDATED",
         ],
     };
 
@@ -173,7 +237,7 @@ const AuditLogsView = () => {
 
         const matchesModule =
             moduleFilter === "ALL" ||
-            moduleActions[moduleFilter].includes(log.action);
+            moduleActions[moduleFilter]?.includes(log.action);
 
         const matchesAction =
             actionFilter === "ALL" ||
@@ -186,6 +250,11 @@ const AuditLogsView = () => {
             matchesAction
         );
     });
+
+    const availableActions =
+        moduleFilter === "ALL"
+            ? [...new Set(Object.values(moduleActions).flat())]
+            : moduleActions[moduleFilter] ?? [];
 
     return (
 
@@ -245,17 +314,18 @@ const AuditLogsView = () => {
                     value={moduleFilter}
                     onChange={(e) => {
                         setModuleFilter(e.target.value);
+                        setActionFilter("ALL");
                         setCurrentPage(0);
                     }}
                     style={styles.filterSelect}
                 >
-                    <option value="ALL">All Modules</option>
-                    <option value="LOGIN">Login</option>
-                    <option value="ACCOUNTS">Accounts</option>
-                    <option value="LOANS">Loans</option>
-                    <option value="FIXED_DEPOSITS">Fixed Deposits</option>
-                    <option value="TRANSFERS">Transfers</option>
-                    <option value="PROFILE">Profile</option>
+                    <option value="ALL">📂 All Modules</option>
+
+                    {Object.keys(moduleActions).map((module) => (
+                        <option key={module} value={module}>
+                            {moduleDisplayNames[module] ?? module}
+                        </option>
+                    ))}
                 </select>
 
                 <select
@@ -266,17 +336,16 @@ const AuditLogsView = () => {
                     }}
                     style={styles.filterSelect}
                 >
-                    <option value="ALL">All Actions</option>
-                    <option value="LOGIN">Login</option>
-                    <option value="ACCOUNT_CREATED">Account Created</option>
-                    <option value="MONEY_TRANSFER">Money Transfer</option>
-                    <option value="LOAN_APPLIED">Loan Applied</option>
-                    <option value="LOAN_APPROVED">Loan Approved</option>
-                    <option value="LOAN_REJECTED">Loan Rejected</option>
-                    <option value="EMI_PAID">EMI Paid</option>
-                    <option value="FD_CREATED">FD Created</option>
-                    <option value="FD_CLOSED">FD Closed</option>
-                    <option value="PROFILE_UPDATED">Profile Updated</option>
+                    <option value="ALL">⚡ All Actions</option>
+
+                    {availableActions.map((action) => (
+                        <option
+                            key={action}
+                            value={action}
+                        >
+                            {actionDisplayNames[action] ?? action}
+                        </option>
+                    ))}
                 </select>
 
                 {/* Refresh */}
@@ -309,7 +378,7 @@ const AuditLogsView = () => {
                     <strong>{logs.length}</strong> audit logs
                 </div>
 
-                {(search || roleFilter !== "ALL" || moduleFilter !== "ALL") && (
+                {(search || roleFilter !== "ALL" || moduleFilter !== "ALL" || actionFilter !== "ALL") && (
                     <button
                         onClick={() => {
                             setSearch("");

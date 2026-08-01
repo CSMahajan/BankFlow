@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { applyLoan } from '../api/bankService';
 import modalStyles from '../styles/modalStyles';
+import toast from "react-hot-toast";
 
 const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
     const [accountNumber, setAccountNumber] = useState('');
@@ -38,7 +39,7 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
             setTenureMonths('');
 
             await onLoanApplied();
-
+            toast.success("Loan applied successfully");
             onClose();
         } catch (err) {
             console.error('Failed to apply for loan:', err);

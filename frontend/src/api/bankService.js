@@ -60,3 +60,7 @@ export const fetchUsers = async () => {
 export const fetchAuditLogs = (page = 0, size = 10) =>
   API.get(`/admin/audit-logs?page=${page}&size=${size}`)
     .then(res => res.data);
+
+export const fetchMyCards = () =>
+  API.get("/cards/my-cards")
+    .then(res => res.data);

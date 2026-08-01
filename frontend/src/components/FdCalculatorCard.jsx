@@ -50,9 +50,8 @@ const FdCalculatorCard = ({ onOpenFd, defaultAccountNumber }) => {
         if (onOpenFd) {
             onOpenFd({
                 depositAmount: amount,
-                tenureInYears: tenureYears,
-                interestRate: interestRate,
-                sourceAccountNumber: defaultAccountNumber || 'BF5891164768',
+                tenureYears: tenureYears,
+                sourceAccountNumber: defaultAccountNumber,
             });
         }
     };

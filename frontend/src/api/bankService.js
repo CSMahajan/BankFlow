@@ -92,3 +92,18 @@ export const issueCard = async (cardData) => {
   const response = await API.post("/cards/issue", cardData);
   return response.data;
 };
+
+export const createFixedDeposit = async (request) => {
+  const response = await API.post("/fd/create", request);
+  return response.data;
+};
+
+export const fetchMyFixedDeposits = async () => {
+  const response = await API.get("/fd/my-fds");
+  return response.data;
+};
+
+export const closeFixedDeposit = async (fdNumber) => {
+  const response = await API.patch(`/fd/${fdNumber}/close`);
+  return response.data;
+};

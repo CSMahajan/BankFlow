@@ -1,20 +1,59 @@
 import React, { useEffect, useState } from "react";
-import API from "../api/axios";
+import { fetchMyFixedDeposits, closeFixedDeposit } from "../api/bankService";
 
-const ViewFds = () => {
+const ViewFds = ({ onFdClosed }) => {
     const [fds, setFds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const handleCloseFd = async (fd) => {
+
+        const confirmed = window.confirm(
+            new Date(fd.maturityDate) > new Date()
+                ? "This Fixed Deposit has not matured yet.\n\nOnly the principal amount will be credited.\n\nDo you want to continue?"
+                : "The maturity amount will be credited to your source account.\n\nDo you want to continue?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+            await closeFixedDeposit(fd.fdNumber);
+
+            await Promise.all([
+                loadFds(),
+                onFdClosed?.()
+            ]);
+
+            alert("✅ Fixed Deposit closed successfully.");
+        } catch (err) {
+            console.error(err);
+            alert(
+                err.response?.data?.message ??
+                "Failed to close Fixed Deposit."
+            );
+        }
+    };
 
     useEffect(() => {
         loadFds();
     }, []);
 
     const loadFds = async () => {
+
         try {
-            const response = await API.get("/fd/my-fds");
-            setFds(response.data || []);
+            setLoading(true);
+            setError(null);
+
+            console.log("Loading FDs...");
+
+            const response = await fetchMyFixedDeposits();
+
+            console.log(response);
+
+            setFds(response);
+
         } catch (err) {
+            console.error(err);
             setError("Unable to load Fixed Deposits.");
         } finally {
             setLoading(false);
@@ -59,8 +98,22 @@ const ViewFds = () => {
                                 {fd.fdNumber}
                             </span>
 
-                            <span style={styles.status}>
-                                {fd.status}
+                            <span
+                                style={{
+                                    ...styles.status,
+                                    backgroundColor:
+                                        fd.status === "ACTIVE"
+                                            ? "#dcfce7"
+                                            : "#cbd5e1",
+                                    color:
+                                        fd.status === "ACTIVE"
+                                            ? "#15803d"
+                                            : "#334155",
+                                }}
+                            >
+                                {fd.status === "ACTIVE"
+                                    ? "🟢 ACTIVE"
+                                    : "⚫ CLOSED"}
                             </span>
                         </div>
 
@@ -102,6 +155,14 @@ const ViewFds = () => {
                                 {formatCurrency(fd.maturityAmount)}
                             </strong>
                         </div>
+                        {fd.status === "ACTIVE" && (
+                            <button
+                                style={styles.closeButton}
+                                onClick={() => handleCloseFd(fd)}
+                            >
+                                Close Fixed Deposit
+                            </button>
+                        )}
 
                     </div>
                 ))}
@@ -169,6 +230,18 @@ const styles = {
         color: "#fff",
         border: "none",
         borderRadius: 8,
+        cursor: "pointer",
+    },
+
+    closeButton: {
+        width: "100%",
+        marginTop: 16,
+        padding: "10px",
+        border: "none",
+        borderRadius: 10,
+        backgroundColor: "#b91c1c",
+        color: "#fff",
+        fontWeight: 700,
         cursor: "pointer",
     },
 };

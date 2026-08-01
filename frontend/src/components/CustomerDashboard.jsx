@@ -26,27 +26,6 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     localStorage.getItem('name') ||
     'Customer';
 
-  useEffect(() => {
-    const fetchDashboardSummary = async () => {
-      setLoadingSummary(true);
-      setSummaryError(null);
-
-      try {
-        const response = await API.get('/dashboard/summary');
-
-        setSummary(response.data);
-
-      } catch (err) {
-        console.error(err);
-        setSummaryError('Unable to load dashboard summary.');
-      } finally {
-        setLoadingSummary(false);
-      }
-    };
-
-    fetchDashboardSummary();
-  }, []);
-
   const fetchDashboardSummary = async () => {
     setLoadingSummary(true);
     setSummaryError(null);
@@ -261,6 +240,7 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
 
         {activeTab === 'fd' && fdSubTab === 'open' && (
           <FdManagementView
+            accounts={accounts}
             initialConfig={fdDraftConfig}
             onFdCreated={() => {
               setActiveTab('accounts');
@@ -270,7 +250,12 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
         )}
 
         {activeTab === 'fd' && fdSubTab === 'view' && (
-          <ViewFds />
+          <ViewFds
+            onFdClosed={async () => {
+              await fetchAccounts();
+              await fetchDashboardSummary();
+            }}
+          />
         )}
       </main>
 

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import API from '../api/axios';
+import { createFixedDeposit } from "../api/bankService";
+import { FD_RATES, FD_TENURES } from "./fdConfig";
 
 const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
   const [sourceAccountNumber, setSourceAccountNumber] = useState(
     accounts[0]?.accountNumber || initialConfig?.sourceAccountNumber || ''
   );
   const [depositAmount, setDepositAmount] = useState(
-    initialConfig?.principal || initialConfig?.depositAmount || 24045.93
+    initialConfig?.depositAmount ?? ""
   );
   const [tenureYears, setTenureYears] = useState(initialConfig?.tenureYears || 3);
   const [loading, setLoading] = useState(false);
@@ -27,8 +28,8 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
     setErrorMsg(null);
 
     try {
-      await API.post('/fd/create', {
-        sourceAccountNumber: sourceAccountNumber,
+      await createFixedDeposit({
+        sourceAccountNumber,
         depositAmount: Number(depositAmount),
         tenureYears: Number(tenureYears),
       });
@@ -56,14 +57,24 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
       <form onSubmit={handleCreateFd} style={styles.form}>
         <div style={styles.inputGroup}>
           <label style={styles.label}>Source Account Number</label>
-          <input
-            type="text"
+
+          <select
             value={sourceAccountNumber}
             onChange={(e) => setSourceAccountNumber(e.target.value)}
-            placeholder="e.g. BF5891164768"
             required
             style={styles.input}
-          />
+          >
+            <option value="">Select Source Account</option>
+
+            {accounts.map((account) => (
+              <option
+                key={account.accountNumber}
+                value={account.accountNumber}
+              >
+                {account.accountNumber}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div style={styles.inputGroup}>
@@ -72,6 +83,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
             type="number"
             step="0.01"
             value={depositAmount}
+            placeholder="Enter deposit amount"
             onChange={(e) => setDepositAmount(e.target.value)}
             required
             style={styles.input}
@@ -85,9 +97,14 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
             onChange={(e) => setTenureYears(Number(e.target.value))}
             style={styles.input}
           >
-            <option value={1}>1 Year (6.5%)</option>
-            <option value={3}>3 Years (7%)</option>
-            <option value={5}>5 Years (7.5%)</option>
+            {FD_TENURES.map(year => (
+              <option
+                key={year}
+                value={year}
+              >
+                {year} Year{year > 1 ? "s" : ""}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -95,7 +112,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
           <label style={styles.label}>Applicable Interest Rate</label>
           <input
             type="text"
-            value={interestRates[tenureYears] || '7.0% p.a.'}
+            value={FD_RATES[tenureYears]}
             disabled
             style={{ ...styles.input, backgroundColor: '#f3f4f6', fontWeight: '700', color: '#0d6360' }}
           />

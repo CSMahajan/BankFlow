@@ -50,6 +50,9 @@ class TransactionServiceTest {
     private SecurityContext securityContext;
 
     @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
     private Authentication authentication;
 
     @InjectMocks

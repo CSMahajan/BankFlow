@@ -4,10 +4,7 @@ import com.bankflow.dto.CreateFdRequest;
 import com.bankflow.dto.FdCalculatorRequest;
 import com.bankflow.dto.FdCalculatorResponse;
 import com.bankflow.dto.FdResponse;
-import com.bankflow.entity.Account;
-import com.bankflow.entity.FixedDeposit;
-import com.bankflow.entity.Transaction;
-import com.bankflow.entity.User;
+import com.bankflow.entity.*;
 import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.FixedDepositRepository;
 import com.bankflow.repository.TransactionRepository;
@@ -36,6 +33,7 @@ public class FixedDepositService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final AuditLogService auditLogService;
 
     private static final BigDecimal RATE_1_YEAR = new BigDecimal("6.50");
     private static final BigDecimal RATE_3_YEARS = new BigDecimal("7.00");
@@ -141,7 +139,18 @@ public class FixedDepositService {
         FixedDeposit savedFd = fdRepository.save(fd);
         log.info("Fixed Deposit successfully booked. FD Number: [{}], User: [{}], Maturity Amount: [Rs. {}]",
                 fdNumber, currentUser.getEmail(), maturityAmount);
-
+        auditLogService.log(
+                AuditAction.FD_CREATED,
+                "Created Fixed Deposit " +
+                        savedFd.getFdNumber() +
+                        " for ₹" +
+                        savedFd.getDepositAmount() +
+                        " (" +
+                        savedFd.getTenureYears() +
+                        " " +
+                        (savedFd.getTenureYears() == 1 ? "Year" : "Years") +
+                        ")"
+        );
         return mapToResponse(savedFd);
     }
 

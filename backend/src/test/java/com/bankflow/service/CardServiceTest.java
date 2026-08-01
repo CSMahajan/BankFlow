@@ -46,6 +46,9 @@ class CardServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
     private SecurityContext securityContext;
 
     @Mock

@@ -54,6 +54,9 @@ class AccountServiceTest {
     @InjectMocks
     private AccountService accountService;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     private User mockUser;
     private User mockAdminUser;
     private User mockOtherUser;

@@ -52,6 +52,9 @@ class FixedDepositServiceTest {
     private TransactionRepository transactionRepository;
 
     @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
     private SecurityContext securityContext;
 
     @Mock

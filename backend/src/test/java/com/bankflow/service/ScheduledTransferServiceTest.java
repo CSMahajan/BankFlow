@@ -50,6 +50,9 @@ class ScheduledTransferServiceTest {
     private FundTransferService transferService;
 
     @Mock
+    private AuditLogService auditLogService;
+
+    @Mock
     private SecurityContext securityContext;
 
     @Mock

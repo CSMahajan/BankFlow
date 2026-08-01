@@ -146,9 +146,9 @@ public class FixedDepositService {
 
         FixedDeposit fd = fdRepository.findByFdNumber(fdNumber).orElseThrow(() -> new IllegalArgumentException("Fixed Deposit not found"));
 
-        validateFdOwnership(fd, currentUser);
-
         validateFdClosure(fd);
+
+        validateFdOwnership(fd, currentUser);
 
         creditClosureAmount(fd);
 
@@ -157,7 +157,6 @@ public class FixedDepositService {
         log.info("Closing Fixed Deposit [{}] requested by [{}]", fdNumber, currentUser.getEmail());
         FixedDeposit closedFd = fdRepository.save(fd);
         log.info("FD [{}] marked CLOSED", fd.getFdNumber());
-        auditLogService.log(AuditAction.FD_CLOSED, "Closed Fixed Deposit " + closedFd.getFdNumber() + " for ₹" + closedFd.getMaturityAmount());
 
         return mapToResponse(closedFd);
     }
@@ -197,13 +196,24 @@ public class FixedDepositService {
         Transaction creditTx = Transaction.builder()
                 .transactionId(txId)
                 .account(account)
-                .transactionType(Transaction.TransactionType.CREDIT).
-                amount(amountToCredit).availableBalance(updatedBalance).
-                description(description).build();
+                .transactionType(Transaction.TransactionType.CREDIT)
+                .amount(amountToCredit)
+                .availableBalance(updatedBalance)
+                .description(description)
+                .build();
 
         transactionRepository.save(creditTx);
 
         log.info("FD [{}] closed. Credited Rs. {} to Account [{}]. Ref [{}]", fd.getFdNumber(), amountToCredit, account.getAccountNumber(), txId);
+
+        auditLogService.log(
+                AuditAction.FD_CLOSED,
+                (premature ? "Prematurely closed " : "Closed ")
+                        + "Fixed Deposit "
+                        + fd.getFdNumber()
+                        + " for ₹"
+                        + amountToCredit
+        );
     }
 
     private void validateTenure(Integer years) {

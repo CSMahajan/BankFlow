@@ -1,4 +1,4 @@
-import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./auditConstants";
+import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./auditConfig";
 
 const AuditFilterBar = ({
     search,

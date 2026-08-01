@@ -279,7 +279,6 @@ const AuditLogsView = () => {
                 actionDisplayNames={actionDisplayNames}
                 loadLogs={loadLogs}
                 setCurrentPage={setCurrentPage}
-                styles={styles}
             />
 
             <div
@@ -517,26 +516,6 @@ const AuditLogsView = () => {
 };
 
 const styles = {
-
-    filterSelect: {
-        padding: "12px 16px",
-        borderRadius: "10px",
-        border: "1px solid #d1d5db",
-        backgroundColor: "#ffffff",
-        fontSize: "14px",
-        minWidth: "170px",
-        cursor: "pointer",
-    },
-
-    refreshButton: {
-        padding: "12px 22px",
-        borderRadius: "10px",
-        border: "1px solid #22c55e",
-        backgroundColor: "#ffffff",
-        color: "#16a34a",
-        fontWeight: "700",
-        cursor: "pointer",
-    },
 
     clearButton: {
         padding: "10px 18px",

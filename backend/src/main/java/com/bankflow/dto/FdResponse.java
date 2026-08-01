@@ -15,5 +15,6 @@ public record FdResponse(
         LocalDate maturityDate,
         LocalDate closedDate,
         BigDecimal maturityAmount,
+        BigDecimal creditedAmount,
         String status
 ) {}

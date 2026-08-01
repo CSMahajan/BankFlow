@@ -69,7 +69,7 @@ public class FixedDeposit {
 
     public enum FdStatus {
         ACTIVE,
-        CLOSED,
-        MATURED
+        PREMATURELY_CLOSED,
+        MATURED_CLOSED
     }
 }

@@ -152,7 +152,12 @@ public class FixedDepositService {
 
         creditClosureAmount(fd);
 
-        fd.setStatus(FixedDeposit.FdStatus.CLOSED);
+        fd.setStatus(
+                LocalDate.now().isBefore(fd.getMaturityDate())
+                        ? FixedDeposit.FdStatus.PREMATURELY_CLOSED
+                        : FixedDeposit.FdStatus.MATURED_CLOSED
+        );
+
         fd.setClosedDate(LocalDate.now());
         log.info("Closing Fixed Deposit [{}] requested by [{}]", fdNumber, currentUser.getEmail());
         FixedDeposit closedFd = fdRepository.save(fd);
@@ -264,10 +269,27 @@ public class FixedDepositService {
     }
 
     private FdResponse mapToResponse(FixedDeposit fd) {
-        return new FdResponse(fd.getId(), fd.getFdNumber(), fd.getUser().getFullName(),
-                fd.getSourceAccount().getAccountNumber(), fd.getDepositAmount(),
-                fd.getInterestRate(), fd.getTenureYears(), fd.getDepositDate(),
-                fd.getMaturityDate(), fd.getClosedDate(), fd.getMaturityAmount(),
-                fd.getStatus().name());
+
+        BigDecimal creditedAmount = switch (fd.getStatus()) {
+            case PREMATURELY_CLOSED -> fd.getDepositAmount();
+            case MATURED_CLOSED -> fd.getMaturityAmount();
+            default -> null;      // ACTIVE
+        };
+
+        return new FdResponse(
+                fd.getId(),
+                fd.getFdNumber(),
+                fd.getUser().getFullName(),
+                fd.getSourceAccount().getAccountNumber(),
+                fd.getDepositAmount(),
+                fd.getInterestRate(),
+                fd.getTenureYears(),
+                fd.getDepositDate(),
+                fd.getMaturityDate(),
+                fd.getClosedDate(),
+                fd.getMaturityAmount(),
+                creditedAmount,
+                fd.getStatus().name()
+        );
     }
 }

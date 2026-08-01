@@ -43,8 +43,7 @@ public class FixedDepositService {
     private final SecureRandom secureRandom = new SecureRandom();
 
     public FdCalculatorResponse calculateMaturity(FdCalculatorRequest request) {
-        log.debug("FD maturity calculation requested for Amount: [Rs. {}], Tenure: [{}] years",
-                request.depositAmount(), request.tenureYears());
+        log.debug("FD maturity calculation requested for Amount: [Rs. {}], Tenure: [{}] years", request.depositAmount(), request.tenureYears());
 
         validateTenure(request.tenureYears());
 
@@ -52,47 +51,35 @@ public class FixedDepositService {
         BigDecimal maturityAmount = calculateCompoundInterest(request.depositAmount(), rate, request.tenureYears());
         BigDecimal interestEarned = maturityAmount.subtract(request.depositAmount());
 
-        log.debug("FD calculation complete. Calculated Maturity: [Rs. {}], Interest Earned: [Rs. {}]",
-                maturityAmount, interestEarned);
+        log.debug("FD calculation complete. Calculated Maturity: [Rs. {}], Interest Earned: [Rs. {}]", maturityAmount, interestEarned);
 
-        return new FdCalculatorResponse(
-                request.depositAmount(),
-                rate,
-                request.tenureYears(),
-                interestEarned,
-                maturityAmount
-        );
+        return new FdCalculatorResponse(request.depositAmount(), rate, request.tenureYears(), interestEarned, maturityAmount);
     }
 
     @Transactional
     public FdResponse createFixedDeposit(CreateFdRequest request) {
         User currentUser = getAuthenticatedUser();
-        log.info("Initiating FD booking for user [{}] from account [{}] with deposit [Rs. {}] for [{}] years",
-                currentUser.getEmail(), request.sourceAccountNumber(), request.depositAmount(), request.tenureYears());
+        log.info("Initiating FD booking for user [{}] from account [{}] with deposit [Rs. {}] for [{}] years", currentUser.getEmail(), request.sourceAccountNumber(), request.depositAmount(), request.tenureYears());
 
         // Validate minimum deposit constraint
         if (request.depositAmount().compareTo(MIN_FD_AMOUNT) < 0) {
-            log.warn("FD creation failed: Requested amount [Rs. {}] is not greater than threshold [Rs. 10000.00]",
-                    request.depositAmount());
+            log.warn("FD creation failed: Requested amount [Rs. {}] is not greater than threshold [Rs. 10000.00]", request.depositAmount());
             throw new IllegalArgumentException("Deposit amount must be minimum Rs. 10,000");
         }
         validateTenure(request.tenureYears());
 
-        Account sourceAccount = accountRepository.findByAccountNumber(request.sourceAccountNumber())
-                .orElseThrow(() -> {
-                    log.error("FD creation failed: Source account [{}] not found", request.sourceAccountNumber());
-                    return new IllegalArgumentException("Source account not found");
-                });
+        Account sourceAccount = accountRepository.findByAccountNumber(request.sourceAccountNumber()).orElseThrow(() -> {
+            log.error("FD creation failed: Source account [{}] not found", request.sourceAccountNumber());
+            return new IllegalArgumentException("Source account not found");
+        });
 
         if (!sourceAccount.getUser().getId().equals(currentUser.getId())) {
-            log.warn("Security Alert: User [{}] attempted FD creation from unowned account [{}]",
-                    currentUser.getEmail(), request.sourceAccountNumber());
+            log.warn("Security Alert: User [{}] attempted FD creation from unowned account [{}]", currentUser.getEmail(), request.sourceAccountNumber());
             throw new AccessDeniedException("You can only open an FD using your own account");
         }
 
         if (sourceAccount.getCurrentBalance().compareTo(request.depositAmount()) < 0) {
-            log.warn("FD creation failed: Insufficient balance in source account [{}]. Current: {}, Requested: {}",
-                    sourceAccount.getAccountNumber(), sourceAccount.getCurrentBalance(), request.depositAmount());
+            log.warn("FD creation failed: Insufficient balance in source account [{}]. Current: {}, Requested: {}", sourceAccount.getAccountNumber(), sourceAccount.getCurrentBalance(), request.depositAmount());
             throw new IllegalArgumentException("Insufficient balance in source account");
         }
 
@@ -104,18 +91,10 @@ public class FixedDepositService {
         String txId = "FD-DEBIT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         // Record DEBIT transaction for FD creation
-        Transaction debitTx = Transaction.builder()
-                .transactionId(txId)
-                .account(sourceAccount)
-                .transactionType(Transaction.TransactionType.DEBIT)
-                .amount(request.depositAmount())
-                .availableBalance(newBalance)
-                .description("Fixed Deposit Booking - Tenure: " + request.tenureYears() + " Yrs")
-                .build();
+        Transaction debitTx = Transaction.builder().transactionId(txId).account(sourceAccount).transactionType(Transaction.TransactionType.DEBIT).amount(request.depositAmount()).availableBalance(newBalance).description("Fixed Deposit Booking - Tenure: " + request.tenureYears() + " Yrs").build();
 
         transactionRepository.save(debitTx);
-        log.info("Source account [{}] debited [Rs. {}] for FD creation. Ref: [{}], New Balance: [Rs. {}]",
-                sourceAccount.getAccountNumber(), request.depositAmount(), txId, newBalance);
+        log.info("Source account [{}] debited [Rs. {}] for FD creation. Ref: [{}], New Balance: [Rs. {}]", sourceAccount.getAccountNumber(), request.depositAmount(), txId, newBalance);
 
         // Save Fixed Deposit details
         BigDecimal interestRate = getInterestRateForTenure(request.tenureYears());
@@ -123,34 +102,11 @@ public class FixedDepositService {
         LocalDate depositDate = LocalDate.now();
         String fdNumber = generateUniqueFdNumber();
 
-        FixedDeposit fd = FixedDeposit.builder()
-                .fdNumber(fdNumber)
-                .user(currentUser)
-                .sourceAccount(sourceAccount)
-                .depositAmount(request.depositAmount())
-                .interestRate(interestRate)
-                .tenureYears(request.tenureYears())
-                .depositDate(depositDate)
-                .maturityDate(depositDate.plusYears(request.tenureYears()))
-                .maturityAmount(maturityAmount)
-                .status(FixedDeposit.FdStatus.ACTIVE)
-                .build();
+        FixedDeposit fd = FixedDeposit.builder().fdNumber(fdNumber).user(currentUser).sourceAccount(sourceAccount).depositAmount(request.depositAmount()).interestRate(interestRate).tenureYears(request.tenureYears()).depositDate(depositDate).maturityDate(depositDate.plusYears(request.tenureYears())).maturityAmount(maturityAmount).status(FixedDeposit.FdStatus.ACTIVE).build();
 
         FixedDeposit savedFd = fdRepository.save(fd);
-        log.info("Fixed Deposit successfully booked. FD Number: [{}], User: [{}], Maturity Amount: [Rs. {}]",
-                fdNumber, currentUser.getEmail(), maturityAmount);
-        auditLogService.log(
-                AuditAction.FD_CREATED,
-                "Created Fixed Deposit " +
-                        savedFd.getFdNumber() +
-                        " for ₹" +
-                        savedFd.getDepositAmount() +
-                        " (" +
-                        savedFd.getTenureYears() +
-                        " " +
-                        (savedFd.getTenureYears() == 1 ? "Year" : "Years") +
-                        ")"
-        );
+        log.info("Fixed Deposit successfully booked. FD Number: [{}], User: [{}], Maturity Amount: [Rs. {}]", fdNumber, currentUser.getEmail(), maturityAmount);
+        auditLogService.log(AuditAction.FD_CREATED, "Created Fixed Deposit " + savedFd.getFdNumber() + " for ₹" + savedFd.getDepositAmount() + " (" + savedFd.getTenureYears() + " " + (savedFd.getTenureYears() == 1 ? "Year" : "Years") + ")");
         return mapToResponse(savedFd);
     }
 
@@ -159,10 +115,7 @@ public class FixedDepositService {
         User currentUser = getAuthenticatedUser();
         log.debug("Fetching all Fixed Deposits for user [{}]", currentUser.getEmail());
 
-        List<FdResponse> fds = fdRepository.findByUserId(currentUser.getId())
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        List<FdResponse> fds = fdRepository.findByUserId(currentUser.getId()).stream().map(this::mapToResponse).toList();
 
         log.debug("Retrieved [{}] Fixed Deposits for user [{}]", fds.size(), currentUser.getEmail());
         return fds;
@@ -173,19 +126,84 @@ public class FixedDepositService {
         User currentUser = getAuthenticatedUser();
         log.debug("Fetching FD details for number [{}] requested by user [{}]", fdNumber, currentUser.getEmail());
 
-        FixedDeposit fd = fdRepository.findByFdNumber(fdNumber)
-                .orElseThrow(() -> {
-                    log.error("FD lookup failed: Fixed Deposit [{}] not found", fdNumber);
-                    return new IllegalArgumentException("Fixed Deposit not found");
-                });
+        FixedDeposit fd = fdRepository.findByFdNumber(fdNumber).orElseThrow(() -> {
+            log.error("FD lookup failed: Fixed Deposit [{}] not found", fdNumber);
+            return new IllegalArgumentException("Fixed Deposit not found");
+        });
 
         if (!currentUser.getRole().equals(User.Role.ADMIN) && !fd.getUser().getId().equals(currentUser.getId())) {
-            log.warn("Security Alert: User [{}] attempted unauthorized view of Fixed Deposit [{}]",
-                    currentUser.getEmail(), fdNumber);
+            log.warn("Security Alert: User [{}] attempted unauthorized view of Fixed Deposit [{}]", currentUser.getEmail(), fdNumber);
             throw new AccessDeniedException("You are not authorized to view this Fixed Deposit");
         }
 
         return mapToResponse(fd);
+    }
+
+    @Transactional
+    public FdResponse closeFixedDeposit(String fdNumber) {
+
+        User currentUser = getAuthenticatedUser();
+
+        FixedDeposit fd = fdRepository.findByFdNumber(fdNumber).orElseThrow(() -> new IllegalArgumentException("Fixed Deposit not found"));
+
+        validateFdOwnership(fd, currentUser);
+
+        validateFdClosure(fd);
+
+        creditClosureAmount(fd);
+
+        fd.setStatus(FixedDeposit.FdStatus.CLOSED);
+        fd.setClosedDate(LocalDate.now());
+        log.info("Closing Fixed Deposit [{}] requested by [{}]", fdNumber, currentUser.getEmail());
+        FixedDeposit closedFd = fdRepository.save(fd);
+        log.info("FD [{}] marked CLOSED", fd.getFdNumber());
+        auditLogService.log(AuditAction.FD_CLOSED, "Closed Fixed Deposit " + closedFd.getFdNumber() + " for ₹" + closedFd.getMaturityAmount());
+
+        return mapToResponse(closedFd);
+    }
+
+    private void validateFdOwnership(FixedDeposit fd, User currentUser) {
+        if (!fd.getUser().getId().equals(currentUser.getId())) {
+            log.warn("Security Alert: User [{}] attempted to close FD [{}] belonging to another user", currentUser.getEmail(), fd.getFdNumber());
+            throw new AccessDeniedException("You are not authorized to close this Fixed Deposit");
+        }
+    }
+
+    private void validateFdClosure(FixedDeposit fd) {
+        if (fd.getStatus() != FixedDeposit.FdStatus.ACTIVE) {
+            log.warn("FD [{}] cannot be closed because current status is [{}]", fd.getFdNumber(), fd.getStatus());
+            throw new IllegalArgumentException("Only active Fixed Deposits can be closed.");
+        }
+    }
+
+    private void creditClosureAmount(FixedDeposit fd) {
+        Account account = fd.getSourceAccount();
+        LocalDate today = LocalDate.now();
+
+        boolean premature = today.isBefore(fd.getMaturityDate());
+        BigDecimal amountToCredit = premature ? fd.getDepositAmount() : fd.getMaturityAmount();
+        BigDecimal updatedBalance = account.getCurrentBalance().add(amountToCredit);
+        account.setCurrentBalance(updatedBalance);
+        accountRepository.save(account);
+
+        String txId = "FD-CREDIT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String description =
+                premature
+                        ? "Premature FD Closure - "
+                        : "Fixed Deposit Closure - ";
+
+        description += fd.getFdNumber();
+
+        Transaction creditTx = Transaction.builder()
+                .transactionId(txId)
+                .account(account)
+                .transactionType(Transaction.TransactionType.CREDIT).
+                amount(amountToCredit).availableBalance(updatedBalance).
+                description(description).build();
+
+        transactionRepository.save(creditTx);
+
+        log.info("FD [{}] closed. Credited Rs. {} to Account [{}]. Ref [{}]", fd.getFdNumber(), amountToCredit, account.getAccountNumber(), txId);
     }
 
     private void validateTenure(Integer years) {
@@ -218,11 +236,10 @@ public class FixedDepositService {
 
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> {
-                    log.error("Authentication Context Error: User [{}] not found in database", auth.getName());
-                    return new IllegalArgumentException("Authenticated user not found");
-                });
+        return userRepository.findByEmail(auth.getName()).orElseThrow(() -> {
+            log.error("Authentication Context Error: User [{}] not found in database", auth.getName());
+            return new IllegalArgumentException("Authenticated user not found");
+        });
     }
 
     private String generateUniqueFdNumber() {
@@ -237,18 +254,6 @@ public class FixedDepositService {
     }
 
     private FdResponse mapToResponse(FixedDeposit fd) {
-        return new FdResponse(
-                fd.getId(),
-                fd.getFdNumber(),
-                fd.getUser().getFullName(),
-                fd.getSourceAccount().getAccountNumber(),
-                fd.getDepositAmount(),
-                fd.getInterestRate(),
-                fd.getTenureYears(),
-                fd.getDepositDate(),
-                fd.getMaturityDate(),
-                fd.getMaturityAmount(),
-                fd.getStatus().name()
-        );
+        return new FdResponse(fd.getId(), fd.getFdNumber(), fd.getUser().getFullName(), fd.getSourceAccount().getAccountNumber(), fd.getDepositAmount(), fd.getInterestRate(), fd.getTenureYears(), fd.getDepositDate(), fd.getMaturityDate(), fd.getMaturityAmount(), fd.getStatus().name());
     }
 }

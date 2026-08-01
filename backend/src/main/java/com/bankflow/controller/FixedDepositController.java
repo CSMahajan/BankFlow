@@ -37,4 +37,11 @@ public class FixedDepositController {
     public ResponseEntity<FdResponse> getFdByNumber(@PathVariable String fdNumber) {
         return ResponseEntity.ok(fdService.getFdByNumber(fdNumber));
     }
+
+    @PatchMapping("/{fdNumber}/close")
+    public ResponseEntity<FdResponse> closeFixedDeposit(
+            @PathVariable String fdNumber) {
+
+        return ResponseEntity.ok(fdService.closeFixedDeposit(fdNumber));
+    }
 }

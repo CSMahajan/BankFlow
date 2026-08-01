@@ -46,6 +46,9 @@ public class FixedDeposit {
     @Column(name = "maturity_date", nullable = false)
     private LocalDate maturityDate;
 
+    @Column(name = "closed_date")
+    private LocalDate closedDate;
+
     @Column(name = "maturity_amount", nullable = false)
     private BigDecimal maturityAmount;
 

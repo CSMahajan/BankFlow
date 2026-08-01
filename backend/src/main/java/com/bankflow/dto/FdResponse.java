@@ -13,6 +13,7 @@ public record FdResponse(
         Integer tenureYears,
         LocalDate depositDate,
         LocalDate maturityDate,
+        LocalDate closedDate,
         BigDecimal maturityAmount,
         String status
 ) {}

@@ -254,6 +254,10 @@ public class FixedDepositService {
     }
 
     private FdResponse mapToResponse(FixedDeposit fd) {
-        return new FdResponse(fd.getId(), fd.getFdNumber(), fd.getUser().getFullName(), fd.getSourceAccount().getAccountNumber(), fd.getDepositAmount(), fd.getInterestRate(), fd.getTenureYears(), fd.getDepositDate(), fd.getMaturityDate(), fd.getMaturityAmount(), fd.getStatus().name());
+        return new FdResponse(fd.getId(), fd.getFdNumber(), fd.getUser().getFullName(),
+                fd.getSourceAccount().getAccountNumber(), fd.getDepositAmount(),
+                fd.getInterestRate(), fd.getTenureYears(), fd.getDepositDate(),
+                fd.getMaturityDate(), fd.getClosedDate(), fd.getMaturityAmount(),
+                fd.getStatus().name());
     }
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { fetchAuditLogs } from "../api/bankService";
 import PageCard from "./PageCard";
-import AuditFilterBar from "./audit/AuditFilterBar";
 import { tableHeader, tableCell } from "../styles/tableStyles";
+import AuditFilterBar from "./audit/AuditFilterBar";
+import AuditPagination from "./audit/AuditPagination";
+import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./audit/auditConstants";
 
 const AuditLogsView = () => {
 
@@ -156,76 +158,6 @@ const AuditLogsView = () => {
         }
     };
 
-    const actionDisplayNames = {
-        LOGIN: "🔐 Login",
-
-        ACCOUNT_CREATED: "🏦 Account Created",
-
-        MONEY_TRANSFER: "💸 Money Transfer",
-
-        FD_CREATED: "💰 Fixed Deposit Created",
-        FD_CLOSED: "💰 Fixed Deposit Closed",
-
-        LOAN_APPLIED: "📄 Loan Applied",
-        LOAN_APPROVED: "✅ Loan Approved",
-        LOAN_REJECTED: "❌ Loan Rejected",
-        EMI_PAID: "💵 EMI Paid",
-
-        CARD_ISSUED: "💳 Card Issued",
-        CARD_FROZEN: "❄ Card Frozen",
-        CARD_ACTIVATED: "✅ Card Activated",
-        CARD_LIMIT_UPDATED: "✏ Daily Limit Updated",
-
-        PROFILE_UPDATED: "👤 Profile Updated",
-    };
-
-    const moduleDisplayNames = {
-        LOGIN: "🔐 Authentication",
-        ACCOUNTS: "🏦 Accounts",
-        TRANSFERS: "💸 Transfers",
-        FIXED_DEPOSITS: "💰 Fixed Deposits",
-        LOANS: "📄 Loans",
-        CARDS: "💳 Cards",
-        PROFILE: "👤 Profile",
-    };
-
-    const moduleActions = {
-        LOGIN: [
-            "LOGIN",
-        ],
-
-        ACCOUNTS: [
-            "ACCOUNT_CREATED",
-        ],
-
-        TRANSFERS: [
-            "MONEY_TRANSFER",
-        ],
-
-        FIXED_DEPOSITS: [
-            "FD_CREATED",
-            "FD_CLOSED",
-        ],
-
-        LOANS: [
-            "LOAN_APPLIED",
-            "LOAN_APPROVED",
-            "LOAN_REJECTED",
-            "EMI_PAID",
-        ],
-
-        CARDS: [
-            "CARD_ISSUED",
-            "CARD_FROZEN",
-            "CARD_ACTIVATED",
-            "CARD_LIMIT_UPDATED",
-        ],
-
-        PROFILE: [
-            "PROFILE_UPDATED",
-        ],
-    };
-
     const filteredLogs = logs.filter((log) => {
 
         const matchesSearch =
@@ -274,9 +206,6 @@ const AuditLogsView = () => {
                 actionFilter={actionFilter}
                 setActionFilter={setActionFilter}
                 availableActions={availableActions}
-                moduleActions={moduleActions}
-                moduleDisplayNames={moduleDisplayNames}
-                actionDisplayNames={actionDisplayNames}
                 loadLogs={loadLogs}
                 setCurrentPage={setCurrentPage}
             />
@@ -444,75 +373,19 @@ const AuditLogsView = () => {
                                     >
                                         {log.description}
                                     </td>
-
                                 </tr>
-
                             ))
                         )}
-
                     </tbody>
-
                 </table>
             </div>
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    gap: "12px",
-                    marginTop: "20px",
-                    paddingTop: "20px",
-                    borderTop: "1px solid #e2e8f0",
-                }}
-            >
-
-                <button
-                    disabled={currentPage === 0}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                    style={{
-                        ...styles.pageButton,
-                        opacity: currentPage === 0 ? 0.45 : 1,
-                        cursor: currentPage === 0 ? "not-allowed" : "pointer",
-                    }}
-                >
-                    ← Previous
-                </button>
-
-                <span
-                    style={{
-                        fontWeight: "600",
-                        color: "#475569",
-                    }}
-                >
-                    <span
-                        style={{
-                            fontWeight: "700",
-                            color: "#334155",
-                            minWidth: "110px",
-                            textAlign: "center",
-                        }}
-                    >
-                        Page {currentPage + 1} of {totalPages}
-                    </span>
-                </span>
-
-                <button
-                    disabled={currentPage === totalPages - 1}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                    style={{
-                        ...styles.pageButton,
-                        opacity: currentPage === totalPages - 1 ? 0.45 : 1,
-                        cursor: currentPage === totalPages - 1 ? "not-allowed" : "pointer",
-                    }}
-                >
-                    Next →
-                </button>
-
-            </div>
+            <AuditPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+            />
         </PageCard>
-
     );
-
 };
 
 const styles = {
@@ -525,16 +398,6 @@ const styles = {
         color: "#2563eb",
         fontWeight: "700",
         cursor: "pointer",
-    },
-
-    pageButton: {
-        padding: "10px 18px",
-        borderRadius: "8px",
-        border: "1px solid #cbd5e1",
-        backgroundColor: "#ffffff",
-        cursor: "pointer",
-        fontWeight: "600",
-        color: "#334155",
     },
 };
 

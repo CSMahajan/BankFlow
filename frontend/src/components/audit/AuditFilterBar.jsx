@@ -1,3 +1,5 @@
+import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./auditConstants";
+
 const AuditFilterBar = ({
     search,
     setSearch,
@@ -8,9 +10,6 @@ const AuditFilterBar = ({
     actionFilter,
     setActionFilter,
     availableActions,
-    moduleActions,
-    moduleDisplayNames,
-    actionDisplayNames,
     loadLogs,
     setCurrentPage
 }) => {

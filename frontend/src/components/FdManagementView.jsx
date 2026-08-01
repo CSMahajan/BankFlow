@@ -93,6 +93,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
           <input
             type="number"
             step="0.01"
+            min="10000"
             value={depositAmount}
             placeholder="Minimum ₹10,000"
             onChange={(e) => setDepositAmount(e.target.value)}

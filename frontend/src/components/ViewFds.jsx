@@ -9,10 +9,23 @@ const ViewFds = ({ onFdClosed }) => {
 
     const handleCloseFd = async (fd) => {
 
+        const isPremature =
+            new Date(fd.maturityDate) > new Date();
+
         const confirmed = window.confirm(
-            new Date(fd.maturityDate) > new Date()
-                ? "This Fixed Deposit has not matured yet.\n\nOnly the principal amount will be credited.\n\nDo you want to continue?"
-                : "The maturity amount will be credited to your source account.\n\nDo you want to continue?"
+            isPremature
+                ? `This Fixed Deposit has not matured yet.
+Deposit Amount: ${formatCurrency(fd.depositAmount)}
+Amount to be credited: ${formatCurrency(fd.depositAmount)}
+Only the principal amount will be credited.
+
+Do you want to continue?`
+                : `This Fixed Deposit has matured.
+
+Amount to be credited:
+${formatCurrency(fd.maturityAmount)}
+
+Do you want to continue?`
         );
 
         if (!confirmed) return;
@@ -20,12 +33,17 @@ const ViewFds = ({ onFdClosed }) => {
         try {
             await closeFixedDeposit(fd.fdNumber);
 
+            alert(
+                isPremature
+                    ? `✅ Principal amount of ${formatCurrency(fd.depositAmount)} credited successfully.`
+                    : `✅ ${formatCurrency(fd.maturityAmount)} credited successfully.`
+            );
+
             await Promise.all([
                 loadFds(),
                 onFdClosed?.()
             ]);
 
-            alert("✅ Fixed Deposit closed successfully.");
         } catch (err) {
             console.error(err);
             alert(
@@ -79,9 +97,10 @@ const ViewFds = ({ onFdClosed }) => {
 
                 <button
                     style={styles.refreshBtn}
+                    disabled={loading}
                     onClick={loadFds}
                 >
-                    Refresh
+                    {loading ? "Refreshing..." : "Refresh"}
                 </button>
             </div>
 
@@ -104,16 +123,20 @@ const ViewFds = ({ onFdClosed }) => {
                                         backgroundColor:
                                             fd.status === "ACTIVE"
                                                 ? "#dcfce7"
-                                                : "#cbd5e1",
+                                                : "#e2e8f0",
                                         color:
                                             fd.status === "ACTIVE"
                                                 ? "#15803d"
-                                                : "#334155",
+                                                : "#475569",
                                     }}
                                 >
-                                    {fd.status === "ACTIVE"
-                                        ? "🟢 ACTIVE"
-                                        : "✓ CLOSED"}
+                                    {
+                                        fd.status === "ACTIVE"
+                                            ? "🟢 ACTIVE"
+                                            : fd.status === "PREMATURELY_CLOSED"
+                                                ? "🟠 PREMATURE CLOSED"
+                                                : "✓ MATURED CLOSED"
+                                    }
                                 </span>
                             </div>
 
@@ -149,7 +172,7 @@ const ViewFds = ({ onFdClosed }) => {
                                 <strong>{formatDate(fd.maturityDate)}</strong>
                             </div>
 
-                            {fd.status === "CLOSED" && (
+                            {fd.status !== "ACTIVE" && (
                                 <div style={styles.row}>
                                     <span>Closed On</span>
                                     <strong>{formatDate(fd.closedDate)}</strong>
@@ -157,9 +180,18 @@ const ViewFds = ({ onFdClosed }) => {
                             )}
 
                             <div style={styles.row}>
-                                <span>Maturity Amount</span>
+                                <span>
+                                    {fd.status === "ACTIVE"
+                                        ? "Maturity Amount"
+                                        : "Amount Credited"}
+                                </span>
+
                                 <strong style={{ color: "#0d6360" }}>
-                                    {formatCurrency(fd.maturityAmount)}
+                                    {formatCurrency(
+                                        fd.status === "ACTIVE"
+                                            ? fd.maturityAmount
+                                            : fd.creditedAmount
+                                    )}
                                 </strong>
                             </div>
                             {fd.status === "ACTIVE" && (
@@ -173,7 +205,7 @@ const ViewFds = ({ onFdClosed }) => {
                                     onClick={() => handleCloseFd(fd)}
                                 >
                                     {isPremature
-                                        ? "Prematurely Close FD"
+                                        ? "Premature Close FD"
                                         : "Close FD"}
                                 </button>
                             )}

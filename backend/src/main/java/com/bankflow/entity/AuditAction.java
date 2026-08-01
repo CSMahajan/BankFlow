@@ -20,5 +20,13 @@ public enum AuditAction {
 
     EMI_PAID,
 
-    PROFILE_UPDATED
+    PROFILE_UPDATED,
+
+    CARD_ISSUED,
+
+    CARD_FROZEN,
+
+    CARD_ACTIVATED,
+
+    CARD_LIMIT_UPDATED
 }

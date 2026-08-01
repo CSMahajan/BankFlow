@@ -3,6 +3,7 @@ package com.bankflow.service;
 import com.bankflow.dto.CardResponse;
 import com.bankflow.dto.IssueCardRequest;
 import com.bankflow.entity.Account;
+import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.Card;
 import com.bankflow.entity.Card.CardStatus;
 import com.bankflow.entity.User;
@@ -30,6 +31,7 @@ public class CardService {
     private final CardRepository cardRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
     private final Random random = new Random();
 
     @Transactional
@@ -47,6 +49,14 @@ public class CardService {
 
         if (account.getAccountStatus() != Account.AccountStatus.ACTIVE) {
             throw new IllegalStateException("Cannot issue a card for a non-active account");
+        }
+
+        if (cardRepository.existsByAccountIdAndCardType(
+                account.getId(),
+                request.cardType())) {
+
+            throw new IllegalStateException(
+                    request.cardType() + " card already exists for this account.");
         }
 
         String cardNumber = generateUniqueCardNumber();
@@ -67,6 +77,12 @@ public class CardService {
         Card savedCard = cardRepository.save(card);
         log.info("Successfully issued card with number ending in [{}]", cardNumber.substring(12));
 
+        auditLogService.log(
+                AuditAction.CARD_ISSUED,
+                request.cardType() +
+                        " card issued for account " +
+                        account.getAccountNumber()
+        );
         return mapToResponse(savedCard);
     }
 
@@ -98,9 +114,17 @@ public class CardService {
         if (card.getCardStatus() == CardStatus.ACTIVE) {
             card.setCardStatus(CardStatus.FROZEN);
             log.info("Card [{}] has been FROZEN", cardId);
+            auditLogService.log(
+                    AuditAction.CARD_FROZEN,
+                    "Card " + maskCardNumber(card.getCardNumber()) + " frozen"
+            );
         } else {
             card.setCardStatus(CardStatus.ACTIVE);
             log.info("Card [{}] has been UNFROZEN/ACTIVATED", cardId);
+            auditLogService.log(
+                    AuditAction.CARD_ACTIVATED,
+                    "Card " + maskCardNumber(card.getCardNumber()) + " activated"
+            );
         }
 
         Card updatedCard = cardRepository.save(card);
@@ -118,11 +142,19 @@ public class CardService {
         if (!card.getAccount().getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not authorized to modify this card");
         }
+        if (card.getCardStatus() != CardStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "Daily limit can only be updated for active cards."
+            );
+        }
 
         card.setDailyLimit(newLimit);
         Card updatedCard = cardRepository.save(card);
         log.info("Daily limit updated to [{}] for card [{}]", newLimit, cardId);
-
+        auditLogService.log(
+                AuditAction.CARD_LIMIT_UPDATED,
+                "Daily limit updated to ₹" + newLimit
+        );
         return mapToResponse(updatedCard);
     }
 

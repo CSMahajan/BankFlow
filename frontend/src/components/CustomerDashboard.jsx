@@ -6,7 +6,7 @@ import ViewFds from '../components/ViewFds';
 import DashboardOverview from '../components/DashboardOverview';
 import CreateAccountModal from '../components/CreateAccountModal';
 import LoansView from '../components/LoansView';
-import CardsView from "../components/CardsView";
+import CardsView from "./cards/CardsView";
 import API from '../api/axios';
 
 const CustomerDashboard = ({ userRole, onLogout }) => {

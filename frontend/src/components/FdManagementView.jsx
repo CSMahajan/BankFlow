@@ -14,13 +14,6 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  // Updated interest rate mapping: 6.5% for 1 yr, 7% for 3 yrs, 7.5% for 5 yrs
-  const interestRates = {
-    1: '6.5% p.a.',
-    3: '7.0% p.a.',
-    5: '7.5% p.a.',
-  };
-
   const handleCreateFd = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -34,7 +27,10 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
         tenureYears: Number(tenureYears),
       });
 
-      setSuccessMsg('Fixed Deposit created successfully!');
+      setSuccessMsg('Your Fixed Deposit has been opened successfully.');
+      setSourceAccountNumber(accounts[0]?.accountNumber ?? "");
+      setDepositAmount("");
+      setTenureYears(FD_TENURES[0]);
       setTimeout(() => {
         if (onFdCreated) onFdCreated();
       }, 1200);
@@ -75,6 +71,21 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
               </option>
             ))}
           </select>
+          {sourceAccountNumber && (
+            <div style={styles.balanceInfo}>
+              Available Balance:&nbsp;
+              <strong>
+                {new Intl.NumberFormat("en-IN", {
+                  style: "currency",
+                  currency: "INR",
+                }).format(
+                  accounts.find(
+                    account => account.accountNumber === sourceAccountNumber
+                  )?.currentBalance ?? 0
+                )}
+              </strong>
+            </div>
+          )}
         </div>
 
         <div style={styles.inputGroup}>
@@ -83,9 +94,10 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
             type="number"
             step="0.01"
             value={depositAmount}
-            placeholder="Enter deposit amount"
+            placeholder="Minimum ₹10,000"
             onChange={(e) => setDepositAmount(e.target.value)}
             required
+            autoFocus
             style={styles.input}
           />
         </div>
@@ -96,6 +108,11 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
             value={tenureYears}
             onChange={(e) => setTenureYears(Number(e.target.value))}
             style={styles.input}
+            disabled={
+              loading ||
+              !sourceAccountNumber ||
+              !depositAmount
+            }
           >
             {FD_TENURES.map(year => (
               <option
@@ -118,7 +135,13 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
           />
         </div>
 
-        <button type="submit" disabled={loading} style={styles.button}>
+        <button type="submit"
+          disabled={
+            loading ||
+            !sourceAccountNumber ||
+            !depositAmount
+          }
+          style={styles.button}>
           {loading ? 'Processing FD Creation...' : 'Confirm & Open Fixed Deposit'}
         </button>
       </form>
@@ -128,6 +151,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
 
 const styles = {
   card: { backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px', maxWidth: '600px', border: '1px solid #eef0ec' },
+  balanceInfo: { marginTop: "6px", fontSize: "13px", color: "#64748b" },
   title: { margin: '0 0 4px 0', fontSize: '22px', fontFamily: 'Georgia, serif', color: '#111827' },
   subtitle: { margin: '0 0 24px 0', fontSize: '13px', color: '#6b7280' },
   form: { display: 'flex', flexDirection: 'column', gap: '16px' },

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchMyFixedDeposits, closeFixedDeposit } from "../api/bankService";
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const ViewFds = ({ onFdClosed }) => {
     const [fds, setFds] = useState([]);
@@ -43,15 +44,8 @@ const ViewFds = ({ onFdClosed }) => {
         try {
             setLoading(true);
             setError(null);
-
-            console.log("Loading FDs...");
-
             const response = await fetchMyFixedDeposits();
-
-            console.log(response);
-
             setFds(response);
-
         } catch (err) {
             console.error(err);
             setError("Unable to load Fixed Deposits.");
@@ -60,21 +54,23 @@ const ViewFds = ({ onFdClosed }) => {
         }
     };
 
-    const formatCurrency = (amount) =>
-        new Intl.NumberFormat("en-IN", {
-            style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 2,
-        }).format(amount || 0);
-
     if (loading)
-        return <div>Loading Fixed Deposits...</div>;
+        return <div style={{ textAlign: "center", padding: "40px" }}>
+            Loading Fixed Deposits...
+        </div>
 
     if (error)
         return <div>{error}</div>;
 
     if (fds.length === 0)
-        return <div>No Fixed Deposits found.</div>;
+        return <div style={{
+            textAlign: "center",
+            padding: "50px",
+            color: "#64748b"
+        }}>
+            <h3>No Fixed Deposits Yet</h3>
+            <p>Open your first Fixed Deposit to start earning guaranteed returns.</p>
+        </div>
 
     return (
         <div style={styles.container}>
@@ -90,82 +86,102 @@ const ViewFds = ({ onFdClosed }) => {
             </div>
 
             <div style={styles.grid}>
-                {fds.map(fd => (
-                    <div key={fd.id} style={styles.card}>
+                {fds.map(fd => {
+                    const isPremature =
+                        new Date(fd.maturityDate) > new Date();
 
-                        <div style={styles.top}>
-                            <span style={styles.fdNumber}>
-                                {fd.fdNumber}
-                            </span>
+                    return (
+                        <div key={fd.id} style={styles.card}>
 
-                            <span
-                                style={{
-                                    ...styles.status,
-                                    backgroundColor:
-                                        fd.status === "ACTIVE"
-                                            ? "#dcfce7"
-                                            : "#cbd5e1",
-                                    color:
-                                        fd.status === "ACTIVE"
-                                            ? "#15803d"
-                                            : "#334155",
-                                }}
-                            >
-                                {fd.status === "ACTIVE"
-                                    ? "🟢 ACTIVE"
-                                    : "⚫ CLOSED"}
-                            </span>
+                            <div style={styles.top}>
+                                <span style={styles.fdNumber}>
+                                    {fd.fdNumber}
+                                </span>
+
+                                <span
+                                    style={{
+                                        ...styles.status,
+                                        backgroundColor:
+                                            fd.status === "ACTIVE"
+                                                ? "#dcfce7"
+                                                : "#cbd5e1",
+                                        color:
+                                            fd.status === "ACTIVE"
+                                                ? "#15803d"
+                                                : "#334155",
+                                    }}
+                                >
+                                    {fd.status === "ACTIVE"
+                                        ? "🟢 ACTIVE"
+                                        : "✓ CLOSED"}
+                                </span>
+                            </div>
+
+                            <div style={styles.row}>
+                                <span>Source Account</span>
+                                <strong>{fd.sourceAccountNumber}</strong>
+                            </div>
+
+                            <div style={styles.row}>
+                                <span>Deposit Amount</span>
+                                <strong>
+                                    {formatCurrency(fd.depositAmount)}
+                                </strong>
+                            </div>
+
+                            <div style={styles.row}>
+                                <span>Interest Rate</span>
+                                <strong>{fd.interestRate}%</strong>
+                            </div>
+
+                            <div style={styles.row}>
+                                <span>Tenure</span>
+                                <strong>{fd.tenureYears} Years</strong>
+                            </div>
+
+                            <div style={styles.row}>
+                                <span>Deposit Date</span>
+                                <strong>{formatDate(fd.depositDate)}</strong>
+                            </div>
+
+                            <div style={styles.row}>
+                                <span>Maturity Date</span>
+                                <strong>{formatDate(fd.maturityDate)}</strong>
+                            </div>
+
+                            {fd.status === "CLOSED" && (
+                                <div style={styles.row}>
+                                    <span>Closed On</span>
+                                    <strong>{formatDate(fd.closedDate)}</strong>
+                                </div>
+                            )}
+
+                            <div style={styles.row}>
+                                <span>Maturity Amount</span>
+                                <strong style={{ color: "#0d6360" }}>
+                                    {formatCurrency(fd.maturityAmount)}
+                                </strong>
+                            </div>
+                            {fd.status === "ACTIVE" && (
+                                <button
+                                    style={{
+                                        ...styles.closeButton,
+                                        backgroundColor: isPremature
+                                            ? "#ea580c"
+                                            : "#b91c1c",
+                                    }}
+                                    onClick={() => handleCloseFd(fd)}
+                                >
+                                    {isPremature
+                                        ? "Prematurely Close FD"
+                                        : "Close FD"}
+                                </button>
+                            )}
+
                         </div>
+                    );
+                })}
 
-                        <div style={styles.row}>
-                            <span>Source Account</span>
-                            <strong>{fd.sourceAccountNumber}</strong>
-                        </div>
-
-                        <div style={styles.row}>
-                            <span>Deposit Amount</span>
-                            <strong>
-                                {formatCurrency(fd.depositAmount)}
-                            </strong>
-                        </div>
-
-                        <div style={styles.row}>
-                            <span>Interest Rate</span>
-                            <strong>{fd.interestRate}%</strong>
-                        </div>
-
-                        <div style={styles.row}>
-                            <span>Tenure</span>
-                            <strong>{fd.tenureYears} Years</strong>
-                        </div>
-
-                        <div style={styles.row}>
-                            <span>Deposit Date</span>
-                            <strong>{fd.depositDate}</strong>
-                        </div>
-
-                        <div style={styles.row}>
-                            <span>Maturity Date</span>
-                            <strong>{fd.maturityDate}</strong>
-                        </div>
-
-                        <div style={styles.row}>
-                            <span>Maturity Amount</span>
-                            <strong style={{ color: "#0d6360" }}>
-                                {formatCurrency(fd.maturityAmount)}
-                            </strong>
-                        </div>
-                        {fd.status === "ACTIVE" && (
-                            <button
-                                style={styles.closeButton}
-                                onClick={() => handleCloseFd(fd)}
-                            >
-                                Close Fixed Deposit
-                            </button>
-                        )}
-
-                    </div>
-                ))}
             </div>
         </div>
     );
@@ -205,7 +221,8 @@ const styles = {
 
     fdNumber: {
         fontWeight: 700,
-        fontSize: 16,
+        fontSize: 17,
+        color: "#0f172a",
     },
 
     status: {

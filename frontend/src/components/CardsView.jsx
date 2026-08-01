@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchMyCards, toggleCardStatus, updateCardLimit } from "../api/bankService";
-import CardManagementPanel from "./CardManagementPanel";
+import CardManagementPanel from "./cards/CardManagementPanel";
 import IssueCardModal from "./IssueCardModal";
 import CardsHeader from "./cards/CardsHeader";
 import BankCard from "./cards/BankCard";

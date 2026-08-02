@@ -66,6 +66,12 @@ public class TransactionService {
 
     @Transactional(readOnly = true)
     public List<TransactionResponse> getTransactionsByDateRange(String accountNumber, LocalDate startDate, LocalDate endDate) {
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date");
+        }
         log.debug("Fetching transactions for account [{}] between [{}] and [{}]", accountNumber, startDate, endDate);
         Account account = getAuthorizedAccount(accountNumber);
 
@@ -86,6 +92,13 @@ public class TransactionService {
     public Page<TransactionResponse> getMyTransactions(TransactionType type, Pageable pageable) {
         User currentUser = getAuthenticatedUser();
 
+        if (pageable.getPageSize() > 100) {
+            throw new IllegalArgumentException("Maximum page size is 100");
+        }
+
+        log.info("Fetching transaction history for user [{}], filter [{}], page [{}]",
+                currentUser.getEmail(), type == null ? "ALL" : type, pageable.getPageNumber()
+        );
         Page<Transaction> page;
 
         if (type == null) {
@@ -111,8 +124,27 @@ public class TransactionService {
                 .map(this::mapToResponse)
                 .toList();
 
-        log.info("ADMIN lookup completed. Retried [{}] transactions for account [{}]", transactions.size(), accountNumber);
+        log.info("ADMIN lookup completed. Retrieved [{}] transactions for account [{}]", transactions.size(), accountNumber);
         return transactions;
+    }
+
+    @Transactional(readOnly = true)
+    public TransactionResponse getTransactionDetails(String transactionId) {
+
+        User currentUser = getAuthenticatedUser();
+
+        Transaction transaction = transactionRepository.findByTransactionId(transactionId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Transaction not found"));
+
+        if (!currentUser.getRole().equals(User.Role.ADMIN)
+                && !transaction.getAccount().getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You are not authorized to view this transaction");
+        }
+
+        log.info("Fetched transaction [{}] for user [{}]", transactionId, currentUser.getEmail());
+
+        return mapToResponse(transaction);
     }
 
     // Security Helper: Enforces that regular customers can only view their own account activity

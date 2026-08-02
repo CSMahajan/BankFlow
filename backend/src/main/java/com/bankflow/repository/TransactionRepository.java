@@ -12,13 +12,14 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     // --- By Account Number ---
 
-    // 1. Missing Method: Fetch transactions using account number string directly
+    // Fetch transactions using account number string directly
     List<Transaction> findByAccountAccountNumberOrderByTransactionDateDesc(String accountNumber);
 
     // --- Single-Account ID Queries ---
@@ -46,8 +47,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     Page<Transaction> findByAccountIdInOrderByTransactionDateDesc(List<Long> accountIds, Pageable pageable);
 
-    List<Transaction> findTop10ByAccountIdInOrderByTransactionDateDesc(List<Long> accountIds);
-
     @Query("""
         SELECT COALESCE(SUM(t.amount), 0)
         FROM Transaction t
@@ -63,13 +62,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("endDate") LocalDateTime endDate
     );
 
-    Page<Transaction> findByAccountIdInAndTransactionDateBetweenOrderByTransactionDateDesc(
-            List<Long> accountIds,
-            LocalDateTime startDate,
-            LocalDateTime endDate,
-            Pageable pageable
-    );
-
     Page<Transaction> findByAccountUserIdOrderByTransactionDateDesc(
             Long userId,
             Pageable pageable
@@ -80,4 +72,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             TransactionType transactionType,
             Pageable pageable
     );
+
+    Optional<Transaction> findByTransactionId(String transactionId);
 }

@@ -35,7 +35,8 @@ public class TransactionController {
     public ResponseEntity<List<TransactionResponse>> getTransactionsByDateRange(
             @PathVariable String accountNumber,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(transactionService.getTransactionsByDateRange(accountNumber, startDate, endDate));
     }
 
@@ -45,6 +46,13 @@ public class TransactionController {
             @RequestParam(required = false) Transaction.TransactionType type,
             @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(transactionService.getMyTransactions(type, pageable));
+    }
+
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponse> getTransactionDetails(
+            @PathVariable String transactionId) {
+        return ResponseEntity.ok(transactionService.getTransactionDetails(transactionId)
+        );
     }
 
     // Admin endpoint: Search transactions for any customer account

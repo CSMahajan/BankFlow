@@ -206,10 +206,19 @@ class ScheduledTransferServiceTest {
         scheduledTransferService.processDueTransfers();
 
         // Verify transferService was called with the right request
-        ArgumentCaptor<FundTransferRequest> captor = ArgumentCaptor.forClass(FundTransferRequest.class);
-        verify(transferService, times(1)).transferFunds(captor.capture());
+        ArgumentCaptor<User> userCaptor =
+                ArgumentCaptor.forClass(User.class);
 
-        FundTransferRequest capturedRequest = captor.getValue();
+        ArgumentCaptor<FundTransferRequest> requestCaptor =
+                ArgumentCaptor.forClass(FundTransferRequest.class);
+
+        verify(transferService).executeScheduledTransfer(
+                userCaptor.capture(),
+                requestCaptor.capture()
+        );
+
+        FundTransferRequest capturedRequest = requestCaptor.getValue();
+        User capturedUser = userCaptor.getValue();
         assertEquals("SRC123456789", capturedRequest.sourceAccountNumber());
         assertEquals("REC987654321", capturedRequest.targetAccountNumber());
         assertEquals(new BigDecimal("250.00"), capturedRequest.amount());

@@ -34,7 +34,12 @@ public class FundTransferService {
     @Transactional
     public FundTransferResponse transferFunds(FundTransferRequest request) {
         User currentUser = getAuthenticatedUser();
+        return executeTransfer(currentUser, request);
+    }
 
+    private FundTransferResponse executeTransfer(
+            User currentUser,
+            FundTransferRequest request) {
         log.info("Initiating fund transfer request by user [{}] from account [{}] to target [{}] for amount [Rs. {}]",
                 currentUser.getEmail(), request.sourceAccountNumber(), request.targetAccountNumber(), request.amount());
 
@@ -132,6 +137,14 @@ public class FundTransferService {
                 "SUCCESS",
                 LocalDateTime.now()
         );
+    }
+
+    @Transactional
+    public void executeScheduledTransfer(
+            User user,
+            FundTransferRequest request) {
+
+        executeTransfer(user, request);
     }
 
     private User getAuthenticatedUser() {

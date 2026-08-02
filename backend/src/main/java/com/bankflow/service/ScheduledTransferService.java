@@ -119,7 +119,10 @@ public class ScheduledTransferService {
                         "[AUTOMATED] " + (transfer.getDescription() != null ? transfer.getDescription() : "Recurring Transfer")
                 );
 
-                fundTransferService.transferFunds(transferRequest);
+                fundTransferService.executeScheduledTransfer(
+                        transfer.getUser(),
+                        transferRequest
+                );
                 log.info("Successfully executed scheduled transfer ID [{}]", transfer.getId());
 
                 // Advance next execution date based on frequency

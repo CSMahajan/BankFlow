@@ -139,6 +139,7 @@ const TransactionsView = ({
 
             </div>
 
+
             <div style={styles.filterBar}>
                 <input
                     type="text"

@@ -43,9 +43,15 @@ public class TransactionController {
     //My All Transactions
     @GetMapping("/my-transactions")
     public ResponseEntity<Page<TransactionResponse>> getMyTransactions(
+            @RequestParam(required = false) String accountNumber,
             @RequestParam(required = false) Transaction.TransactionType type,
-            @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(transactionService.getMyTransactions(type, pageable));
+            @PageableDefault(size = 20, sort = "transactionDate",
+                    direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                transactionService.getMyTransactions(accountNumber, type, pageable)
+        );
     }
 
     @GetMapping("/{transactionId}")

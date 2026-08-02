@@ -74,4 +74,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     );
 
     Optional<Transaction> findByTransactionId(String transactionId);
+
+    Page<Transaction> findByAccountIdOrderByTransactionDateDesc(
+            Long accountId,
+            Pageable pageable
+    );
+
+    Page<Transaction> findByAccountIdAndTransactionTypeOrderByTransactionDateDesc(
+            Long accountId,
+            TransactionType transactionType,
+            Pageable pageable
+    );
 }

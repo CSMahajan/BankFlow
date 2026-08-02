@@ -89,7 +89,7 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<TransactionResponse> getMyTransactions(TransactionType type, Pageable pageable) {
+    public Page<TransactionResponse> getMyTransactions(String accountNumber, TransactionType type, Pageable pageable) {
         User currentUser = getAuthenticatedUser();
 
         if (pageable.getPageSize() > 100) {
@@ -101,12 +101,38 @@ public class TransactionService {
         );
         Page<Transaction> page;
 
-        if (type == null) {
-            page = transactionRepository.
-                    findByAccountUserIdOrderByTransactionDateDesc(currentUser.getId(), pageable);
+        if (accountNumber != null && !accountNumber.isBlank()) {
+
+            Account account = getAuthorizedAccount(accountNumber);
+
+            if (type == null) {
+                page = transactionRepository
+                        .findByAccountIdOrderByTransactionDateDesc(
+                                account.getId(),
+                                pageable);
+            } else {
+                page = transactionRepository
+                        .findByAccountIdAndTransactionTypeOrderByTransactionDateDesc(
+                                account.getId(),
+                                type,
+                                pageable);
+            }
+
         } else {
-            page = transactionRepository
-                    .findByAccountUserIdAndTransactionTypeOrderByTransactionDateDesc(currentUser.getId(), type, pageable);
+
+            if (type == null) {
+                page = transactionRepository
+                        .findByAccountUserIdOrderByTransactionDateDesc(
+                                currentUser.getId(),
+                                pageable);
+            } else {
+                page = transactionRepository
+                        .findByAccountUserIdAndTransactionTypeOrderByTransactionDateDesc(
+                                currentUser.getId(),
+                                type,
+                                pageable);
+            }
+
         }
 
         return page.map(this::mapToResponse);

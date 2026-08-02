@@ -4,6 +4,7 @@ import com.bankflow.dto.CreateScheduledTransferRequest;
 import com.bankflow.dto.FundTransferRequest;
 import com.bankflow.dto.ScheduledTransferResponse;
 import com.bankflow.entity.Account;
+import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.ScheduledTransfer;
 import com.bankflow.entity.ScheduledTransfer.Frequency;
 import com.bankflow.entity.ScheduledTransfer.TransferStatus;
@@ -32,6 +33,7 @@ public class ScheduledTransferService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final FundTransferService fundTransferService;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public ScheduledTransferResponse createScheduledTransfer(CreateScheduledTransferRequest request) {
@@ -45,8 +47,18 @@ public class ScheduledTransferService {
             throw new AccessDeniedException("You are not authorized to schedule transfers from this account");
         }
 
+        if (sourceAccount.getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "Scheduled transfers can only be created from active accounts."
+            );
+        }
+
         accountRepository.findByAccountNumber(request.recipientAccountNumber())
                 .orElseThrow(() -> new IllegalArgumentException("Recipient account not found: " + request.recipientAccountNumber()));
+
+        if (request.startDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Scheduled transfer start date cannot be in the past.");
+        }
 
         ScheduledTransfer scheduledTransfer = ScheduledTransfer.builder()
                 .user(currentUser)
@@ -61,7 +73,10 @@ public class ScheduledTransferService {
 
         ScheduledTransfer saved = scheduledTransferRepository.save(scheduledTransfer);
         log.info("Successfully scheduled transfer ID [{}] due on [{}]", saved.getId(), saved.getNextExecutionDate());
-
+        auditLogService.log(AuditAction.SCHEDULED_TRANSFER_CREATED,
+                "Created scheduled transfer of ₹"
+                        + saved.getAmount() + " to " + saved.getRecipientAccountNumber() + " (" + saved.getFrequency() + ")"
+        );
         return mapToResponse(saved);
     }
 
@@ -91,7 +106,9 @@ public class ScheduledTransferService {
         transfer.setStatus(TransferStatus.CANCELLED);
         ScheduledTransfer updated = scheduledTransferRepository.save(transfer);
         log.info("Cancelled scheduled transfer ID [{}]", transferId);
-
+        auditLogService.log(AuditAction.SCHEDULED_TRANSFER_CANCELLED,
+                "Cancelled scheduled transfer to " + updated.getRecipientAccountNumber()
+        );
         return mapToResponse(updated);
     }
 
@@ -124,14 +141,15 @@ public class ScheduledTransferService {
                         transferRequest
                 );
                 log.info("Successfully executed scheduled transfer ID [{}]", transfer.getId());
-
+                auditLogService.log(AuditAction.SCHEDULED_TRANSFER_EXECUTED,
+                        "Executed " + transfer.getFrequency() + " scheduled transfer of ₹" + transfer.getAmount() + " to " + transfer.getRecipientAccountNumber());
                 // Advance next execution date based on frequency
                 LocalDate nextDate = calculateNextExecutionDate(transfer.getNextExecutionDate(), transfer.getFrequency());
                 transfer.setNextExecutionDate(nextDate);
                 scheduledTransferRepository.save(transfer);
 
             } catch (Exception e) {
-                log.error("Failed to execute scheduled transfer ID [{}]: {}", transfer.getId(), e.getMessage());
+                log.error("Failed to execute scheduled transfer ID [{}]", transfer.getId(), e);
             }
         }
     }

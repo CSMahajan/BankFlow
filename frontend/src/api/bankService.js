@@ -114,3 +114,8 @@ export const toggleAccountStatus = async (accountNumber) => {
   );
   return response.data;
 };
+
+export const getMyTransactions = (params) =>
+  API.get("/transactions/my-transactions", {
+    params,
+  });

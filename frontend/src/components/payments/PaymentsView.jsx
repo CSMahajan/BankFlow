@@ -1,5 +1,6 @@
 import React from "react";
 import TransferForm from "./TransferForm";
+import TransactionsView from "./TransactionsView";
 
 const PaymentsView = ({
     activeTab,
@@ -42,11 +43,7 @@ const PaymentsView = ({
             )}
 
             {activeTab === "transactions" && (
-                <div style={styles.card}>
-                    <h3 style={styles.cardTitle}>📜 Transaction History</h3>
-
-                    <p>Coming next...</p>
-                </div>
+                <TransactionsView />
             )}
 
         </div>

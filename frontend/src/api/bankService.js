@@ -122,3 +122,25 @@ export const getMyTransactions = (params) =>
 
 export const getTransactionDetails = (transactionId) =>
   API.get(`/transactions/${transactionId}`);
+
+export const createScheduledTransfer = async (request) => {
+  const response = await API.post(
+    "/scheduled-transfers",
+    request
+  );
+  return response.data;
+};
+
+export const fetchMyScheduledTransfers = async () => {
+  const response = await API.get(
+    "/scheduled-transfers/my-transfers"
+  );
+  return response.data;
+};
+
+export const cancelScheduledTransfer = async (transferId) => {
+  const response = await API.patch(
+    `/scheduled-transfers/${transferId}/cancel`
+  );
+  return response.data;
+};

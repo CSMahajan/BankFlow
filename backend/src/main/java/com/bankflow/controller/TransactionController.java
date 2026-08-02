@@ -33,26 +33,20 @@ public class TransactionController {
     //My All Transactions
     @GetMapping("/my-transactions")
     public ResponseEntity<Page<TransactionResponse>> getMyTransactions(
-
-            @RequestParam(required = false)
-            String accountNumber,
-
-            @RequestParam(required = false)
-            Transaction.TransactionType type,
-
+            @RequestParam(required = false) String accountNumber,
+            @RequestParam(required = false) Transaction.TransactionType type,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate startDate,
-
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate endDate,
-
+            @RequestParam(required = false) String search,
             @PageableDefault(
                     size = 20,
                     sort = "transactionDate",
-                    direction = Sort.Direction.DESC)
-            Pageable pageable
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
     ) {
         return ResponseEntity.ok(
                 transactionService.getMyTransactions(
@@ -60,6 +54,7 @@ public class TransactionController {
                         type,
                         startDate,
                         endDate,
+                        search,
                         pageable
                 )
         );

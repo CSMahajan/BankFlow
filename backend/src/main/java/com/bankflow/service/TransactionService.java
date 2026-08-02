@@ -68,8 +68,7 @@ public class TransactionService {
     public Page<TransactionResponse> getMyTransactions(
             String accountNumber, TransactionType type,
             LocalDate startDate, LocalDate endDate,
-            Pageable pageable
-    ) {
+            String search, Pageable pageable) {
         User currentUser = getAuthenticatedUser();
 
         if (pageable.getPageSize() > 100) {
@@ -83,26 +82,30 @@ public class TransactionService {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
 
-        log.info("Fetching transaction history for user [{}], filter [{}], page [{}]",
-                currentUser.getEmail(), type == null ? "ALL" : type, pageable.getPageNumber()
+
+        log.info(
+                "Fetching transactions for user [{}], account [{}], type [{}], from [{}], to [{}], search [{}], page [{}]",
+                currentUser.getEmail(),
+                accountNumber,
+                type,
+                startDate,
+                endDate,
+                search,
+                pageable.getPageNumber()
         );
+
         Specification<Transaction> specification =
-                TransactionSpecification.belongsToUser(currentUser.getId());
+                Specification.where(TransactionSpecification.belongsToUser(currentUser.getId()));
 
-        if (accountNumber != null && !accountNumber.isBlank()) {
-            specification = specification.and(
-                    TransactionSpecification.accountNumber(accountNumber));
-        }
-
-        if (type != null) {
-            specification = specification.and(
-                    TransactionSpecification.transactionType(type));
-        }
+        specification = specification.and(TransactionSpecification.accountNumber(accountNumber));
+        specification = specification.and(TransactionSpecification.transactionType(type));
 
         if (startDate != null) {
             specification = specification.and(
                     TransactionSpecification.dateRange(startDate, endDate));
         }
+
+        specification = specification.and(TransactionSpecification.search(search));
 
         Page<Transaction> page =
                 transactionRepository.findAll(specification, pageable);

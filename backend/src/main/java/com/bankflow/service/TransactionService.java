@@ -11,6 +11,8 @@ import com.bankflow.repository.TransactionRepository;
 import com.bankflow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -78,6 +80,23 @@ public class TransactionService {
 
         log.info("Retrieved [{}] transactions for account [{}] in specified date range", transactions.size(), accountNumber);
         return transactions;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TransactionResponse> getMyTransactions(TransactionType type, Pageable pageable) {
+        User currentUser = getAuthenticatedUser();
+
+        Page<Transaction> page;
+
+        if (type == null) {
+            page = transactionRepository.
+                    findByAccountUserIdOrderByTransactionDateDesc(currentUser.getId(), pageable);
+        } else {
+            page = transactionRepository
+                    .findByAccountUserIdAndTransactionTypeOrderByTransactionDateDesc(currentUser.getId(), type, pageable);
+        }
+
+        return page.map(this::mapToResponse);
     }
 
     @Transactional(readOnly = true)

@@ -69,4 +69,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             LocalDateTime endDate,
             Pageable pageable
     );
+
+    Page<Transaction> findByAccountUserIdOrderByTransactionDateDesc(
+            Long userId,
+            Pageable pageable
+    );
+
+    Page<Transaction> findByAccountUserIdAndTransactionTypeOrderByTransactionDateDesc(
+            Long userId,
+            TransactionType transactionType,
+            Pageable pageable
+    );
 }

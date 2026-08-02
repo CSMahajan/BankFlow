@@ -5,11 +5,7 @@ import com.bankflow.entity.*;
 import com.bankflow.entity.Loan.LoanStatus;
 import com.bankflow.entity.Loan.LoanType;
 import com.bankflow.entity.Transaction.TransactionType;
-import com.bankflow.repository.AccountRepository;
-import com.bankflow.repository.LoanRepaymentRepository;
-import com.bankflow.repository.LoanRepository;
-import com.bankflow.repository.TransactionRepository;
-import com.bankflow.repository.UserRepository;
+import com.bankflow.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -53,6 +49,10 @@ public class LoanService {
 
         if (!account.getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You can only apply for loans linked to your own account");
+        }
+
+        if (account.getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException("Loans can only be applied using an active account.");
         }
 
         BigDecimal interestRate = getInterestRateForType(request.loanType());
@@ -174,6 +174,12 @@ public class LoanService {
 
         if (!sourceAccount.getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Unauthorized: Source account does not belong to user");
+        }
+
+        if (sourceAccount.getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "EMI payments can only be made from an active account."
+            );
         }
 
         BigDecimal emiAmount = loan.getMonthlyEmi();

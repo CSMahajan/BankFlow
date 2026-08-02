@@ -78,6 +78,12 @@ public class FixedDepositService {
             throw new AccessDeniedException("You can only open an FD using your own account");
         }
 
+        if (sourceAccount.getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "Fixed Deposits can only be opened from an active account."
+            );
+        }
+
         if (sourceAccount.getCurrentBalance().compareTo(request.depositAmount()) < 0) {
             log.warn("FD creation failed: Insufficient balance in source account [{}]. Current: {}, Requested: {}", sourceAccount.getAccountNumber(), sourceAccount.getCurrentBalance(), request.depositAmount());
             throw new IllegalArgumentException("Insufficient balance in source account");

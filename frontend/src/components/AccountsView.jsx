@@ -1,12 +1,32 @@
 import React from 'react';
 import BalanceSummaryCard from './BalanceSummaryCard';
-
+import { toggleAccountStatus } from "../api/bankService";
 const AccountsView = ({
   accounts,
   loading,
   error,
   refreshAccounts,
 }) => {
+
+  const handleToggleStatus = async (account) => {
+    const confirmed = window.confirm(
+      account.accountStatus === "ACTIVE"
+        ? "Freeze this account?\n\nOutgoing transactions will not be allowed until it is activated again."
+        : "Activate this account?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await toggleAccountStatus(account.accountNumber);
+      alert(account.accountStatus === "ACTIVE"
+        ? "✅ Account frozen successfully." : "✅ Account activated successfully.");
+      await refreshAccounts();
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message ?? "Failed to update account status.");
+    }
+  };
 
   const formatCurrency = (val) =>
     new Intl.NumberFormat('en-IN', {
@@ -18,6 +38,8 @@ const AccountsView = ({
   const totalBalance = accounts.reduce((sum, acc) => sum + (Number(acc.currentBalance) || 0), 0);
   const savingsAccounts = accounts.filter((acc) => acc.accountType === 'SAVINGS');
   const currentAccounts = accounts.filter((acc) => acc.accountType === 'CURRENT');
+  const activeSavingsCount = savingsAccounts.filter(acc => acc.accountStatus === "ACTIVE").length;
+  const activeCurrentCount = currentAccounts.filter(acc => acc.accountStatus === "ACTIVE").length;
 
   return (
     <div style={styles.container}>
@@ -45,20 +67,69 @@ const AccountsView = ({
           <div style={styles.section}>
             <div style={styles.sectionHeader}>
               <h3 style={styles.sectionTitle}>💰 Savings Accounts</h3>
-              <span style={styles.countBadge}>{savingsAccounts.length} Active</span>
+              <span style={styles.countBadge}>
+                {savingsAccounts.length} Accounts
+              </span>
             </div>
             {savingsAccounts.length === 0 ? (
-              <p style={styles.noneText}>No active Savings account.</p>
+              <p style={styles.noneText}>No Savings accounts found.</p>
             ) : (
               savingsAccounts.map((acc) => (
                 <div key={acc.accountNumber} style={styles.accountCard}>
                   <div style={styles.cardTop}>
-                    <span style={styles.accNumber}>{acc.accountNumber}</span>
-                    <span style={styles.badgeSavings}>SAVINGS</span>
+
+                    <div>
+                      <div style={styles.accNumber}>
+                        {acc.accountNumber}
+                      </div>
+
+                      <span style={styles.badgeSavings}>
+                        SAVINGS
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        ...styles.statusBadge,
+                        backgroundColor:
+                          acc.accountStatus === "ACTIVE"
+                            ? "#dcfce7"
+                            : "#fed7aa",
+                        color:
+                          acc.accountStatus === "ACTIVE"
+                            ? "#15803d"
+                            : "#c2410c",
+                      }}
+                    >
+                      {acc.accountStatus === "ACTIVE"
+                        ? "🟢 ACTIVE"
+                        : "🟠 FROZEN"}
+                    </div>
+
                   </div>
                   <div style={styles.cardBottom}>
-                    <span style={styles.balanceLabel}>Holder: {acc.userName || localStorage.getItem('fullName') || 'Customer'}</span>
-                    <span style={styles.balanceAmount}>{formatCurrency(acc.currentBalance)}</span>
+                    <span style={styles.balanceLabel}>
+                      Holder: {acc.userName || localStorage.getItem('fullName') || 'Customer'}
+                    </span>
+
+                    <span style={styles.balanceAmount}>
+                      {formatCurrency(acc.currentBalance)}
+                    </span>
+
+                    <button
+                      style={{
+                        ...styles.accountActionButton,
+                        backgroundColor:
+                          acc.accountStatus === "ACTIVE"
+                            ? "#ea580c"
+                            : "#15803d",
+                      }}
+                      onClick={() => handleToggleStatus(acc)}
+                    >
+                      {acc.accountStatus === "ACTIVE"
+                        ? "Freeze Account"
+                        : "Activate Account"}
+                    </button>
                   </div>
                 </div>
               ))
@@ -69,20 +140,70 @@ const AccountsView = ({
           <div style={styles.section}>
             <div style={styles.sectionHeader}>
               <h3 style={styles.sectionTitle}>🏢 Current Accounts</h3>
-              <span style={styles.countBadge}>{currentAccounts.length} Active</span>
+              <span style={styles.countBadge}>
+                {currentAccounts.length} Accounts
+              </span>
             </div>
             {currentAccounts.length === 0 ? (
-              <p style={styles.noneText}>No active Current account.</p>
+              <p style={styles.noneText}>No Current accounts found.</p>
             ) : (
               currentAccounts.map((acc) => (
                 <div key={acc.accountNumber} style={styles.accountCard}>
                   <div style={styles.cardTop}>
-                    <span style={styles.accNumber}>{acc.accountNumber}</span>
-                    <span style={styles.badgeCurrent}>CURRENT</span>
+
+                    <div>
+                      <div style={styles.accNumber}>
+                        {acc.accountNumber}
+                      </div>
+
+                      <span style={styles.badgeCurrent}>
+                        CURRENT
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        ...styles.statusBadge,
+                        backgroundColor:
+                          acc.accountStatus === "ACTIVE"
+                            ? "#dcfce7"
+                            : "#fed7aa",
+                        color:
+                          acc.accountStatus === "ACTIVE"
+                            ? "#15803d"
+                            : "#c2410c",
+                      }}
+                    >
+                      {acc.accountStatus === "ACTIVE"
+                        ? "🟢 ACTIVE"
+                        : "🟠 FROZEN"}
+                    </div>
+
                   </div>
+
                   <div style={styles.cardBottom}>
-                    <span style={styles.balanceLabel}>Holder: {acc.userName || localStorage.getItem('fullName') || 'Customer'}</span>
-                    <span style={styles.balanceAmount}>{formatCurrency(acc.currentBalance)}</span>
+                    <span style={styles.balanceLabel}>
+                      Holder: {acc.userName || localStorage.getItem('fullName') || 'Customer'}
+                    </span>
+
+                    <span style={styles.balanceAmount}>
+                      {formatCurrency(acc.currentBalance)}
+                    </span>
+
+                    <button
+                      style={{
+                        ...styles.accountActionButton,
+                        backgroundColor:
+                          acc.accountStatus === "ACTIVE"
+                            ? "#ea580c"
+                            : "#15803d",
+                      }}
+                      onClick={() => handleToggleStatus(acc)}
+                    >
+                      {acc.accountStatus === "ACTIVE"
+                        ? "Freeze Account"
+                        : "Activate Account"}
+                    </button>
                   </div>
                 </div>
               ))
@@ -110,14 +231,34 @@ const styles = {
   accountCard: { backgroundColor: '#f9fafb', borderRadius: '12px', padding: '16px', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: '12px' },
   cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   accNumber: { fontFamily: 'monospace', fontWeight: '700', fontSize: '14px' },
-  badgeSavings: { backgroundColor: '#dcfce7', color: '#15803d', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700' },
-  badgeCurrent: { backgroundColor: '#e0f2fe', color: '#0369a1', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700' },
+  badgeSavings: {
+    backgroundColor: '#f3f4f6',
+    color: '#374151',
+    padding: '3px 8px',
+    borderRadius: '6px',
+    fontSize: '11px',
+    fontWeight: '700',
+    marginTop: '6px',
+    display: 'inline-block'
+  },
+  badgeCurrent: {
+    backgroundColor: '#f3f4f6',
+    color: '#374151',
+    padding: '3px 8px',
+    borderRadius: '6px',
+    fontSize: '11px',
+    fontWeight: '700',
+    marginTop: '6px',
+    display: 'inline-block'
+  },
   cardBottom: { display: 'flex', flexDirection: 'column', gap: '4px' },
   balanceLabel: { fontSize: '12px', color: '#6b7280' },
   balanceAmount: { fontSize: '20px', fontWeight: '800', color: '#0d6360' },
   noneText: { fontSize: '13px', color: '#9ca3af', fontStyle: 'italic', margin: 0 },
   errorBox: { backgroundColor: '#fee2e2', color: '#991b1b', padding: '12px', borderRadius: '8px', fontSize: '13px' },
   emptyCard: { backgroundColor: '#ffffff', borderRadius: '16px', padding: '40px', textAlign: 'center', border: '1px solid #eef0ec' },
+  accountActionButton: { marginTop: '12px', width: '100%', border: 'none', borderRadius: '8px', padding: '10px', color: '#ffffff', fontWeight: '700', cursor: 'pointer' },
+  statusBadge: { display: "inline-block", marginTop: "6px", padding: "3px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "700" }
 };
 
 export default AccountsView;

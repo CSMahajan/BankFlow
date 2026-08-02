@@ -107,3 +107,10 @@ export const closeFixedDeposit = async (fdNumber) => {
   const response = await API.patch(`/fd/${fdNumber}/close`);
   return response.data;
 };
+
+export const toggleAccountStatus = async (accountNumber) => {
+  const response = await API.patch(
+    `/accounts/${accountNumber}/toggle-status`
+  );
+  return response.data;
+};

@@ -10,6 +10,7 @@ const TransactionsView = () => {
     const [transactionType, setTransactionType] = useState("");
     const [page, setPage] = useState(0);
     const [pageData, setPageData] = useState(null);
+    const [searchText, setSearchText] = useState("");
 
     const loadTransactions = async (page = 0) => {
         try {
@@ -48,6 +49,12 @@ const TransactionsView = () => {
         return <div>{error}</div>;
     }
 
+    const filteredTransactions = transactions.filter(tx =>
+        (tx.description || "")
+            .toLowerCase()
+            .includes(searchText.toLowerCase())
+    );
+
     return (
         <div style={styles.card}>
 
@@ -63,15 +70,26 @@ const TransactionsView = () => {
                     </p>
                 </div>
 
-                <select
-                    value={transactionType}
-                    onChange={handleTypeChange}
-                    style={styles.filterSelect}
-                >
-                    <option value="">All Transactions</option>
-                    <option value="CREDIT">Credits</option>
-                    <option value="DEBIT">Debits</option>
-                </select>
+                <div style={styles.headerActions}>
+
+                    <select
+                        value={transactionType}
+                        onChange={(e) => setTransactionType(e.target.value)}
+                        style={styles.filterSelect}
+                    >
+                        <option value="">All Transactions</option>
+                        <option value="CREDIT">Credits</option>
+                        <option value="DEBIT">Debits</option>
+                    </select>
+
+                    <button
+                        style={styles.refreshButton}
+                        onClick={() => loadTransactions(page)}
+                    >
+                        🔄 Refresh
+                    </button>
+
+                </div>
 
             </div>
 
@@ -85,6 +103,12 @@ const TransactionsView = () => {
                 </div>
             ) : (
                 <>
+                    <input
+                        placeholder="Search description..."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        style={styles.searchInput}
+                    />
                     <table style={styles.table}>
 
                         <thead>
@@ -143,7 +167,7 @@ const TransactionsView = () => {
                         </thead>
 
                         <tbody>
-                            {transactions.map((tx, index) => (
+                            {filteredTransactions.map((tx, index) => (
                                 <tr
                                     key={tx.transactionId}
                                     style={{
@@ -354,6 +378,21 @@ const styles = {
         cursor: "pointer",
     },
 
+    headerActions: {
+        display: "flex",
+        gap: "12px",
+        alignItems: "center",
+    },
+
+    refreshButton: {
+        padding: "10px 16px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+        background: "#fff",
+        cursor: "pointer",
+        fontWeight: "600",
+    },
+
     pagination: {
         display: "flex",
         justifyContent: "space-between",
@@ -373,6 +412,24 @@ const styles = {
         borderRadius: "8px",
         cursor: "pointer",
         fontWeight: "600",
+    },
+
+    emptyState: {
+        textAlign: "center",
+        padding: "60px 20px",
+        color: "#6b7280",
+    },
+
+    emptyIcon: {
+        fontSize: "52px",
+        marginBottom: "16px",
+    },
+
+    searchInput: {
+        padding: "10px 14px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+        minWidth: "240px",
     },
 };
 

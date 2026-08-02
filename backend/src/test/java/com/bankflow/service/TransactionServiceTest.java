@@ -191,46 +191,6 @@ class TransactionServiceTest {
     }
 
     // ==========================================
-    // TRANSACTIONS BY DATE RANGE TESTS
-    // ==========================================
-
-    @Test
-    @DisplayName("Get Transactions By Date Range - Success")
-    void getTransactionsByDateRange_Success() {
-        mockAuthenticatedUser(mockUser);
-        LocalDate startDate = LocalDate.now().minusDays(7);
-        LocalDate endDate = LocalDate.now();
-
-        when(accountRepository.findByAccountNumber("BF1000000001")).thenReturn(Optional.of(mockAccount));
-        when(transactionRepository.findByAccountIdAndTransactionDateBetweenOrderByTransactionDateDesc(
-                eq(10L), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(List.of(mockCreditTx, mockDebitTx));
-
-        List<TransactionResponse> result = transactionService.getTransactionsByDateRange("BF1000000001", startDate, endDate);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("TX101", result.get(0).transactionId());
-        assertEquals("TX100", result.get(1).transactionId());
-    }
-
-    @Test
-    @DisplayName("Get Transactions By Date Range - Account Not Found Throws Exception")
-    void getTransactionsByDateRange_AccountNotFound_ThrowsException() {
-        mockAuthenticatedUser(mockUser);
-        LocalDate startDate = LocalDate.now().minusDays(1);
-        LocalDate endDate = LocalDate.now();
-
-        when(accountRepository.findByAccountNumber("BF9999999999")).thenReturn(Optional.empty());
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                transactionService.getTransactionsByDateRange("BF9999999999", startDate, endDate)
-        );
-
-        assertEquals("Account not found", ex.getMessage());
-    }
-
-    // ==========================================
     // ADMIN TRANSACTIONS LOOKUP TESTS
     // ==========================================
 

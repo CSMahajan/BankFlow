@@ -9,10 +9,12 @@ import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.TransactionRepository;
 import com.bankflow.repository.UserRepository;
+import com.bankflow.specification.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
@@ -65,75 +65,47 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getTransactionsByDateRange(String accountNumber, LocalDate startDate, LocalDate endDate) {
-        if (endDate == null) {
-            endDate = LocalDate.now();
-        }
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Start date cannot be after end date");
-        }
-        log.debug("Fetching transactions for account [{}] between [{}] and [{}]", accountNumber, startDate, endDate);
-        Account account = getAuthorizedAccount(accountNumber);
-
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-
-        List<TransactionResponse> transactions = transactionRepository
-                .findByAccountIdAndTransactionDateBetweenOrderByTransactionDateDesc(account.getId(), startDateTime, endDateTime)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-
-        log.info("Retrieved [{}] transactions for account [{}] in specified date range", transactions.size(), accountNumber);
-        return transactions;
-    }
-
-    @Transactional(readOnly = true)
-    public Page<TransactionResponse> getMyTransactions(String accountNumber, TransactionType type, Pageable pageable) {
+    public Page<TransactionResponse> getMyTransactions(
+            String accountNumber, TransactionType type,
+            LocalDate startDate, LocalDate endDate,
+            Pageable pageable
+    ) {
         User currentUser = getAuthenticatedUser();
 
         if (pageable.getPageSize() > 100) {
             throw new IllegalArgumentException("Maximum page size is 100");
         }
 
+        if (startDate != null && endDate == null) {
+            endDate = LocalDate.now();
+        }
+        if (startDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date");
+        }
+
         log.info("Fetching transaction history for user [{}], filter [{}], page [{}]",
                 currentUser.getEmail(), type == null ? "ALL" : type, pageable.getPageNumber()
         );
-        Page<Transaction> page;
+        Specification<Transaction> specification =
+                TransactionSpecification.belongsToUser(currentUser.getId());
 
         if (accountNumber != null && !accountNumber.isBlank()) {
-
-            Account account = getAuthorizedAccount(accountNumber);
-
-            if (type == null) {
-                page = transactionRepository
-                        .findByAccountIdOrderByTransactionDateDesc(
-                                account.getId(),
-                                pageable);
-            } else {
-                page = transactionRepository
-                        .findByAccountIdAndTransactionTypeOrderByTransactionDateDesc(
-                                account.getId(),
-                                type,
-                                pageable);
-            }
-
-        } else {
-
-            if (type == null) {
-                page = transactionRepository
-                        .findByAccountUserIdOrderByTransactionDateDesc(
-                                currentUser.getId(),
-                                pageable);
-            } else {
-                page = transactionRepository
-                        .findByAccountUserIdAndTransactionTypeOrderByTransactionDateDesc(
-                                currentUser.getId(),
-                                type,
-                                pageable);
-            }
-
+            specification = specification.and(
+                    TransactionSpecification.accountNumber(accountNumber));
         }
+
+        if (type != null) {
+            specification = specification.and(
+                    TransactionSpecification.transactionType(type));
+        }
+
+        if (startDate != null) {
+            specification = specification.and(
+                    TransactionSpecification.dateRange(startDate, endDate));
+        }
+
+        Page<Transaction> page =
+                transactionRepository.findAll(specification, pageable);
 
         return page.map(this::mapToResponse);
     }

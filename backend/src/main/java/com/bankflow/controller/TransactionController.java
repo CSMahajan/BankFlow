@@ -30,27 +30,38 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getDashboardSummary(accountNumber));
     }
 
-    // Filter Transactions by Date Range
-    @GetMapping("/filter/{accountNumber}")
-    public ResponseEntity<List<TransactionResponse>> getTransactionsByDateRange(
-            @PathVariable String accountNumber,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(transactionService.getTransactionsByDateRange(accountNumber, startDate, endDate));
-    }
-
     //My All Transactions
     @GetMapping("/my-transactions")
     public ResponseEntity<Page<TransactionResponse>> getMyTransactions(
-            @RequestParam(required = false) String accountNumber,
-            @RequestParam(required = false) Transaction.TransactionType type,
-            @PageableDefault(size = 20, sort = "transactionDate",
-                    direction = Sort.Direction.DESC)
-            Pageable pageable) {
 
+            @RequestParam(required = false)
+            String accountNumber,
+
+            @RequestParam(required = false)
+            Transaction.TransactionType type,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+
+            @PageableDefault(
+                    size = 20,
+                    sort = "transactionDate",
+                    direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
         return ResponseEntity.ok(
-                transactionService.getMyTransactions(accountNumber, type, pageable)
+                transactionService.getMyTransactions(
+                        accountNumber,
+                        type,
+                        startDate,
+                        endDate,
+                        pageable
+                )
         );
     }
 

@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { getMyTransactions } from "../../api/bankService";
+import { getMyTransactions, getTransactionDetails } from "../../api/bankService";
 import { formatDate, formatCurrency } from '../../utils/formatUtils';
 
 const TransactionsView = ({
     accounts = [],
 }) => {
     const [transactions, setTransactions] = useState([]);
+    const [selectedTransaction, setSelectedTransaction] = useState(null);
+    const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+    const [transactionDetails, setTransactionDetails] = useState(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [detailsLoading, setDetailsLoading] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [page, setPage] = useState(0);
@@ -87,6 +92,23 @@ const TransactionsView = ({
         setFilters(defaultFilters);
         setAppliedFilters(defaultFilters);
         setPage(0);
+    };
+
+    const openTransactionDetails = async (transactionId) => {
+        try {
+            setDrawerOpen(true);
+            setSelectedTransactionId(transactionId);
+            setDetailsLoading(true);
+
+            const response = await getTransactionDetails(transactionId);
+
+            setTransactionDetails(response.data);
+        } catch (err) {
+            console.error(err);
+            setError("Unable to load transaction details.");
+        } finally {
+            setDetailsLoading(false);
+        }
     };
 
     return (
@@ -267,17 +289,35 @@ const TransactionsView = ({
                             {transactions.map((tx, index) => (
                                 <tr
                                     key={tx.transactionId}
+                                    onClick={() => openTransactionDetails(tx.transactionId)}
                                     style={{
                                         ...styles.row,
-                                        backgroundColor: index % 2 === 0 ? "#ffffff" : "#f8fafc",
+                                        backgroundColor:
+                                            selectedTransactionId === tx.transactionId
+                                                ? "#e8f1ff"
+                                                : index % 2 === 0
+                                                    ? "#ffffff"
+                                                    : "#f8fafc",
+
+                                        borderLeft:
+                                            selectedTransactionId === tx.transactionId
+                                                ? "4px solid #2563eb"
+                                                : "4px solid transparent",
                                     }}
-                                    onMouseEnter={(e) =>
-                                        e.currentTarget.style.background = "#eef6ff"
-                                    }
-                                    onMouseLeave={(e) =>
-                                        e.currentTarget.style.background =
-                                        index % 2 === 0 ? "#ffffff" : "#f8fafc"
-                                    }
+                                    onMouseEnter={(e) => {
+                                        if (selectedTransactionId !== tx.transactionId) {
+                                            e.currentTarget.style.background = "#eef6ff";
+                                        }
+                                    }}
+
+                                    onMouseLeave={(e) => {
+                                        if (selectedTransactionId === tx.transactionId) {
+                                            e.currentTarget.style.background = "#dbeafe";
+                                        } else {
+                                            e.currentTarget.style.background =
+                                                index % 2 === 0 ? "#ffffff" : "#f8fafc";
+                                        }
+                                    }}
                                 >
                                     <td
                                         style={{
@@ -388,6 +428,131 @@ const TransactionsView = ({
                 </>
             )}
 
+            {drawerOpen && (
+                <div
+                    style={styles.drawerOverlay}
+                    onClick={() => {
+                        setDrawerOpen(false);
+                        setSelectedTransactionId(null);
+                        setTransactionDetails(null);
+                    }}
+                >
+
+                    <div
+                        style={styles.drawer}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+
+                        <div style={styles.drawerHeader}>
+                            <div>
+                                <h3 style={styles.drawerTitle}>
+                                    Transaction Details
+                                </h3>
+
+                                <p style={styles.drawerSubtitle}>
+                                    View complete transaction information
+                                </p>
+                            </div>
+
+                            <button
+                                style={styles.closeButton}
+                                onClick={() => {
+                                    setDrawerOpen(false);
+                                    setSelectedTransactionId(null);
+                                    setTransactionDetails(null);
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {detailsLoading ? (
+
+                            <p>Loading transaction...</p>
+
+                        ) : transactionDetails ? (
+
+                            <div style={styles.detailsGrid}>
+
+                                <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Reference</span>
+                                    <span
+                                        style={{
+                                            fontFamily: "monospace",
+                                            fontSize: "13px",
+                                            color: "#374151",
+                                            wordBreak: "break-all",
+                                        }}
+                                    >
+                                        {transactionDetails.transactionId}
+                                    </span>
+                                </div>
+
+                                <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Date</span>
+                                    <span>{formatDate(transactionDetails.transactionDate)}</span>
+                                </div>
+
+                                <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Account</span>
+                                    <span>{transactionDetails.accountNumber}</span>
+                                </div>
+
+                                <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Type</span>
+                                    <span
+                                        style={
+                                            transactionDetails.transactionType === "CREDIT"
+                                                ? styles.creditBadge
+                                                : styles.debitBadge
+                                        }
+                                    >
+                                        {transactionDetails.transactionType}
+                                    </span>
+                                </div>
+
+                                <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Amount</span>
+
+                                    <span
+                                        style={{
+                                            fontSize: "22px",
+                                            fontWeight: 700,
+                                            color:
+                                                transactionDetails.transactionType === "CREDIT"
+                                                    ? "#15803d"
+                                                    : "#dc2626",
+                                        }}
+                                    >
+                                        {transactionDetails.transactionType === "CREDIT"
+                                            ? "+"
+                                            : "-"}
+                                        {formatCurrency(transactionDetails.amount)}
+                                    </span>
+                                </div>
+
+                                <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Available Balance</span>
+                                    <span>{formatCurrency(transactionDetails.availableBalance)}</span>
+                                </div>
+
+                                <div style={styles.detailItem}>
+                                    <span style={styles.detailLabel}>Description</span>
+                                    <span>{transactionDetails.description || "-"}</span>
+                                </div>
+
+                            </div>
+
+                        ) : (
+
+                            <p>No details found.</p>
+
+                        )}
+
+                    </div>
+
+                </div>
+            )}
         </div>
     );
 };
@@ -468,6 +633,7 @@ const styles = {
     row: {
         transition: "background-color .2s",
         cursor: "pointer",
+        boxShadow: "inset 4px 0 0 transparent",
     },
 
     filterSelect: {
@@ -577,7 +743,77 @@ const styles = {
         cursor: "pointer",
         fontWeight: "600",
         whiteSpace: "nowrap",
-    }
+    },
+
+    drawerOverlay: {
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(15,23,42,0.15)",
+        display: "flex",
+        justifyContent: "flex-end",
+        alignItems: "center",
+        padding: "24px",
+        zIndex: 1000,
+    },
+
+    drawer: {
+        width: "380px",
+        maxWidth: "90vw",
+        height: "84vh",
+        backgroundColor: "#ffffff",
+        borderRadius: "18px",
+        padding: "28px",
+        overflowY: "auto",
+        boxShadow: "0 20px 50px rgba(0,0,0,.18)",
+    },
+
+    drawerHeader: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "28px",
+    },
+
+    drawerTitle: {
+        margin: 0,
+        fontSize: "22px",
+        fontFamily: "Georgia, serif",
+    },
+
+    drawerSubtitle: {
+        marginTop: "4px",
+        color: "#6b7280",
+        fontSize: "14px",
+    },
+
+    closeButton: {
+        border: "none",
+        background: "transparent",
+        cursor: "pointer",
+        fontSize: "20px",
+    },
+
+    detailsGrid: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "18px",
+    },
+
+    detailItem: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "6px",
+        paddingBottom: "14px",
+        borderBottom: "1px solid #eef2f7",
+    },
+
+    detailLabel: {
+        color: "#6b7280",
+        fontSize: "12px",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: ".4px",
+    },
 };
 
 export default TransactionsView;

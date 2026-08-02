@@ -119,3 +119,6 @@ export const getMyTransactions = (params) =>
   API.get("/transactions/my-transactions", {
     params,
   });
+
+export const getTransactionDetails = (transactionId) =>
+  API.get(`/transactions/${transactionId}`);

@@ -29,12 +29,6 @@ public interface TransactionRepository extends
 
     List<Transaction> findTop10ByAccountIdOrderByTransactionDateDesc(Long accountId);
 
-    List<Transaction> findByAccountIdAndTransactionDateBetweenOrderByTransactionDateDesc(
-            Long accountId,
-            LocalDateTime startDate,
-            LocalDateTime endDate
-    );
-
     @Query("""
         SELECT COALESCE(SUM(t.amount), 0)
         FROM Transaction t
@@ -65,29 +59,5 @@ public interface TransactionRepository extends
             @Param("endDate") LocalDateTime endDate
     );
 
-    Page<Transaction> findByAccountUserIdOrderByTransactionDateDesc(
-            Long userId,
-            Pageable pageable
-    );
-
-    Page<Transaction> findByAccountUserIdAndTransactionTypeOrderByTransactionDateDesc(
-            Long userId,
-            TransactionType transactionType,
-            Pageable pageable
-    );
-
     Optional<Transaction> findByTransactionId(String transactionId);
-
-    Page<Transaction> findByAccountIdOrderByTransactionDateDesc(
-            Long accountId,
-            Pageable pageable
-    );
-
-    Page<Transaction> findByAccountIdAndTransactionTypeOrderByTransactionDateDesc(
-            Long accountId,
-            TransactionType transactionType,
-            Pageable pageable
-    );
-
-
 }

@@ -21,6 +21,7 @@ const TransactionsView = ({
         transactionType: "",
         fromDate: "",
         toDate: "",
+        search: "",
     });
 
     const [appliedFilters, setAppliedFilters] = useState({
@@ -28,6 +29,7 @@ const TransactionsView = ({
         transactionType: "",
         fromDate: "",
         toDate: "",
+        search: "",
     });
 
     const today = new Date().toISOString().split("T")[0];
@@ -50,17 +52,25 @@ const TransactionsView = ({
             const response = await getMyTransactions({
                 page,
                 size: 20,
+
                 ...(appliedFilters.accountNumber && {
                     accountNumber: appliedFilters.accountNumber,
                 }),
+
                 ...(appliedFilters.transactionType && {
                     type: appliedFilters.transactionType,
                 }),
+
                 ...(appliedFilters.fromDate && {
                     startDate: appliedFilters.fromDate,
                 }),
+
                 ...(appliedFilters.toDate && {
                     endDate: appliedFilters.toDate,
+                }),
+
+                ...(appliedFilters.search && {
+                    search: appliedFilters.search,
                 }),
             });
 
@@ -87,6 +97,7 @@ const TransactionsView = ({
             transactionType: "",
             fromDate: "",
             toDate: "",
+            search: "",
         };
 
         setFilters(defaultFilters);
@@ -129,6 +140,24 @@ const TransactionsView = ({
             </div>
 
             <div style={styles.filterBar}>
+                <input
+                    type="text"
+                    placeholder="Search by Transaction ID or Description"
+                    value={filters.search}
+                    onChange={(e) =>
+                        setFilters(prev => ({
+                            ...prev,
+                            search: e.target.value,
+                        }))
+                    }
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            setPage(0);
+                            setAppliedFilters(filters);
+                        }
+                    }}
+                    style={styles.searchInput}
+                />
                 <select
                     value={filters.accountNumber}
                     onChange={(e) =>
@@ -813,6 +842,15 @@ const styles = {
         fontWeight: 700,
         textTransform: "uppercase",
         letterSpacing: ".4px",
+    },
+
+    searchInput: {
+        width: "280px",
+        padding: "10px 14px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+        fontSize: "14px",
+        outline: "none",
     },
 };
 

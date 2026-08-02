@@ -141,6 +141,40 @@ public class AccountService {
         );
     }
 
+    @Transactional
+    public AccountResponse toggleAccountStatus(String accountNumber) {
+
+        User currentUser = getAuthenticatedUser();
+
+        log.info("Toggling account status for account [{}] by user [{}]",
+                accountNumber, currentUser.getEmail());
+
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Account not found with number: " + accountNumber));
+
+        validateAccountOwnership(account, currentUser);
+
+        validateStatusChange(account);
+
+        if (account.getAccountStatus() == Account.AccountStatus.ACTIVE) {
+            account.setAccountStatus(Account.AccountStatus.FROZEN);
+            log.info("Account [{}] has been FROZEN", accountNumber);
+            auditLogService.log(AuditAction.ACCOUNT_FROZEN,
+                    "Account " + account.getAccountNumber() + " frozen");
+        } else if (account.getAccountStatus() == Account.AccountStatus.FROZEN) {
+            account.setAccountStatus(Account.AccountStatus.ACTIVE);
+            log.info("Account [{}] has been ACTIVATED", accountNumber);
+            auditLogService.log(AuditAction.ACCOUNT_ACTIVATED,
+                    "Account " + account.getAccountNumber() + " activated"
+            );
+        }
+
+        Account updatedAccount = accountRepository.save(account);
+
+        return mapToResponse(updatedAccount);
+    }
+
     @Transactional(readOnly = true)
     public List<AccountResponse> getAllAccountsForAdmin() {
         User currentUser = getAuthenticatedUser();
@@ -153,6 +187,24 @@ public class AccountService {
 
         log.info("ADMIN view retrieved [{}] total accounts", allAccounts.size());
         return allAccounts;
+    }
+
+    private void validateAccountOwnership(Account account, User currentUser) {
+        if (!account.getUser().getId().equals(currentUser.getId())) {
+            log.warn("Security Alert: User [{}] attempted to modify account [{}] belonging to another user",
+                    currentUser.getEmail(), account.getAccountNumber());
+
+            throw new AccessDeniedException("You are not authorized to modify this account");
+        }
+    }
+
+    private void validateStatusChange(Account account) {
+        if (account.getAccountStatus() == Account.AccountStatus.INACTIVE) {
+            log.warn("Account [{}] cannot be modified because current status is [{}]",
+                    account.getAccountNumber(), account.getAccountStatus());
+
+            throw new IllegalStateException("Inactive accounts cannot be activated or frozen.");
+        }
     }
 
     private User getAuthenticatedUser() {

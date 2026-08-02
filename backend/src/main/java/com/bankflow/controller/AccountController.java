@@ -42,6 +42,15 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAvailableBalance(accountNumber));
     }
 
+    @PatchMapping("/accounts/{accountNumber}/toggle-status")
+    public ResponseEntity<AccountResponse> toggleAccountStatus(
+            @PathVariable String accountNumber) {
+
+        return ResponseEntity.ok(
+                accountService.toggleAccountStatus(accountNumber)
+        );
+    }
+
     @GetMapping("/admin/accounts/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AccountResponse>> getAllAccountsForAdmin() {

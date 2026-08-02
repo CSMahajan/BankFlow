@@ -6,6 +6,10 @@ public enum AuditAction {
 
     ACCOUNT_CREATED,
 
+    ACCOUNT_ACTIVATED,
+
+    ACCOUNT_FROZEN,
+
     MONEY_TRANSFER,
 
     FD_CREATED,

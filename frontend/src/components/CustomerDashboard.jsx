@@ -5,12 +5,14 @@ import FdManagementView from '../components/FdManagementView';
 import ViewFds from '../components/ViewFds';
 import DashboardOverview from '../components/DashboardOverview';
 import CreateAccountModal from '../components/CreateAccountModal';
+import PaymentsView from "./payments/PaymentsView";
 import LoansView from '../components/LoansView';
 import CardsView from "./cards/CardsView";
 import API from '../api/axios';
 
 const CustomerDashboard = ({ userRole, onLogout }) => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [paymentSubTab, setPaymentSubTab] = useState("transfer");
   const [fdSubTab, setFdSubTab] = useState('calculator');
   const [fdDraftConfig, setFdDraftConfig] = useState(null);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
@@ -104,6 +106,77 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             >
               💳 Accounts
             </button>
+            <div style={styles.sidebarGroup}>
+              <div style={styles.groupHeader}>
+                💸 Payments
+              </div>
+
+              <button
+                style={{
+                  ...styles.subNavLink,
+                  backgroundColor:
+                    activeTab === "payments" &&
+                      paymentSubTab === "transfer"
+                      ? "#e6f2f1"
+                      : "transparent",
+                  color:
+                    activeTab === "payments" &&
+                      paymentSubTab === "transfer"
+                      ? "#0d6360"
+                      : "#4b5563",
+                }}
+                onClick={() => {
+                  setActiveTab("payments");
+                  setPaymentSubTab("transfer");
+                }}
+              >
+                💸 Transfer Money
+              </button>
+
+              <button
+                style={{
+                  ...styles.subNavLink,
+                  backgroundColor:
+                    activeTab === "payments" &&
+                      paymentSubTab === "scheduled"
+                      ? "#e6f2f1"
+                      : "transparent",
+                  color:
+                    activeTab === "payments" &&
+                      paymentSubTab === "scheduled"
+                      ? "#0d6360"
+                      : "#4b5563",
+                }}
+                onClick={() => {
+                  setActiveTab("payments");
+                  setPaymentSubTab("scheduled");
+                }}
+              >
+                🔁 Scheduled Transfers
+              </button>
+
+              <button
+                style={{
+                  ...styles.subNavLink,
+                  backgroundColor:
+                    activeTab === "payments" &&
+                      paymentSubTab === "transactions"
+                      ? "#e6f2f1"
+                      : "transparent",
+                  color:
+                    activeTab === "payments" &&
+                      paymentSubTab === "transactions"
+                      ? "#0d6360"
+                      : "#4b5563",
+                }}
+                onClick={() => {
+                  setActiveTab("payments");
+                  setPaymentSubTab("transactions");
+                }}
+              >
+                📜 Transactions
+              </button>
+            </div>
             <button
               style={{
                 ...styles.navBtn,
@@ -221,6 +294,15 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             loading={loadingAccounts}
             error={accountsError}
             refreshAccounts={fetchAccounts}
+          />
+        )}
+
+        {activeTab === "payments" && (
+          <PaymentsView
+            activeTab={paymentSubTab}
+            accounts={accounts}
+            refreshAccounts={fetchAccounts}
+            refreshSummary={fetchDashboardSummary}
           />
         )}
 

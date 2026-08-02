@@ -2,24 +2,41 @@ import React, { useEffect, useState } from "react";
 import { getMyTransactions } from "../../api/bankService";
 import { formatDate, formatCurrency } from '../../utils/formatUtils';
 
-const TransactionsView = () => {
-
+const TransactionsView = ({
+    accounts = [],
+}) => {
+    const [selectedAccount, setSelectedAccount] = useState("");
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [transactionType, setTransactionType] = useState("");
     const [page, setPage] = useState(0);
     const [pageData, setPageData] = useState(null);
-    const [searchText, setSearchText] = useState("");
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
 
     const loadTransactions = async (page = 0) => {
         try {
+            setError("");
             setLoading(true);
 
+            if (
+                fromDate &&
+                toDate &&
+                fromDate > toDate
+            ) {
+                setError("From date cannot be after To date.");
+                setTransactions([]);
+                setLoading(false);
+                return;
+            }
             const response = await getMyTransactions({
                 page,
                 size: 20,
+                ...(selectedAccount && { accountNumber: selectedAccount }),
                 ...(transactionType && { type: transactionType }),
+                ...(fromDate && { startDate: fromDate }),
+                ...(toDate && { endDate: toDate }),
             });
 
             setTransactions(response.data.content);
@@ -34,10 +51,31 @@ const TransactionsView = () => {
 
     useEffect(() => {
         loadTransactions(page);
-    }, [page, transactionType]);
+    }, [
+        page,
+        selectedAccount,
+        transactionType,
+        fromDate,
+        toDate,
+    ]);
 
     const handleTypeChange = (e) => {
         setTransactionType(e.target.value);
+        setPage(0);
+    };
+
+    const handleAccountChange = (e) => {
+        setSelectedAccount(e.target.value);
+        setPage(0);
+    };
+
+    const handleFromDateChange = (e) => {
+        setFromDate(e.target.value);
+        setPage(0);
+    };
+
+    const handleToDateChange = (e) => {
+        setToDate(e.target.value);
         setPage(0);
     };
 
@@ -48,12 +86,6 @@ const TransactionsView = () => {
     if (error) {
         return <div>{error}</div>;
     }
-
-    const filteredTransactions = transactions.filter(tx =>
-        (tx.description || "")
-            .toLowerCase()
-            .includes(searchText.toLowerCase())
-    );
 
     return (
         <div style={styles.card}>
@@ -73,8 +105,25 @@ const TransactionsView = () => {
                 <div style={styles.headerActions}>
 
                     <select
+                        value={selectedAccount}
+                        onChange={handleAccountChange}
+                        style={styles.filterSelect}
+                    >
+                        <option value="">All Accounts</option>
+
+                        {accounts.map(account => (
+                            <option
+                                key={account.accountNumber}
+                                value={account.accountNumber}
+                            >
+                                {account.accountType} • {account.accountNumber}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
                         value={transactionType}
-                        onChange={(e) => setTransactionType(e.target.value)}
+                        onChange={handleTypeChange}
                         style={styles.filterSelect}
                     >
                         <option value="">All Transactions</option>
@@ -84,10 +133,33 @@ const TransactionsView = () => {
 
                     <button
                         style={styles.refreshButton}
-                        onClick={() => loadTransactions(page)}
+                        onClick={() => {
+                            setPage(0);
+                            loadTransactions(0);
+                        }}
                     >
                         🔄 Refresh
                     </button>
+                    <div style={styles.dateToolbar}>
+
+                        <input
+                            type="date"
+                            value={fromDate}
+                            max={new Date().toISOString().split("T")[0]}
+                            onChange={handleFromDateChange}
+                            style={styles.dateInput}
+                        />
+
+                        <input
+                            type="date"
+                            value={toDate}
+                            min={fromDate}
+                            max={new Date().toISOString().split("T")[0]}
+                            onChange={handleToDateChange}
+                            style={styles.dateInput}
+                        />
+
+                    </div>
 
                 </div>
 
@@ -103,12 +175,6 @@ const TransactionsView = () => {
                 </div>
             ) : (
                 <>
-                    <input
-                        placeholder="Search description..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        style={styles.searchInput}
-                    />
                     <table style={styles.table}>
 
                         <thead>
@@ -167,7 +233,7 @@ const TransactionsView = () => {
                         </thead>
 
                         <tbody>
-                            {filteredTransactions.map((tx, index) => (
+                            {transactions.map((tx, index) => (
                                 <tr
                                     key={tx.transactionId}
                                     style={{
@@ -382,6 +448,7 @@ const styles = {
         display: "flex",
         gap: "12px",
         alignItems: "center",
+        flexWrap: "wrap"
     },
 
     refreshButton: {
@@ -425,12 +492,18 @@ const styles = {
         marginBottom: "16px",
     },
 
-    searchInput: {
-        padding: "10px 14px",
+    dateToolbar: {
+        display: "flex",
+        gap: "10px",
+        marginBottom: "22px",
+        alignItems: "center",
+    },
+
+    dateInput: {
+        padding: "10px",
         borderRadius: "8px",
         border: "1px solid #d1d5db",
-        minWidth: "240px",
-    },
+    }
 };
 
 export default TransactionsView;

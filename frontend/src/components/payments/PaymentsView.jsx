@@ -43,7 +43,9 @@ const PaymentsView = ({
             )}
 
             {activeTab === "transactions" && (
-                <TransactionsView />
+                <TransactionsView
+                    accounts={accounts}
+                />
             )}
 
         </div>

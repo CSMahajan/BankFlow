@@ -5,15 +5,27 @@ import { formatDate, formatCurrency } from '../../utils/formatUtils';
 const TransactionsView = ({
     accounts = [],
 }) => {
-    const [selectedAccount, setSelectedAccount] = useState("");
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [transactionType, setTransactionType] = useState("");
     const [page, setPage] = useState(0);
     const [pageData, setPageData] = useState(null);
-    const [fromDate, setFromDate] = useState("");
-    const [toDate, setToDate] = useState("");
+
+    const [filters, setFilters] = useState({
+        accountNumber: "",
+        transactionType: "",
+        fromDate: "",
+        toDate: "",
+    });
+
+    const [appliedFilters, setAppliedFilters] = useState({
+        accountNumber: "",
+        transactionType: "",
+        fromDate: "",
+        toDate: "",
+    });
+
+    const today = new Date().toISOString().split("T")[0];
 
     const loadTransactions = async (page = 0) => {
         try {
@@ -21,9 +33,9 @@ const TransactionsView = ({
             setLoading(true);
 
             if (
-                fromDate &&
-                toDate &&
-                fromDate > toDate
+                appliedFilters.fromDate &&
+                appliedFilters.toDate &&
+                appliedFilters.fromDate > appliedFilters.toDate
             ) {
                 setError("From date cannot be after To date.");
                 setTransactions([]);
@@ -33,10 +45,18 @@ const TransactionsView = ({
             const response = await getMyTransactions({
                 page,
                 size: 20,
-                ...(selectedAccount && { accountNumber: selectedAccount }),
-                ...(transactionType && { type: transactionType }),
-                ...(fromDate && { startDate: fromDate }),
-                ...(toDate && { endDate: toDate }),
+                ...(appliedFilters.accountNumber && {
+                    accountNumber: appliedFilters.accountNumber,
+                }),
+                ...(appliedFilters.transactionType && {
+                    type: appliedFilters.transactionType,
+                }),
+                ...(appliedFilters.fromDate && {
+                    startDate: appliedFilters.fromDate,
+                }),
+                ...(appliedFilters.toDate && {
+                    endDate: appliedFilters.toDate,
+                }),
             });
 
             setTransactions(response.data.content);
@@ -53,116 +73,127 @@ const TransactionsView = ({
         loadTransactions(page);
     }, [
         page,
-        selectedAccount,
-        transactionType,
-        fromDate,
-        toDate,
+        appliedFilters,
     ]);
 
-    const handleTypeChange = (e) => {
-        setTransactionType(e.target.value);
+    const resetFilters = () => {
+        const defaultFilters = {
+            accountNumber: "",
+            transactionType: "",
+            fromDate: "",
+            toDate: "",
+        };
+
+        setFilters(defaultFilters);
+        setAppliedFilters(defaultFilters);
         setPage(0);
     };
-
-    const handleAccountChange = (e) => {
-        setSelectedAccount(e.target.value);
-        setPage(0);
-    };
-
-    const handleFromDateChange = (e) => {
-        setFromDate(e.target.value);
-        setPage(0);
-    };
-
-    const handleToDateChange = (e) => {
-        setToDate(e.target.value);
-        setPage(0);
-    };
-
-    if (loading) {
-        return <div>Loading transactions...</div>;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
-    }
 
     return (
         <div style={styles.card}>
 
             <div style={styles.header}>
 
-                <div>
+                <div style={styles.headerText}>
                     <h3 style={styles.title}>
                         📜 Transaction History
                     </h3>
 
                     <p style={styles.subtitle}>
-                        Showing your latest transactions
+                        Browse and filter transactions across your accounts
                     </p>
                 </div>
 
-                <div style={styles.headerActions}>
+            </div>
 
-                    <select
-                        value={selectedAccount}
-                        onChange={handleAccountChange}
-                        style={styles.filterSelect}
-                    >
-                        <option value="">All Accounts</option>
+            <div style={styles.filterBar}>
+                <select
+                    value={filters.accountNumber}
+                    onChange={(e) =>
+                        setFilters(prev => ({
+                            ...prev,
+                            accountNumber: e.target.value,
+                        }))
+                    }
+                    style={styles.filterSelect}
+                >
+                    <option value="">All Accounts</option>
 
-                        {accounts.map(account => (
-                            <option
-                                key={account.accountNumber}
-                                value={account.accountNumber}
-                            >
-                                {account.accountType} • {account.accountNumber}
-                            </option>
-                        ))}
-                    </select>
+                    {accounts.map(account => (
+                        <option
+                            key={account.accountNumber}
+                            value={account.accountNumber}
+                        >
+                            {account.accountType} • {account.accountNumber}
+                        </option>
+                    ))}
+                </select>
 
-                    <select
-                        value={transactionType}
-                        onChange={handleTypeChange}
-                        style={styles.filterSelect}
-                    >
-                        <option value="">All Transactions</option>
-                        <option value="CREDIT">Credits</option>
-                        <option value="DEBIT">Debits</option>
-                    </select>
+                <select
+                    value={filters.transactionType}
+                    onChange={(e) =>
+                        setFilters(prev => ({
+                            ...prev,
+                            transactionType: e.target.value,
+                        }))
+                    }
+                    style={styles.filterSelect}
+                >
+                    <option value="">All Transactions</option>
+                    <option value="CREDIT">Credits</option>
+                    <option value="DEBIT">Debits</option>
+                </select>
 
-                    <button
-                        style={styles.refreshButton}
-                        onClick={() => {
-                            setPage(0);
-                            loadTransactions(0);
-                        }}
-                    >
-                        🔄 Refresh
-                    </button>
-                    <div style={styles.dateToolbar}>
-
+                <div style={styles.dateToolbar}>
+                    <div style={styles.dateField}>
+                        <span style={styles.dateLabel}>Start Date</span>
                         <input
                             type="date"
-                            value={fromDate}
-                            max={new Date().toISOString().split("T")[0]}
-                            onChange={handleFromDateChange}
+                            value={filters.fromDate}
+                            max={today}
+                            onChange={(e) =>
+                                setFilters(prev => ({
+                                    ...prev,
+                                    fromDate: e.target.value,
+                                }))
+                            }
                             style={styles.dateInput}
                         />
-
+                    </div>
+                    <div style={styles.dateField}>
+                        <span style={styles.dateLabel}>End Date</span>
                         <input
                             type="date"
-                            value={toDate}
-                            min={fromDate}
-                            max={new Date().toISOString().split("T")[0]}
-                            onChange={handleToDateChange}
+                            value={filters.toDate}
+                            min={filters.fromDate}
+                            max={today}
+                            onChange={(e) =>
+                                setFilters(prev => ({
+                                    ...prev,
+                                    toDate: e.target.value,
+                                }))
+                            }
                             style={styles.dateInput}
                         />
-
                     </div>
 
-                </div>
+                    <button
+                        style={styles.applyButton}
+                        onClick={() => {
+                            setPage(0);
+                            setAppliedFilters(filters);
+                        }}
+                    >
+                        Apply Filters
+                    </button>
 
+                    <button
+                        style={styles.resetButton}
+                        onClick={resetFilters}
+                    >
+                        Reset
+                    </button>
+                </div>
             </div>
 
             {transactions.length === 0 ? (
@@ -374,20 +405,24 @@ const styles = {
     header: {
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "20px",
-    },
-
-    subtitle: {
-        marginTop: "4px",
-        color: "#6b7280",
-        fontSize: "16px",
+        alignItems: "flex-start",
+        gap: "24px",
+        marginBottom: "24px",
+        flexWrap: "wrap",
     },
 
     title: {
         margin: 0,
+        marginBottom: "4px",
         fontSize: "24px",
         fontFamily: "Georgia, serif",
+        whiteSpace: "nowrap",
+    },
+
+    subtitle: {
+        margin: 0,
+        color: "#6b7280",
+        fontSize: "15px",
     },
 
     table: {
@@ -436,6 +471,7 @@ const styles = {
     },
 
     filterSelect: {
+        width: "240px",
         padding: "10px 14px",
         borderRadius: "8px",
         border: "1px solid #d1d5db",
@@ -444,20 +480,20 @@ const styles = {
         cursor: "pointer",
     },
 
-    headerActions: {
-        display: "flex",
-        gap: "12px",
-        alignItems: "center",
-        flexWrap: "wrap"
+    headerText: {
+        flex: "1 1 340px",
     },
 
-    refreshButton: {
-        padding: "10px 16px",
-        borderRadius: "8px",
-        border: "1px solid #d1d5db",
-        background: "#fff",
-        cursor: "pointer",
-        fontWeight: "600",
+    filterBar: {
+        display: "flex",
+        alignItems: "center",
+        gap: "14px",
+        flexWrap: "wrap",
+        marginBottom: "24px",
+        padding: "18px",
+        border: "1px solid #e5e7eb",
+        borderRadius: "12px",
+        backgroundColor: "#fafafa",
     },
 
     pagination: {
@@ -494,15 +530,53 @@ const styles = {
 
     dateToolbar: {
         display: "flex",
-        gap: "10px",
-        marginBottom: "22px",
         alignItems: "center",
+        gap: "14px",
+    },
+
+    dateField: {
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+    },
+
+    dateLabel: {
+        fontSize: "13px",
+        fontWeight: "600",
+        color: "#6b7280",
+        minWidth: "36px",
     },
 
     dateInput: {
-        padding: "10px",
+        width: "155px",
+        padding: "10px 12px",
         borderRadius: "8px",
         border: "1px solid #d1d5db",
+        fontSize: "14px",
+    },
+
+    applyButton: {
+        padding: "10px 18px",
+        height: "42px",
+        border: "none",
+        borderRadius: "8px",
+        backgroundColor: "#0d6360",
+        color: "#ffffff",
+        cursor: "pointer",
+        fontWeight: "600",
+        whiteSpace: "nowrap",
+    },
+
+    resetButton: {
+        padding: "10px 18px",
+        height: "42px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+        backgroundColor: "#ffffff",
+        color: "#374151",
+        cursor: "pointer",
+        fontWeight: "600",
+        whiteSpace: "nowrap",
     }
 };
 

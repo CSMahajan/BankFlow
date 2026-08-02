@@ -2,8 +2,10 @@ import React from "react";
 import TransferForm from "./TransferForm";
 
 const PaymentsView = ({
+    activeTab,
     accounts,
     refreshAccounts,
+    refreshSummary,
 }) => {
 
     return (
@@ -17,28 +19,35 @@ const PaymentsView = ({
                 Transfer money, manage scheduled transfers and view transaction history.
             </p>
 
-            <div style={styles.card}>
-                <h3 style={styles.cardTitle}>
-                    💸 Transfer Money
-                </h3>
+            {activeTab === "transfer" && (
+                <div style={styles.card}>
+                    <h3 style={styles.cardTitle}>💸 Transfer Money</h3>
 
-                <TransferForm
-                    accounts={accounts}
-                    onSuccess={refreshAccounts}
-                />
-            </div>
+                    <TransferForm
+                        accounts={accounts}
+                        onSuccess={async () => {
+                            await refreshAccounts();
+                            await refreshSummary();
+                        }}
+                    />
+                </div>
+            )}
 
-            <div style={styles.card}>
-                <h3>🗓 Scheduled Transfers</h3>
+            {activeTab === "scheduled" && (
+                <div style={styles.card}>
+                    <h3 style={styles.cardTitle}>🔁 Scheduled Transfers</h3>
 
-                <p>Coming next...</p>
-            </div>
+                    <p>Coming next...</p>
+                </div>
+            )}
 
-            <div style={styles.card}>
-                <h3>📜 Transaction History</h3>
+            {activeTab === "transactions" && (
+                <div style={styles.card}>
+                    <h3 style={styles.cardTitle}>📜 Transaction History</h3>
 
-                <p>Coming next...</p>
-            </div>
+                    <p>Coming next...</p>
+                </div>
+            )}
 
         </div>
     );

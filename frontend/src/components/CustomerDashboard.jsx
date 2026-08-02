@@ -106,6 +106,16 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             >
               💳 Accounts
             </button>
+            <button
+              style={{
+                ...styles.navBtn,
+                backgroundColor: activeTab === "payments" ? "#0d6360" : "transparent",
+                color: activeTab === "payments" ? "#ffffff" : "#374151",
+              }}
+              onClick={() => setActiveTab("payments")}
+            >
+              💸 Payments
+            </button>
             <div style={styles.sidebarGroup}>
               <div style={styles.groupHeader}>
                 💸 Payments

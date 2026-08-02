@@ -6,7 +6,6 @@ const TransactionsView = ({
     accounts = [],
 }) => {
     const [transactions, setTransactions] = useState([]);
-    const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [selectedTransactionId, setSelectedTransactionId] = useState(null);
     const [transactionDetails, setTransactionDetails] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -91,6 +90,12 @@ const TransactionsView = ({
         appliedFilters,
     ]);
 
+    useEffect(() => {
+        setDrawerOpen(false);
+        setSelectedTransactionId(null);
+        setTransactionDetails(null);
+    }, [page, appliedFilters]);
+
     const resetFilters = () => {
         const defaultFilters = {
             accountNumber: "",
@@ -102,12 +107,20 @@ const TransactionsView = ({
 
         setFilters(defaultFilters);
         setAppliedFilters(defaultFilters);
+        setDrawerOpen(false);
+        setSelectedTransactionId(null);
+        setTransactionDetails(null);
+
         setPage(0);
     };
 
     const openTransactionDetails = async (transactionId) => {
         try {
+
+            if (detailsLoading) return;
+
             setDrawerOpen(true);
+            setTransactionDetails(null);
             setSelectedTransactionId(transactionId);
             setDetailsLoading(true);
 
@@ -143,7 +156,7 @@ const TransactionsView = ({
             <div style={styles.filterBar}>
                 <input
                     type="text"
-                    placeholder="Search by Transaction ID or Description"
+                    placeholder="Search transaction ID or description"
                     value={filters.search}
                     onChange={(e) =>
                         setFilters(prev => ({
@@ -248,10 +261,16 @@ const TransactionsView = ({
                 </div>
             </div>
 
+            {error && (
+                <div style={styles.errorBanner}>
+                    {error}
+                </div>
+            )}
+
             {transactions.length === 0 ? (
                 <div style={styles.emptyState}>
                     <div style={{ fontSize: "42px" }}>📜</div>
-                    <h4>No transactions found</h4>
+                    <h4>No transactions matched your filters.</h4>
                     <p>
                         Try changing the filters or make your first transaction.
                     </p>
@@ -337,6 +356,8 @@ const TransactionsView = ({
                                     onMouseEnter={(e) => {
                                         if (selectedTransactionId !== tx.transactionId) {
                                             e.currentTarget.style.background = "#eef6ff";
+                                            e.currentTarget.style.cursor = "pointer";
+                                            e.currentTarget.style.transition = "all .18s ease";
                                         }
                                     }}
 
@@ -498,7 +519,14 @@ const TransactionsView = ({
 
                         {detailsLoading ? (
 
-                            <p>Loading transaction...</p>
+                            <div style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                height: "200px"
+                            }}>
+                                Loading transaction...
+                            </div>
 
                         ) : transactionDetails ? (
 
@@ -787,7 +815,7 @@ const styles = {
     },
 
     drawer: {
-        width: "380px",
+        width: "420px",
         maxWidth: "90vw",
         height: "84vh",
         backgroundColor: "#ffffff",
@@ -852,6 +880,16 @@ const styles = {
         border: "1px solid #d1d5db",
         fontSize: "14px",
         outline: "none",
+    },
+
+    errorBanner: {
+        marginBottom: "20px",
+        padding: "12px 16px",
+        borderRadius: "8px",
+        backgroundColor: "#fef2f2",
+        color: "#b91c1c",
+        border: "1px solid #fecaca",
+        fontWeight: "500",
     },
 };
 

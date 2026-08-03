@@ -83,7 +83,8 @@ public class ScheduledTransferService {
     @Transactional(readOnly = true)
     public List<ScheduledTransferResponse> getMyScheduledTransfers() {
         User currentUser = getAuthenticatedUser();
-        return scheduledTransferRepository.findByUserId(currentUser.getId())
+        return scheduledTransferRepository
+                .findByUserIdOrderByActiveFirst(currentUser.getId())
                 .stream()
                 .map(this::mapToResponse)
                 .toList();

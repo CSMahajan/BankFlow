@@ -173,7 +173,7 @@ class ScheduledTransferServiceTest {
     @DisplayName("Get My Scheduled Transfers - Success")
     void getMyScheduledTransfers_Success() {
         mockAuthenticatedUser();
-        when(scheduledTransferRepository.findByUserId(mockUser.getId())).thenReturn(List.of(mockScheduledTransfer));
+        when(scheduledTransferRepository.findByUserIdOrderByActiveFirst(mockUser.getId())).thenReturn(List.of(mockScheduledTransfer));
 
         List<ScheduledTransferResponse> responses = scheduledTransferService.getMyScheduledTransfers();
 

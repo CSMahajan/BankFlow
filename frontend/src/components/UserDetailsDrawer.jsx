@@ -1,5 +1,7 @@
 import React from "react";
 import { formatDate, formatCurrency } from "../utils/formatUtils";
+import { useState } from "react";
+import { fetchUserAccounts } from "../API/bankService";
 
 const UserDetailsDrawer = ({
     open,
@@ -8,7 +10,27 @@ const UserDetailsDrawer = ({
     onClose,
 }) => {
 
+    const [accounts, setAccounts] = useState([]);
+    const [accountsLoading, setAccountsLoading] = useState(false);
+    const [showAccounts, setShowAccounts] = useState(false);
+
     if (!open) return null;
+
+    const loadAccounts = async () => {
+
+        if (showAccounts) {
+            setShowAccounts(false);
+            return;
+        }
+        try {
+            setAccountsLoading(true);
+            const response = await fetchUserAccounts(user.id);
+            setAccounts(response);
+            setShowAccounts(true);
+        } finally {
+            setAccountsLoading(false);
+        }
+    };
 
     return (
         <div
@@ -63,7 +85,7 @@ const UserDetailsDrawer = ({
                         <div style={styles.statsGrid}>
                             <div
                                 style={styles.statCard}
-                                onClick={() => loadCustomerAccounts(user.id)}
+                                onClick={loadAccounts}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = "translateY(-3px)";
                                     e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
@@ -81,7 +103,7 @@ const UserDetailsDrawer = ({
                                     {user.accountCount}
                                 </div>
                                 <div style={styles.statFooter}>
-                                    View Details →
+                                    {showAccounts ? "Hide Accounts ↑" : "View Accounts →"}
                                 </div>
                             </div>
                             <div
@@ -154,6 +176,62 @@ const UserDetailsDrawer = ({
                                 </div>
                             </div>
                         </div>
+
+                        {showAccounts && (
+                            <div style={styles.section}>
+                                <h3 style={styles.sectionTitle}>
+                                    Linked Accounts
+                                </h3>
+                                {accountsLoading ? (
+                                    <p>Loading accounts...</p>
+                                ) : (
+                                    accounts.map(account => (
+                                        <div
+                                            key={account.accountNumber}
+                                            style={styles.accountCard}
+                                        >
+                                            <div style={{ flex: 1 }}>
+                                                <div style={styles.accountHeader}>
+                                                    <strong>
+                                                        {account.accountType} Account
+                                                    </strong>
+                                                    <span
+                                                        style={{
+                                                            ...styles.accountStatus,
+                                                            backgroundColor:
+                                                                account.accountStatus === "ACTIVE"
+                                                                    ? "#dcfce7"
+                                                                    : "#fee2e2",
+                                                            color:
+                                                                account.accountStatus === "ACTIVE"
+                                                                    ? "#15803d"
+                                                                    : "#b91c1c",
+                                                        }}
+                                                    >
+                                                        {account.accountStatus}
+                                                    </span>
+                                                </div>
+                                                <div style={styles.accountNumber}>
+                                                    {account.accountNumber}
+                                                </div>
+                                                <div style={styles.branchName}>
+                                                    📍 {account.branchName}
+                                                </div>
+                                            </div>
+                                            <div style={styles.balanceSection}>
+                                                <div style={styles.balanceLabel}>
+                                                    Available Balance
+                                                </div>
+                                                <div style={styles.balanceValue}>
+                                                    ₹{Number(account.currentBalance).toLocaleString("en-IN")}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+
 
                         <div style={styles.financialCard}>
                             <div style={styles.financialLabel}>
@@ -433,13 +511,6 @@ const styles = {
         paddingTop: "22px",
     },
 
-    sectionTitle: {
-        margin: "0 0 18px",
-        fontSize: "18px",
-        fontWeight: "700",
-        color: "#1e293b",
-    },
-
     infoRow: {
         display: "flex",
         justifyContent: "space-between",
@@ -503,7 +574,76 @@ const styles = {
         fontSize: "12px",
         color: "#0d6360",
         fontWeight: 600,
-    }
+    },
+
+    sectionTitle: {
+        marginBottom: "16px",
+        fontSize: "18px",
+        fontWeight: 700,
+    },
+
+    accountCard: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        border: "1px solid #e5e7eb",
+        borderRadius: "12px",
+        padding: "16px",
+        marginBottom: "12px",
+        background: "#fafafa",
+    },
+
+    accountNumber: {
+        marginTop: "4px",
+        color: "#64748b",
+        fontFamily: "monospace",
+        fontSize: "13px",
+    },
+
+    accountHeader: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "8px",
+    },
+
+    accountStatus: {
+        padding: "4px 10px",
+        borderRadius: "999px",
+        fontSize: "11px",
+        fontWeight: 700,
+    },
+
+    branchName: {
+        marginTop: "8px",
+        color: "#64748b",
+        fontSize: "13px",
+    },
+
+    balanceSection: {
+        textAlign: "right",
+        minWidth: "130px",
+    },
+
+    balanceLabel: {
+        color: "#64748b",
+        fontSize: "12px",
+    },
+
+    balanceValue: {
+        marginTop: "4px",
+        fontWeight: 700,
+        fontSize: "18px",
+        color: "#0f172a",
+    },
+
+    emptyAccounts: {
+        padding: "24px",
+        textAlign: "center",
+        color: "#6b7280",
+        border: "1px dashed #d1d5db",
+        borderRadius: "10px",
+    },
 };
 
 export default UserDetailsDrawer;

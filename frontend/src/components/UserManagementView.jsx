@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { fetchUsers } from "../api/bankService";
+import { fetchUsers, fetchUserDetails } from "../api/bankService";
 import { tableHeader, tableCell } from "../styles/tableStyles";
 import PageCard from "./PageCard";
+import UserDetailsDrawer from "./UserDetailsDrawer";
 
 const UserManagementView = () => {
     const [users, setUsers] = useState([]);
@@ -9,6 +10,10 @@ const UserManagementView = () => {
     const [error, setError] = useState("");
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("ALL");
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [detailsLoading, setDetailsLoading] = useState(false);
 
     useEffect(() => {
         loadUsers();
@@ -32,6 +37,40 @@ const UserManagementView = () => {
         }
     };
 
+    const openUserDetails = async (userId) => {
+
+        try {
+
+            if (detailsLoading) return;
+
+            setDrawerOpen(true);
+            setSelectedUserId(userId);
+            setSelectedUser(null);
+            setDetailsLoading(true);
+
+            const response = await fetchUserDetails(userId);
+
+            setSelectedUser(response);
+
+        } catch (err) {
+
+            console.error(err);
+            setError("Unable to load user details.");
+
+        } finally {
+
+            setDetailsLoading(false);
+
+        }
+
+    };
+
+    const closeDrawer = () => {
+        setDrawerOpen(false);
+        setSelectedUserId(null);
+        setSelectedUser(null);
+    };
+
     if (loading) {
         return <p>Loading users...</p>;
     }
@@ -53,8 +92,6 @@ const UserManagementView = () => {
 
     return (
         <div>
-            <h2>User Management</h2>
-
             <PageCard title="👥 User Management">
                 <div
                     style={{
@@ -134,7 +171,28 @@ const UserManagementView = () => {
 
                         <tbody>
                             {filteredUsers.map((user) => (
-                                <tr key={user.id}>
+                                <tr
+                                    key={user.id}
+                                    onClick={() => openUserDetails(user.id)}
+                                    style={{
+                                        cursor: "pointer",
+                                        background:
+                                            selectedUserId === user.id
+                                                ? "#eef6ff"
+                                                : "#fff",
+                                        transition: ".18s",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (selectedUserId !== user.id) {
+                                            e.currentTarget.style.background = "#f8fafc";
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (selectedUserId !== user.id) {
+                                            e.currentTarget.style.background = "#fff";
+                                        }
+                                    }}
+                                >
                                     <td style={tableCell}>{user.fullName}</td>
                                     <td style={tableCell}>{user.email}</td>
                                     <td style={tableCell}>
@@ -171,6 +229,12 @@ const UserManagementView = () => {
                     </table>
                 </div>
             </PageCard>
+            <UserDetailsDrawer
+                open={drawerOpen}
+                loading={detailsLoading}
+                user={selectedUser}
+                onClose={closeDrawer}
+            />
         </div>
     );
 };

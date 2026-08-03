@@ -144,3 +144,10 @@ export const cancelScheduledTransfer = async (transferId) => {
   );
   return response.data;
 };
+
+export const fetchUserDetails = async (userId) => {
+  const response = await API.get(
+    `/users/${userId}`
+  );
+  return response.data;
+};

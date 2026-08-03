@@ -182,6 +182,30 @@ public class UserService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<AdminUserAccountResponse> getUserAccounts(Long userId) {
+
+        log.info("Fetching accounts for user [{}]", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return accountRepository.findByUserId(user.getId())
+                .stream()
+                .map(account -> new AdminUserAccountResponse(
+
+                        account.getAccountNumber(),
+                        account.getAccountType(),
+                        account.getCurrentBalance(),
+                        account.getAccountStatus(),
+                        account.getBranchName(),
+                        account.getCreatedAt()
+
+                ))
+                .toList();
+    }
+
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(auth.getName())

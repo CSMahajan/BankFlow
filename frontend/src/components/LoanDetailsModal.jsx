@@ -13,7 +13,6 @@ const LoanDetailsModal = ({
     repaymentError
 }) => {
 
-    console.log("Loan Details:", loan);
     if (!isOpen || !loan) return null;
     <button
         onClick={() => toast.success("Hello BankFlow!")}

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { createFixedDeposit } from "../api/bankService";
 import { FD_RATES, FD_TENURES } from "./fdConfig";
 
 const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
-  const [sourceAccountNumber, setSourceAccountNumber] = useState(
-    accounts[0]?.accountNumber || initialConfig?.sourceAccountNumber || ''
-  );
+
+  const [sourceAccountNumber, setSourceAccountNumber] = useState('');
   const [depositAmount, setDepositAmount] = useState(
     initialConfig?.depositAmount ?? ""
   );
@@ -13,6 +12,24 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    const activeAccounts = accounts.filter(
+      acc => acc.accountStatus === "ACTIVE"
+    );
+
+    if (!sourceAccountNumber && activeAccounts.length > 0) {
+      setSourceAccountNumber(activeAccounts[0].accountNumber);
+    }
+  }, [accounts, sourceAccountNumber]);
+
+  const activeAccounts = accounts.filter(
+    acc => acc.accountStatus === "ACTIVE"
+  );
+
+  const selectedAccount = activeAccounts.find(
+    acc => acc.accountNumber === sourceAccountNumber
+  );
 
   const handleCreateFd = async (e) => {
     e.preventDefault();
@@ -28,9 +45,13 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
       });
 
       setSuccessMsg('Your Fixed Deposit has been opened successfully.');
-      setSourceAccountNumber(accounts[0]?.accountNumber ?? "");
-      setDepositAmount("");
+      if (activeAccounts.length > 0) {
+        setSourceAccountNumber(activeAccounts[0].accountNumber);
+      } else {
+        setSourceAccountNumber("");
+      } setDepositAmount("");
       setTenureYears(FD_TENURES[0]);
+
       setTimeout(() => {
         if (onFdCreated) onFdCreated();
       }, 1200);
@@ -60,29 +81,23 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
             required
             style={styles.input}
           >
-            <option value="">Select Source Account</option>
-
-            {accounts.map((account) => (
+            {activeAccounts.map(acc => (
               <option
-                key={account.accountNumber}
-                value={account.accountNumber}
+                key={acc.accountNumber}
+                value={acc.accountNumber}
               >
-                {account.accountNumber}
+                {acc.accountType} • {acc.accountNumber}
               </option>
             ))}
           </select>
-          {sourceAccountNumber && (
+          {selectedAccount && (
             <div style={styles.balanceInfo}>
               Available Balance:&nbsp;
               <strong>
                 {new Intl.NumberFormat("en-IN", {
                   style: "currency",
                   currency: "INR",
-                }).format(
-                  accounts.find(
-                    account => account.accountNumber === sourceAccountNumber
-                  )?.currentBalance ?? 0
-                )}
+                }).format(selectedAccount.currentBalance)}
               </strong>
             </div>
           )}

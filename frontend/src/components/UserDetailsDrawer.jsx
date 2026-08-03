@@ -1,7 +1,7 @@
 import React from "react";
 import { formatDate, formatCurrency } from "../utils/formatUtils";
 import { useState } from "react";
-import { fetchUserAccounts } from "../API/bankService";
+import { fetchUserAccounts, fetchUserCards } from "../API/bankService";
 
 const UserDetailsDrawer = ({
     open,
@@ -13,11 +13,13 @@ const UserDetailsDrawer = ({
     const [accounts, setAccounts] = useState([]);
     const [accountsLoading, setAccountsLoading] = useState(false);
     const [showAccounts, setShowAccounts] = useState(false);
+    const [cards, setCards] = useState([]);
+    const [cardsLoading, setCardsLoading] = useState(false);
+    const [showCards, setShowCards] = useState(false);
 
     if (!open) return null;
 
     const loadAccounts = async () => {
-
         if (showAccounts) {
             setShowAccounts(false);
             return;
@@ -29,6 +31,22 @@ const UserDetailsDrawer = ({
             setShowAccounts(true);
         } finally {
             setAccountsLoading(false);
+        }
+    };
+
+
+    const loadCards = async () => {
+        if (showCards) {
+            setShowCards(false);
+            return;
+        }
+        try {
+            setCardsLoading(true);
+            const response = await fetchUserCards(user.id);
+            setCards(response);
+            setShowCards(true);
+        } finally {
+            setCardsLoading(false);
         }
     };
 
@@ -108,7 +126,7 @@ const UserDetailsDrawer = ({
                             </div>
                             <div
                                 style={styles.statCard}
-                                onClick={() => loadCustomerAccounts(user.id)}
+                                onClick={loadCards}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = "translateY(-3px)";
                                     e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
@@ -118,7 +136,7 @@ const UserDetailsDrawer = ({
                                     e.currentTarget.style.boxShadow = "none";
                                 }}
                             >
-                                <div style={styles.statIcon}>💳</div>
+                                <div style={styles.statIcon}>🏦</div>
                                 <div style={styles.statTitle}>
                                     Cards
                                 </div>
@@ -126,7 +144,7 @@ const UserDetailsDrawer = ({
                                     {user.cardCount}
                                 </div>
                                 <div style={styles.statFooter}>
-                                    View Details →
+                                    {showCards ? "Hide Cards ↑" : "View Cards →"}
                                 </div>
                             </div>
                             <div
@@ -224,6 +242,70 @@ const UserDetailsDrawer = ({
                                                 </div>
                                                 <div style={styles.balanceValue}>
                                                     ₹{Number(account.currentBalance).toLocaleString("en-IN")}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+
+                        {showCards && (
+                            <div style={styles.section}>
+                                <h3 style={styles.sectionTitle}>
+                                    Cards
+                                </h3>
+                                {cardsLoading ? (
+                                    <p>Loading cards...</p>
+                                ) : cards.length === 0 ? (
+                                    <div style={styles.emptyAccounts}>
+                                        No cards issued.
+                                    </div>
+                                ) : (
+                                    cards.map(card => (
+                                        <div
+                                            key={card.cardNumber}
+                                            style={styles.accountCard}
+                                        >
+                                            <div style={{ flex: 1 }}>
+                                                <div style={styles.accountHeader}>
+                                                    <strong>
+                                                        {card.cardType === "DEBIT"
+                                                            ? "💳 Debit Card"
+                                                            : "💎 Credit Card"}
+                                                    </strong>
+                                                    <span
+                                                        style={{
+                                                            ...styles.accountStatus,
+                                                            backgroundColor:
+                                                                card.cardStatus === "ACTIVE"
+                                                                    ? "#dcfce7"
+                                                                    : "#fee2e2",
+                                                            color:
+                                                                card.cardStatus === "ACTIVE"
+                                                                    ? "#15803d"
+                                                                    : "#b91c1c",
+                                                        }}
+                                                    >
+                                                        {card.cardStatus}
+                                                    </span>
+                                                </div>
+                                                <div style={styles.accountNumber}>
+                                                    **** **** **** {card.cardNumber.slice(-4)}
+                                                </div>
+                                                <div style={styles.branchName}>
+                                                    Expires {new Date(card.expiryDate).toLocaleDateString("en-IN", {
+                                                        month: "2-digit",
+                                                        year: "numeric",
+                                                    })}
+                                                </div>
+                                            </div>
+                                            <div style={styles.balanceSection}>
+                                                <div style={styles.balanceLabel}>
+                                                    Daily Limit
+                                                </div>
+                                                <div style={styles.balanceValue}>
+                                                    ₹{Number(card.dailyLimit).toLocaleString("en-IN")}
                                                 </div>
                                             </div>
                                         </div>

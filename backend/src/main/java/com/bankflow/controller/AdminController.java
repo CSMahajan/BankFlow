@@ -2,6 +2,7 @@ package com.bankflow.controller;
 
 import com.bankflow.dto.AdminUserAccountResponse;
 import com.bankflow.dto.AdminUserCardResponse;
+import com.bankflow.dto.AdminUserLoanResponse;
 import com.bankflow.dto.CreateAdminRequest;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
@@ -44,6 +45,16 @@ public class AdminController {
 
         return ResponseEntity.ok(
                 userService.getUserCards(userId)
+        );
+    }
+
+    @GetMapping("/users/{userId}/loans")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AdminUserLoanResponse>> getUserLoans(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                userService.getUserLoans(userId)
         );
     }
 }

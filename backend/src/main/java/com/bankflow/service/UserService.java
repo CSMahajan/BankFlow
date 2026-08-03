@@ -229,6 +229,32 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<AdminUserLoanResponse> getUserLoans(Long userId) {
+
+        log.info("Fetching loans for user [{}]", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return loanRepository.findByUserId(user.getId())
+                .stream()
+                .map(loan -> new AdminUserLoanResponse(
+
+                        loan.getLoanNumber(),
+                        loan.getLoanType(),
+                        loan.getStatus(),
+                        loan.getPrincipalAmount(),
+                        loan.getRemainingBalance(),
+                        loan.getMonthlyEmi(),
+                        loan.getTenureMonths(),
+                        loan.getNextDueDate()
+
+                ))
+                .toList();
+    }
+
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(auth.getName())

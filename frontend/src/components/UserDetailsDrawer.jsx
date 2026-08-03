@@ -1,7 +1,7 @@
 import React from "react";
 import { formatDate, formatCurrency } from "../utils/formatUtils";
 import { useState } from "react";
-import { fetchUserAccounts, fetchUserCards, fetchUserLoans } from "../API/bankService";
+import { fetchUserAccounts, fetchUserCards, fetchUserLoans, fetchUserFixedDeposits } from "../API/bankService";
 
 const UserDetailsDrawer = ({
     open,
@@ -19,6 +19,9 @@ const UserDetailsDrawer = ({
     const [loans, setLoans] = useState([]);
     const [loansLoading, setLoansLoading] = useState(false);
     const [showLoans, setShowLoans] = useState(false);
+    const [fixedDeposits, setFixedDeposits] = useState([]);
+    const [fixedDepositsLoading, setFixedDepositsLoading] = useState(false);
+    const [showFixedDeposits, setShowFixedDeposits] = useState(false);
 
     if (!open) return null;
 
@@ -79,6 +82,36 @@ const UserDetailsDrawer = ({
         }
     };
 
+    const getFdStatusStyle = (status) => {
+
+        switch (status) {
+
+            case "ACTIVE":
+                return {
+                    backgroundColor: "#dcfce7",
+                    color: "#15803d",
+                };
+
+            case "PREMATURE_CLOSED":
+                return {
+                    backgroundColor: "#fef3c7",
+                    color: "#b45309",
+                };
+
+            case "CLOSED":
+                return {
+                    backgroundColor: "#dbeafe",
+                    color: "#1d4ed8",
+                };
+
+            default:
+                return {
+                    backgroundColor: "#f3f4f6",
+                    color: "#6b7280",
+                };
+        }
+    };
+
     const loadAccounts = async () => {
         if (showAccounts) {
             setShowAccounts(false);
@@ -122,6 +155,22 @@ const UserDetailsDrawer = ({
             setShowLoans(true);
         } finally {
             setLoansLoading(false);
+        }
+    };
+
+    const loadFixedDeposits = async () => {
+        if (showFixedDeposits) {
+            setShowFixedDeposits(false);
+            return;
+        }
+        try {
+            setFixedDepositsLoading(true);
+            const response =
+                await fetchUserFixedDeposits(user.id);
+            setFixedDeposits(response);
+            setShowFixedDeposits(true);
+        } finally {
+            setFixedDepositsLoading(false);
         }
     };
 
@@ -247,7 +296,7 @@ const UserDetailsDrawer = ({
                             </div>
                             <div
                                 style={styles.statCard}
-                                onClick={() => loadCustomerAccounts(user.id)}
+                                onClick={loadFixedDeposits}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = "translateY(-3px)";
                                     e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
@@ -265,7 +314,7 @@ const UserDetailsDrawer = ({
                                     {user.fixedDepositCount}
                                 </div>
                                 <div style={styles.statFooter}>
-                                    View Details →
+                                    {showFixedDeposits ? "Hide Fixed Deposits ↑" : "View Fixed Deposits →"}
                                 </div>
                             </div>
                         </div>
@@ -440,6 +489,69 @@ const UserDetailsDrawer = ({
 
                                                     <div style={styles.balanceValue}>
                                                         {formatCurrency(loan.remainingBalance)}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+
+                        {showFixedDeposits && (
+                            <div style={styles.section}>
+                                <h3 style={styles.sectionTitle}>
+                                    Fixed Deposits
+                                </h3>
+                                {fixedDepositsLoading ? (
+                                    <p>Loading fixed deposits...</p>
+                                ) : fixedDeposits.length === 0 ? (
+                                    <div style={styles.emptyAccounts}>
+                                        No fixed deposits found.
+                                    </div>
+                                ) : (
+                                    fixedDeposits.map(fd => (
+                                        <div
+                                            key={fd.fdNumber}
+                                            style={styles.accountCard}
+                                        >
+                                            <div style={{ flex: 1 }}>
+                                                <div style={styles.accountHeader}>
+                                                    <strong>
+                                                        💰 Fixed Deposit
+                                                    </strong>
+                                                    <span
+                                                        style={{
+                                                            ...styles.accountStatus,
+                                                            ...getFdStatusStyle(fd.status),
+                                                        }}
+                                                    >
+                                                        {fd.status.replaceAll("_", " ")}
+                                                    </span>
+                                                </div>
+                                                <div style={styles.accountNumber}>
+                                                    {fd.fdNumber}
+                                                </div>
+                                                {fd.status === "ACTIVE" && (
+                                                    <>
+                                                        <div style={styles.loanMeta}>
+                                                            Interest {fd.interestRate}%
+                                                        </div>
+
+                                                        <div style={styles.loanMeta}>
+                                                            Matures : {formatDate(fd.maturityDate)}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                            {fd.status === "ACTIVE" && (
+                                                <div style={styles.balanceSection}>
+                                                    <div style={styles.balanceLabel}>
+                                                        Maturity Amount
+                                                    </div>
+
+                                                    <div style={styles.balanceValue}>
+                                                        {formatCurrency(fd.maturityAmount)}
                                                     </div>
                                                 </div>
                                             )}

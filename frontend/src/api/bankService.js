@@ -166,3 +166,8 @@ export const fetchUserLoans = async (userId) => {
   const response = await API.get(`/admin/users/${userId}/loans`);
   return response.data;
 };
+
+export const fetchUserFixedDeposits = async (userId) => {
+  const response = await API.get(`/admin/users/${userId}/fixed-deposits`);
+  return response.data;
+};

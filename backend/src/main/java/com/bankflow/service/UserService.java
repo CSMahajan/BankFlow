@@ -4,8 +4,7 @@ import com.bankflow.dto.*;
 import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.User;
 import com.bankflow.exception.ResourceNotFoundException;
-import com.bankflow.repository.AccountRepository;
-import com.bankflow.repository.UserRepository;
+import com.bankflow.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,10 +22,13 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AccountRepository accountRepository;
+    private final CardRepository cardRepository;
+    private final LoanRepository loanRepository;
+    private final FixedDepositRepository fixedDepositRepository;
     private final JwtService jwtService;
     private final AuditLogService auditLogService;
-    private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void registerCustomer(RegisterRequest request) {
@@ -151,6 +153,32 @@ public class UserService {
                 user.getFullName(),
                 user.getEmail(),
                 user.getRole().name()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public UserDetailsResponse getUserDetails(Long userId) {
+
+        log.info("Fetching details for user [{}]", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return new UserDetailsResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getRole().name(),
+                user.getCreatedAt(),
+
+                accountRepository.countByUserId(userId),
+                cardRepository.countByAccountUserId(userId),
+                loanRepository.countByUserId(userId),
+                fixedDepositRepository.countByUserId(userId),
+
+                accountRepository.getTotalBalance(userId),
+                loanRepository.getOutstandingLoanAmount(userId)
         );
     }
 

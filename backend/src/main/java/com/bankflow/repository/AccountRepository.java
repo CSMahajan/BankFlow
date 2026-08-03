@@ -25,4 +25,11 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     FROM Account a
 """)
     BigDecimal getTotalDeposits();
+
+    @Query("""
+        SELECT COALESCE(SUM(a.currentBalance), 0)
+        FROM Account a
+        WHERE a.user.id = :userId
+        """)
+    BigDecimal getTotalBalance(Long userId);
 }

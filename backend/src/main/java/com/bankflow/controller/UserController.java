@@ -1,6 +1,7 @@
 package com.bankflow.controller;
 
 import com.bankflow.dto.UpdateProfileRequest;
+import com.bankflow.dto.UserDetailsResponse;
 import com.bankflow.dto.UserMeResponse;
 import com.bankflow.dto.UserSummaryResponse;
 import com.bankflow.service.UserService;
@@ -35,5 +36,15 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserSummaryResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDetailsResponse> getUserDetails(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                userService.getUserDetails(userId)
+        );
     }
 }

@@ -17,4 +17,6 @@ public interface FixedDepositRepository extends JpaRepository<FixedDeposit, Long
     boolean existsByFdNumber(String fdNumber);
 
     long countByStatus(FixedDeposit.FdStatus status);
+
+    long countByUserId(Long userId);
 }

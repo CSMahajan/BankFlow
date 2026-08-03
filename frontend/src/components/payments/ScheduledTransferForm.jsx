@@ -16,6 +16,7 @@ const ScheduledTransferForm = ({
     const [startDate, setStartDate] = useState(today);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState("");
 
     // Auto-select the first account if available when modal opens
     useEffect(() => {
@@ -28,9 +29,11 @@ const ScheduledTransferForm = ({
         (acc) => acc.accountNumber === sourceAccount
     );
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
 
+    const handleSubmit = async (e) => {
+        setSuccess("");
+        setError(null);
+        e.preventDefault();
         setSubmitting(true);
         setError(null);
 
@@ -56,6 +59,7 @@ const ScheduledTransferForm = ({
                 setSourceAccount("");
             }
 
+            setSuccess("Scheduled transfer created successfully.");
             onSuccess?.();
 
         } catch (err) {
@@ -73,7 +77,11 @@ const ScheduledTransferForm = ({
     return (
         <>
             {error && <div style={styles.errorBox}>{error}</div>}
-
+            {success && (
+                <div style={styles.successBox}>
+                    {success}
+                </div>
+            )}
             <form onSubmit={handleSubmit} style={styles.form}>
                 <div style={styles.field}>
                     <label style={styles.label}>Source Account Number</label>
@@ -86,14 +94,16 @@ const ScheduledTransferForm = ({
                                 required
                                 style={styles.input}
                             >
-                                {accounts.map((acc) => (
-                                    <option
-                                        key={acc.accountNumber}
-                                        value={acc.accountNumber}
-                                    >
-                                        {acc.accountNumber}
-                                    </option>
-                                ))}
+                                {accounts
+                                    .filter(acc => acc.accountStatus === "ACTIVE")
+                                    .map((acc) => (
+                                        <option
+                                            key={acc.accountNumber}
+                                            value={acc.accountNumber}
+                                        >
+                                            {acc.accountNumber}
+                                        </option>
+                                    ))}
                             </select>
 
                             {selectedAccount && (
@@ -235,6 +245,15 @@ const styles = {
         fontSize: "13px",
         fontWeight: "700",
         color: "#0d6360",
+    },
+
+    successBox: {
+        background: "#dcfce7",
+        color: "#166534",
+        padding: "10px",
+        borderRadius: "8px",
+        marginBottom: "12px",
+        fontSize: "13px",
     },
 };
 

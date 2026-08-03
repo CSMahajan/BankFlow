@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import TransferForm from "./TransferForm";
 import TransactionsView from "./TransactionsView";
 import ScheduledTransferForm from "./ScheduledTransferForm";
+import ScheduledTransfersList from "./ScheduledTransfersList";
 
 const PaymentsView = ({
     activeTab,
@@ -9,6 +10,8 @@ const PaymentsView = ({
     refreshAccounts,
     refreshSummary,
 }) => {
+
+    const [scheduledRefreshKey, setScheduledRefreshKey] = useState(0);
 
     return (
         <div style={styles.container}>
@@ -28,18 +31,30 @@ const PaymentsView = ({
             )}
 
             {activeTab === "scheduled" && (
-                <div style={styles.card}>
-                    <h3 style={styles.cardTitle}>
-                        🔁 Scheduled Transfers
-                    </h3>
+                <div style={styles.scheduledLayout}>
 
-                    <ScheduledTransferForm
-                        accounts={accounts}
-                        onSuccess={async () => {
-                            await refreshAccounts();
-                            await refreshSummary();
-                        }}
-                    />
+                    <div style={styles.leftPanel}>
+                        <div style={styles.card}>
+                            <h3 style={styles.cardTitle}>
+                                🔁 Schedule Transfer
+                            </h3>
+
+                            <ScheduledTransferForm
+                                accounts={accounts}
+                                onSuccess={async () => {
+                                    await refreshAccounts();
+                                    await refreshSummary();
+                                    setScheduledRefreshKey(prev => prev + 1);
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <div style={styles.rightPanel}>
+                        <ScheduledTransfersList
+                            refreshTrigger={scheduledRefreshKey}
+                        />
+                    </div>
                 </div>
             )}
 
@@ -82,6 +97,24 @@ const styles = {
     cardTitle: {
         marginTop: 0,
         marginBottom: "20px",
+    },
+
+    scheduledLayout: {
+        display: "grid",
+        gridTemplateColumns: "430px 1fr",
+        gap: "24px",
+        alignItems: "start",
+    },
+
+    leftPanel: {
+        position: "sticky",
+        top: "20px",
+    },
+
+    rightPanel: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
     },
 };
 

@@ -73,14 +73,16 @@ const TransferForm = ({
                                 required
                                 style={styles.input}
                             >
-                                {accounts.map((acc) => (
-                                    <option
-                                        key={acc.accountNumber}
-                                        value={acc.accountNumber}
-                                    >
-                                        {acc.accountNumber}
-                                    </option>
-                                ))}
+                                {accounts
+                                    .filter(acc => acc.accountStatus === "ACTIVE")
+                                    .map((acc) => (
+                                        <option
+                                            key={acc.accountNumber}
+                                            value={acc.accountNumber}
+                                        >
+                                            {acc.accountNumber}
+                                        </option>
+                                    ))}
                             </select>
 
                             {selectedAccount && (

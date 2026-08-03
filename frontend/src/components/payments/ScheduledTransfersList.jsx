@@ -84,7 +84,8 @@ const ScheduledTransfersList = ({ refreshTrigger }) => {
                 </div>
             ) : (
                 transfers.map((transfer) => (
-                    <div style={styles.transferCard}>
+                    <div key={transfer.id}
+                        style={styles.transferCard}>
 
                         <div style={styles.cardTop}>
 

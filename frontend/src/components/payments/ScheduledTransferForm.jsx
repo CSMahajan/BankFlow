@@ -7,7 +7,7 @@ const ScheduledTransferForm = ({
     onCancel,
 }) => {
 
-    const [sourceAccount, setSourceAccount] = useState('');
+    const [sourceAccountNumber, setSourceAccountNumber] = useState('');
     const [targetAccount, setTargetAccount] = useState('');
     const [amount, setAmount] = useState('');
     const [remark, setRemark] = useState('');
@@ -23,17 +23,17 @@ const ScheduledTransferForm = ({
             acc => acc.accountStatus === "ACTIVE"
         );
 
-        if (!sourceAccount && activeAccounts.length > 0) {
-            setSourceAccount(activeAccounts[0].accountNumber);
+        if (!sourceAccountNumber && activeAccounts.length > 0) {
+            setSourceAccountNumber(activeAccounts[0].accountNumber);
         }
-    }, [accounts, sourceAccount]);
+    }, [accounts, sourceAccountNumber]);
 
     const activeAccounts = accounts.filter(
         acc => acc.accountStatus === "ACTIVE"
     );
 
     const selectedAccount = activeAccounts.find(
-        acc => acc.accountNumber === sourceAccount
+        acc => acc.accountNumber === sourceAccountNumber
     );
 
 
@@ -46,7 +46,7 @@ const ScheduledTransferForm = ({
 
         try {
             await createScheduledTransfer({
-                sourceAccountNumber: sourceAccount,
+                sourceAccountNumber: sourceAccountNumber,
                 recipientAccountNumber: targetAccount,
                 amount: parseFloat(amount),
                 description: remark,
@@ -61,9 +61,9 @@ const ScheduledTransferForm = ({
             setStartDate(today);
 
             if (activeAccounts.length > 0) {
-                setSourceAccount(activeAccounts[0].accountNumber);
+                setSourceAccountNumber(activeAccounts[0].accountNumber);
             } else {
-                setSourceAccount("");
+                setSourceAccountNumber("");
             }
 
             setSuccess("Scheduled transfer created successfully.");
@@ -80,7 +80,6 @@ const ScheduledTransferForm = ({
             setSubmitting(false);
         }
     };
-    console.log("chaitanya accounts:", accounts);
     return (
         <>
             {error && <div style={styles.errorBox}>{error}</div>}
@@ -96,8 +95,8 @@ const ScheduledTransferForm = ({
                     {accounts.length > 0 ? (
                         <>
                             <select
-                                value={sourceAccount}
-                                onChange={(e) => setSourceAccount(e.target.value)}
+                                value={sourceAccountNumber}
+                                onChange={(e) => setSourceAccountNumber(e.target.value)}
                                 required
                                 style={styles.input}
                             >
@@ -127,8 +126,8 @@ const ScheduledTransferForm = ({
                         <input
                             type="text"
                             placeholder="e.g. BF5891164768"
-                            value={sourceAccount}
-                            onChange={(e) => setSourceAccount(e.target.value)}
+                            value={sourceAccountNumber}
+                            onChange={(e) => setSourceAccountNumber(e.target.value)}
                             required
                             style={styles.input}
                         />

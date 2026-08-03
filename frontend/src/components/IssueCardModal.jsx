@@ -14,6 +14,9 @@ const IssueCardModal = ({
     const [accountNumber, setAccountNumber] = useState("");
     const [cardType, setCardType] = useState("DEBIT");
     const [dailyLimit, setDailyLimit] = useState(50000);
+    const selectedAccount = accounts.find(
+        account => account.accountNumber === accountNumber
+    );
 
     useEffect(() => {
 
@@ -31,10 +34,14 @@ const IssueCardModal = ({
 
             const response = await fetchMyAccounts();
 
-            setAccounts(response);
+            const activeAccounts = response.filter(
+                account => account.accountStatus === "ACTIVE"
+            );
 
-            if (response.length > 0) {
-                setAccountNumber(response[0].accountNumber);
+            setAccounts(activeAccounts);
+
+            if (activeAccounts.length > 0) {
+                setAccountNumber(activeAccounts[0].accountNumber);
             }
 
         } catch (err) {
@@ -52,7 +59,6 @@ const IssueCardModal = ({
     const handleIssueCard = async () => {
 
         try {
-
             await issueCard({
                 accountNumber,
                 cardType,
@@ -60,9 +66,9 @@ const IssueCardModal = ({
             });
 
             toast.success("Card issued successfully.");
-
+            setCardType("DEBIT");
+            setDailyLimit(50000);
             onClose();
-
             onCardIssued();
 
         } catch (err) {
@@ -99,22 +105,44 @@ const IssueCardModal = ({
 
                             <label>Linked Account</label>
 
-                            <select
-                                value={accountNumber}
-                                onChange={(e) => setAccountNumber(e.target.value)}
-                                style={styles.input}
-                            >
-                                {accounts.map((account) => (
+                            {accounts.length === 0 ? (
 
-                                    <option
-                                        key={account.accountNumber}
-                                        value={account.accountNumber}
+                                <div style={styles.errorBox}>
+                                    No active accounts available to issue a card.
+                                </div>
+
+                            ) : (
+
+                                <>
+                                    <select
+                                        value={accountNumber}
+                                        onChange={(e) => setAccountNumber(e.target.value)}
+                                        style={styles.input}
                                     >
-                                        {account.accountType} • {account.accountNumber}
-                                    </option>
+                                        {accounts.map((account) => (
+                                            <option
+                                                key={account.accountNumber}
+                                                value={account.accountNumber}
+                                            >
+                                                {account.accountType} • {account.accountNumber}
+                                            </option>
+                                        ))}
+                                    </select>
 
-                                ))}
-                            </select>
+                                    {selectedAccount && (
+                                        <div style={styles.balanceInfo}>
+                                            Available Balance:&nbsp;
+                                            <strong>
+                                                {new Intl.NumberFormat("en-IN", {
+                                                    style: "currency",
+                                                    currency: "INR",
+                                                }).format(selectedAccount.currentBalance)}
+                                            </strong>
+                                        </div>
+                                    )}
+                                </>
+
+                            )}
 
                         </div>
 
@@ -150,7 +178,11 @@ const IssueCardModal = ({
 
                             <button
                                 style={styles.cancel}
-                                onClick={onClose}
+                                onClick={() => {
+                                    setCardType("DEBIT");
+                                    setDailyLimit(50000);
+                                    onClose();
+                                }}
                             >
                                 Cancel
                             </button>
@@ -158,6 +190,7 @@ const IssueCardModal = ({
                             <button
                                 style={styles.save}
                                 onClick={handleIssueCard}
+                                disabled={accounts.length === 0}
                             >
                                 Apply for Card
                             </button>
@@ -232,7 +265,21 @@ const styles = {
         color: "#fff",
         cursor: "pointer",
         fontWeight: "700",
-    }
+    },
+
+    balanceInfo: {
+        marginTop: "6px",
+        fontSize: "13px",
+        color: "#64748b",
+    },
+
+    errorBox: {
+        background: "#fee2e2",
+        color: "#991b1b",
+        padding: "10px",
+        borderRadius: "8px",
+        fontSize: "13px",
+    },
 
 };
 

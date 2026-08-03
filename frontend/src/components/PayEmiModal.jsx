@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { payEmi } from '../api/bankService';
 import modalStyles from '../styles/modalStyles';
+import toast from "react-hot-toast";
 
 const PayEmiModal = ({
     isOpen,
@@ -12,11 +13,24 @@ const PayEmiModal = ({
     const [sourceAccountNumber, setSourceAccountNumber] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
     useEffect(() => {
-        if (accounts?.length > 0) {
-            setSourceAccountNumber(accounts[0].accountNumber);
+        const activeAccounts = accounts.filter(
+            acc => acc.accountStatus === "ACTIVE"
+        );
+
+        if (!sourceAccountNumber && activeAccounts.length > 0) {
+            setSourceAccountNumber(activeAccounts[0].accountNumber);
         }
-    }, [accounts]);
+    }, [accounts, sourceAccountNumber]);
+
+    const activeAccounts = accounts.filter(
+        acc => acc.accountStatus === "ACTIVE"
+    );
+
+    const selectedAccount = activeAccounts.find(
+        acc => acc.accountNumber === sourceAccountNumber
+    );
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,8 +44,16 @@ const PayEmiModal = ({
                 sourceAccountNumber
             });
 
-            await onPaymentSuccess();
+            setError(null);
 
+            if (activeAccounts.length > 0) {
+                setSourceAccountNumber(activeAccounts[0].accountNumber);
+            } else {
+                setSourceAccountNumber("");
+            }
+
+            await onPaymentSuccess();
+            toast.success("EMI Paid successfully");
             onClose();
         } catch (err) {
             console.error(err);
@@ -56,7 +78,10 @@ const PayEmiModal = ({
 
                         <button
                             style={modalStyles.closeBtn}
-                            onClick={onClose}
+                            onClick={() => {
+                                setError(null);
+                                onClose();
+                            }}
                         >
                             ✕
                         </button>
@@ -93,35 +118,69 @@ const PayEmiModal = ({
                             Pay From Account
                         </label>
 
-                        <select
-                            value={sourceAccountNumber}
-                            onChange={(e) =>
-                                setSourceAccountNumber(e.target.value)
-                            }
-                            style={modalStyles.input}
-                        >
-                            {accounts?.map((account) => (
-                                <option
-                                    key={account.accountNumber}
-                                    value={account.accountNumber}
+                        {activeAccounts.length === 0 ? (
+
+                            <div style={modalStyles.errorBox}>
+                                No active accounts available for EMI payment.
+                            </div>
+
+                        ) : (
+
+                            <>
+                                <select
+                                    value={sourceAccountNumber}
+                                    onChange={(e) =>
+                                        setSourceAccountNumber(e.target.value)
+                                    }
+                                    style={modalStyles.input}
                                 >
-                                    {account.accountType} - {account.accountNumber}
-                                </option>
-                            ))}
-                        </select>
+                                    {activeAccounts.map((account) => (
+                                        <option
+                                            key={account.accountNumber}
+                                            value={account.accountNumber}
+                                        >
+                                            {account.accountType} • {account.accountNumber}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {selectedAccount && (
+                                    <div
+                                        style={{
+                                            marginTop: "6px",
+                                            fontSize: "13px",
+                                            color: "#64748b",
+                                        }}
+                                    >
+                                        Available Balance:&nbsp;
+                                        <strong>
+                                            {new Intl.NumberFormat("en-IN", {
+                                                style: "currency",
+                                                currency: "INR",
+                                            }).format(selectedAccount.currentBalance)}
+                                        </strong>
+                                    </div>
+                                )}
+
+                            </>
+
+                        )}
                     </div>
 
                     <div style={modalStyles.actions}>
                         <button
                             style={modalStyles.cancelBtn}
-                            onClick={onClose}
+                            onClick={() => {
+                                setError(null);
+                                onClose();
+                            }}
                         >
                             Cancel
                         </button>
 
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || activeAccounts.length === 0}
                             style={modalStyles.submitBtn}
                         >
                             {loading ? 'Processing...' : 'Pay EMI'}

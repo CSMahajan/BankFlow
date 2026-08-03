@@ -177,7 +177,7 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
           {/* Super Admin Token Field (Only shown for Admin Registration) */}
           {role === 'ADMIN' && (
             <div style={styles.field}>
-              <label style={styles.label}>Password</label>
+              <label style={styles.label}>Admin Token</label>
 
               <div
                 style={{

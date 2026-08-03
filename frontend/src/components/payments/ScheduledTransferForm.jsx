@@ -18,15 +18,22 @@ const ScheduledTransferForm = ({
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState("");
 
-    // Auto-select the first account if available when modal opens
     useEffect(() => {
-        if (accounts.length > 0 && !sourceAccount) {
-            setSourceAccount(accounts[0].accountNumber);
+        const activeAccounts = accounts.filter(
+            acc => acc.accountStatus === "ACTIVE"
+        );
+
+        if (!sourceAccount && activeAccounts.length > 0) {
+            setSourceAccount(activeAccounts[0].accountNumber);
         }
     }, [accounts, sourceAccount]);
 
-    const selectedAccount = accounts.find(
-        (acc) => acc.accountNumber === sourceAccount
+    const activeAccounts = accounts.filter(
+        acc => acc.accountStatus === "ACTIVE"
+    );
+
+    const selectedAccount = activeAccounts.find(
+        acc => acc.accountNumber === sourceAccount
     );
 
 
@@ -53,8 +60,8 @@ const ScheduledTransferForm = ({
             setFrequency("MONTHLY");
             setStartDate(today);
 
-            if (accounts.length > 0) {
-                setSourceAccount(accounts[0].accountNumber);
+            if (activeAccounts.length > 0) {
+                setSourceAccount(activeAccounts[0].accountNumber);
             } else {
                 setSourceAccount("");
             }
@@ -73,7 +80,7 @@ const ScheduledTransferForm = ({
             setSubmitting(false);
         }
     };
-
+    console.log("chaitanya accounts:", accounts);
     return (
         <>
             {error && <div style={styles.errorBox}>{error}</div>}
@@ -94,16 +101,14 @@ const ScheduledTransferForm = ({
                                 required
                                 style={styles.input}
                             >
-                                {accounts
-                                    .filter(acc => acc.accountStatus === "ACTIVE")
-                                    .map((acc) => (
-                                        <option
-                                            key={acc.accountNumber}
-                                            value={acc.accountNumber}
-                                        >
-                                            {acc.accountNumber}
-                                        </option>
-                                    ))}
+                                {activeAccounts.map(acc => (
+                                    <option
+                                        key={acc.accountNumber}
+                                        value={acc.accountNumber}
+                                    >
+                                        {acc.accountType} • {acc.accountNumber}
+                                    </option>
+                                ))}
                             </select>
 
                             {selectedAccount && (

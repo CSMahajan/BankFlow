@@ -13,22 +13,31 @@ const TransferForm = ({
     const [remark, setRemark] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState("");
 
-    // Auto-select the first account if available when modal opens
     useEffect(() => {
-        if (accounts.length > 0 && !sourceAccount) {
-            setSourceAccount(accounts[0].accountNumber);
+        const activeAccounts = accounts.filter(
+            acc => acc.accountStatus === "ACTIVE"
+        );
+
+        if (!sourceAccount && activeAccounts.length > 0) {
+            setSourceAccount(activeAccounts[0].accountNumber);
         }
     }, [accounts, sourceAccount]);
 
-    const selectedAccount = accounts.find(
-        (acc) => acc.accountNumber === sourceAccount
+    const activeAccounts = accounts.filter(
+        acc => acc.accountStatus === "ACTIVE"
+    );
+
+    const selectedAccount = activeAccounts.find(
+        acc => acc.accountNumber === sourceAccount
     );
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
         setError(null);
+        setSuccess("");
 
         try {
             await transferFunds({
@@ -41,11 +50,12 @@ const TransferForm = ({
             setAmount('');
             setTargetAccount('');
             setRemark('');
-            if (accounts.length > 0) {
-                setSourceAccount(accounts[0].accountNumber);
+            if (activeAccounts.length > 0) {
+                setSourceAccount(activeAccounts[0].accountNumber);
             } else {
-                setSourceAccount('');
+                setSourceAccount("");
             }
+            setSuccess("Transfer completed successfully.");
             onSuccess?.();
         } catch (err) {
             console.error('Transfer error:', err);
@@ -60,7 +70,11 @@ const TransferForm = ({
     return (
         <>
             {error && <div style={styles.errorBox}>{error}</div>}
-
+            {success && (
+                <div style={styles.successBox}>
+                    {success}
+                </div>
+            )}
             <form onSubmit={handleSubmit} style={styles.form}>
                 <div style={styles.field}>
                     <label style={styles.label}>Source Account Number</label>
@@ -73,16 +87,14 @@ const TransferForm = ({
                                 required
                                 style={styles.input}
                             >
-                                {accounts
-                                    .filter(acc => acc.accountStatus === "ACTIVE")
-                                    .map((acc) => (
-                                        <option
-                                            key={acc.accountNumber}
-                                            value={acc.accountNumber}
-                                        >
-                                            {acc.accountNumber}
-                                        </option>
-                                    ))}
+                                {activeAccounts.map(acc => (
+                                    <option
+                                        key={acc.accountNumber}
+                                        value={acc.accountNumber}
+                                    >
+                                        {acc.accountType} • {acc.accountNumber}
+                                    </option>
+                                ))}
                             </select>
 
                             {selectedAccount && (
@@ -195,6 +207,15 @@ const styles = {
         fontSize: "13px",
         fontWeight: "700",
         color: "#0d6360",
+    },
+
+    successBox: {
+        background: "#dcfce7",
+        color: "#166534",
+        padding: "10px",
+        borderRadius: "8px",
+        marginBottom: "12px",
+        fontSize: "13px",
     },
 };
 

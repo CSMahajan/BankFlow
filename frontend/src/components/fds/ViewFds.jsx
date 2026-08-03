@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { fetchMyFixedDeposits, closeFixedDeposit } from "../api/bankService";
-import { formatDate, formatCurrency } from "../utils/formatUtils";
+import { fetchMyFixedDeposits, closeFixedDeposit } from "../../api/bankService";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const ViewFds = ({ onFdClosed }) => {
     const [fds, setFds] = useState([]);

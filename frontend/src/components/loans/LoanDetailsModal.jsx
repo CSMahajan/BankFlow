@@ -1,8 +1,8 @@
 import React from 'react';
-import modalStyles from '../styles/modalStyles';
-import { formatCurrency, formatDate } from '../utils/formatUtils';
-import { tableHeader, tableCell } from '../styles/tableStyles';
-import { getLoanStatusStyle } from '../utils/loanStatusUtils';
+import modalStyles from '../../styles/modalStyles';
+import { formatCurrency, formatDate } from '../../utils/formatUtils';
+import { tableHeader, tableCell } from '../../styles/tableStyles';
+import { getLoanStatusStyle } from '../../utils/loanStatusUtils';
 
 const LoanDetailsModal = ({
     isOpen,

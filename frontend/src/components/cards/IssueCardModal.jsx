@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { fetchMyAccounts, issueCard } from "../api/bankService";
+import { fetchMyAccounts, issueCard } from "../../api/bankService";
 import toast from "react-hot-toast";
-import { formatDate, formatCurrency } from "../utils/formatUtils";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const IssueCardModal = ({
     isOpen,

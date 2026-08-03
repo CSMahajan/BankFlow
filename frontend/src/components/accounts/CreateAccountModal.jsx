@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createBankAccount } from '../api/bankService';
+import { createBankAccount } from '../../api/bankService';
 
 const CreateAccountModal = ({ isOpen, onClose, onAccountCreated }) => {
   const [accountType, setAccountType] = useState('SAVINGS');
@@ -32,7 +32,7 @@ const CreateAccountModal = ({ isOpen, onClose, onAccountCreated }) => {
       console.error('Failed to create account:', err);
       setError(
         err.response?.data?.message ||
-          'Failed to open bank account. Please try again.'
+        'Failed to open bank account. Please try again.'
       );
       setLoading(false);
     }

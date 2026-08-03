@@ -1,7 +1,7 @@
 import React from 'react';
-import BalanceSummaryCard from './BalanceSummaryCard';
-import { toggleAccountStatus } from "../api/bankService";
-import { formatDate, formatCurrency } from "../utils/formatUtils";
+import BalanceSummaryCard from '../BalanceSummaryCard';
+import { toggleAccountStatus } from "../../api/bankService";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const AccountsView = ({
   accounts,

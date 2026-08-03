@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatDate, formatCurrency } from "../utils/formatUtils";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const FdCalculatorCard = ({ onOpenFd, defaultAccountNumber }) => {
     const [amount, setAmount] = useState(50000); // Default ₹50,000

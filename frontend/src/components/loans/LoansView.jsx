@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import ApplyLoanModal from './ApplyLoanModal';
 import PayEmiModal from './PayEmiModal';
 import LoanDetailsModal from './LoanDetailsModal';
-import { formatCurrency, formatDate } from '../utils/formatUtils';
-import { getLoanStatusStyle } from '../utils/loanStatusUtils';
-import API from '../api/axios';
+import { formatCurrency, formatDate } from '../../utils/formatUtils';
+import { getLoanStatusStyle } from '../../utils/loanStatusUtils';
+import API from '../../api/axios';
 
 const LoansView = ({ accounts }) => {
     const [isPayEmiModalOpen, setIsPayEmiModalOpen] = useState(false);

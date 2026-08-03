@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { fetchAuditLogs } from "../api/bankService";
-import PageCard from "./PageCard";
-import AuditFilterBar from "./audit/AuditFilterBar";
-import AuditPagination from "./audit/AuditPagination";
-import AuditTable from "./audit/AuditTable";
-import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./audit/auditConfig";
+import { fetchAuditLogs } from "../../api/bankService";
+import PageCard from "../PageCard";
+import AuditFilterBar from "./AuditFilterBar";
+import AuditPagination from "./AuditPagination";
+import AuditTable from "./AuditTable";
+import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./auditConfig";
 
 const AuditLogsView = () => {
 

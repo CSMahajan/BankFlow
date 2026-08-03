@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import LoanApprovalsView from './LoanApprovalsView';
+import LoanApprovalsView from './loans/LoanApprovalsView';
 import AdminDashboardOverview from './AdminDashboardOverview';
 import UserManagementView from "./UserManagementView";
-import AuditLogsView from "./AuditLogsView";
+import AuditLogsView from "./audit/AuditLogsView";
 import { fetchAdminDashboardSummary } from '../api/bankService';
 
 const AdminDashboard = ({ userRole, userName, onLogout }) => {

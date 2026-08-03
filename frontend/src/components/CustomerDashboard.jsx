@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import AccountsView from '../components/AccountsView';
-import FdCalculatorCard from '../components/FdCalculatorCard';
-import FdManagementView from '../components/FdManagementView';
-import ViewFds from '../components/ViewFds';
+import AccountsView from './accounts/AccountsView';
+import FdCalculatorCard from './fds/FdCalculatorCard';
+import FdManagementView from './fds/FdManagementView';
+import ViewFds from './fds/ViewFds';
 import DashboardOverview from '../components/DashboardOverview';
-import CreateAccountModal from '../components/CreateAccountModal';
+import CreateAccountModal from './accounts/CreateAccountModal';
 import PaymentsView from "./payments/PaymentsView";
-import LoansView from '../components/LoansView';
+import LoansView from './loans/LoansView';
 import CardsView from "./cards/CardsView";
 import API from '../api/axios';
 

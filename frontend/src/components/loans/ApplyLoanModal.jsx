@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { applyLoan } from '../api/bankService';
-import modalStyles from '../styles/modalStyles';
+import { applyLoan } from '../../api/bankService';
+import modalStyles from '../../styles/modalStyles';
 import toast from "react-hot-toast";
-import { formatDate, formatCurrency } from "../utils/formatUtils";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
     const [sourceAccountNumber, setSourceAccountNumber] = useState('');

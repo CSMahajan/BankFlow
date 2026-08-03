@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { createFixedDeposit } from "../api/bankService";
+import { createFixedDeposit } from "../../api/bankService";
 import { FD_RATES, FD_TENURES } from "./fdConfig";
-import { formatDate, formatCurrency } from "../utils/formatUtils";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
 

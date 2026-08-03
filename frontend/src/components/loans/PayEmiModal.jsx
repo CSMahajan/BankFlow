@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { payEmi } from '../api/bankService';
-import modalStyles from '../styles/modalStyles';
+import { payEmi } from '../../api/bankService';
+import modalStyles from '../../styles/modalStyles';
 import toast from "react-hot-toast";
-import { formatDate, formatCurrency } from "../utils/formatUtils";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const PayEmiModal = ({
     isOpen,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchMyCards, toggleCardStatus, updateCardLimit } from "../../api/bankService";
 import CardManagementPanel from "./CardManagementPanel";
-import IssueCardModal from "../IssueCardModal";
+import IssueCardModal from "./IssueCardModal";
 import CardsHeader from "./CardsHeader";
 import BankCard from "./BankCard";
 import toast from "react-hot-toast";

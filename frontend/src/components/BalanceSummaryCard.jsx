@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TransferModal from './TransferModal';
+import TransferModal from './payments/TransferModal';
 import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const BalanceSummaryCard = ({

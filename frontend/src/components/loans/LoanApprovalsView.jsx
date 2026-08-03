@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { fetchPendingLoans, approveLoan, rejectLoan } from '../api/bankService';
-import { formatDate, formatCurrency } from '../utils/formatUtils';
-import modalStyles from "../styles/modalStyles";
+import { fetchPendingLoans, approveLoan, rejectLoan } from '../../api/bankService';
+import { formatDate, formatCurrency } from '../../utils/formatUtils';
+import modalStyles from "../../styles/modalStyles";
 import toast from "react-hot-toast";
 
 const LoanApprovalsView = () => {

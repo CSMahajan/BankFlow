@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { applyLoan } from '../api/bankService';
 import modalStyles from '../styles/modalStyles';
 import toast from "react-hot-toast";
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
     const [sourceAccountNumber, setSourceAccountNumber] = useState('');
@@ -120,10 +121,7 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
                                     <div style={styles.balanceInfo}>
                                         Available Balance:&nbsp;
                                         <strong>
-                                            {new Intl.NumberFormat("en-IN", {
-                                                style: "currency",
-                                                currency: "INR",
-                                            }).format(selectedAccount.currentBalance)}
+                                            {formatCurrency(selectedAccount.currentBalance)}
                                         </strong>
                                     </div>
                                 )}

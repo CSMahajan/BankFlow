@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchMyAccounts, issueCard } from "../api/bankService";
 import toast from "react-hot-toast";
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const IssueCardModal = ({
     isOpen,
@@ -59,6 +60,7 @@ const IssueCardModal = ({
     const handleIssueCard = async () => {
 
         try {
+
             await issueCard({
                 accountNumber,
                 cardType,
@@ -133,10 +135,7 @@ const IssueCardModal = ({
                                         <div style={styles.balanceInfo}>
                                             Available Balance:&nbsp;
                                             <strong>
-                                                {new Intl.NumberFormat("en-IN", {
-                                                    style: "currency",
-                                                    currency: "INR",
-                                                }).format(selectedAccount.currentBalance)}
+                                                {formatCurrency(selectedAccount.currentBalance)}
                                             </strong>
                                         </div>
                                     )}

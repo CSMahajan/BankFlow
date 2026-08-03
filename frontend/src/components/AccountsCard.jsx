@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import API from '../api/axios';
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const AccountsCard = () => {
   const [summary, setSummary] = useState(null);
@@ -18,14 +19,6 @@ const AccountsCard = () => {
     };
     fetchSummary();
   }, []);
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 2,
-    }).format(amount || 0);
-  };
 
   if (loading) return <div style={{ color: '#6b7280', fontSize: '14px' }}>Loading summary...</div>;
 

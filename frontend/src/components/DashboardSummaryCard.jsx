@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const DashboardSummaryCard = ({
     summary,
@@ -13,14 +14,6 @@ const DashboardSummaryCard = ({
     if (error) {
         return <div>{error}</div>;
     }
-
-    const formattedDueDate = summary.nextEmiDueDate
-        ? new Date(summary.nextEmiDueDate).toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-        })
-        : '-';
 
     return (
         <div
@@ -44,7 +37,7 @@ const DashboardSummaryCard = ({
                 <div style={cardStyle}>
                     <div style={labelStyle}>Net Worth</div>
                     <div style={valueStyle}>
-                        ₹{Number(summary.totalNetWorth).toLocaleString('en-IN')}
+                        {formatCurrency(summary.totalNetWorth)}
                     </div>
                 </div>
 
@@ -123,7 +116,7 @@ const DashboardSummaryCard = ({
                                     }}
                                 >
                                     {txn.transactionType === 'CREDIT' ? '+' : '-'}
-                                    ₹{Number(txn.amount).toLocaleString('en-IN')}
+                                    {formatCurrency(txn.amount)}
                                 </div>
                             </div>
                         ))}
@@ -145,12 +138,12 @@ const DashboardSummaryCard = ({
                     </h3>
 
                     <div>
-                        <strong>Due Date:</strong> {formattedDueDate}
+                        <strong>Due Date:</strong> {summary.nextEmiDueDate ? formatDate(summary.nextEmiDueDate) : '-'}
                     </div>
 
                     <div style={{ marginTop: '8px' }}>
                         <strong>Amount:</strong> ₹
-                        {Number(summary.nextEmiAmount).toLocaleString('en-IN')}
+                        {formatCurrency(summary.nextEmiAmount)}
                     </div>
                 </div>
             )}

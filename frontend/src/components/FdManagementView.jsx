@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createFixedDeposit } from "../api/bankService";
 import { FD_RATES, FD_TENURES } from "./fdConfig";
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
 
@@ -94,10 +95,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
             <div style={styles.balanceInfo}>
               Available Balance:&nbsp;
               <strong>
-                {new Intl.NumberFormat("en-IN", {
-                  style: "currency",
-                  currency: "INR",
-                }).format(selectedAccount.currentBalance)}
+                {formatCurrency(selectedAccount.currentBalance)}
               </strong>
             </div>
           )}

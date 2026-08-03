@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { transferFunds } from "../../api/bankService";
+import { formatDate, formatCurrency } from "../../utils/formatUtils";
 
 const TransferForm = ({
     accounts = [],
@@ -101,10 +102,7 @@ const TransferForm = ({
                                 <div style={styles.balanceInfo}>
                                     Available Balance:&nbsp;
                                     <strong>
-                                        {new Intl.NumberFormat("en-IN", {
-                                            style: "currency",
-                                            currency: "INR",
-                                        }).format(selectedAccount.currentBalance)}
+                                        {formatCurrency(selectedAccount.currentBalance)}
                                     </strong>
                                 </div>
                             )}

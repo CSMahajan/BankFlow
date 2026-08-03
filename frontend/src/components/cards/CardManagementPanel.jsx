@@ -1,5 +1,5 @@
 import { useState } from "react";
-import UpdateCardLimitModal from "../UpdateCardLimitModal";
+import UpdateCardLimitModal from "./UpdateCardLimitModal";
 
 const CardManagementPanel = ({
     card,

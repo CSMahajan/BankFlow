@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const FdCalculatorCard = ({ onOpenFd, defaultAccountNumber }) => {
     const [amount, setAmount] = useState(50000); // Default ₹50,000
@@ -38,13 +39,6 @@ const FdCalculatorCard = ({ onOpenFd, defaultAccountNumber }) => {
     };
 
     const { maturityAmount, totalInterest } = calculateMaturity();
-
-    const formatCurrency = (val) =>
-        new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            maximumFractionDigits: 0,
-        }).format(val || 0);
 
     const handleOpenFdClick = () => {
         if (onOpenFd) {

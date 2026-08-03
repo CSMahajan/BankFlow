@@ -1,6 +1,8 @@
 import React from 'react';
 import BalanceSummaryCard from './BalanceSummaryCard';
 import { toggleAccountStatus } from "../api/bankService";
+import { formatDate, formatCurrency } from "../utils/formatUtils";
+
 const AccountsView = ({
   accounts,
   loading,
@@ -27,13 +29,6 @@ const AccountsView = ({
       alert(err.response?.data?.message ?? "Failed to update account status.");
     }
   };
-
-  const formatCurrency = (val) =>
-    new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 2,
-    }).format(val || 0);
 
   const totalBalance = accounts.reduce((sum, acc) => sum + (Number(acc.currentBalance) || 0), 0);
   const savingsAccounts = accounts.filter((acc) => acc.accountType === 'SAVINGS');

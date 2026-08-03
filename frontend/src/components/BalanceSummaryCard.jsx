@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TransferModal from './TransferModal';
+import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const BalanceSummaryCard = ({
     accounts = [],
@@ -11,13 +12,6 @@ const BalanceSummaryCard = ({
         (sum, acc) => sum + (Number(acc.currentBalance) || 0),
         0
     );
-
-    const formatCurrency = (val) =>
-        new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            maximumFractionDigits: 2,
-        }).format(val || 0);
 
     return (
         <>

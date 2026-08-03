@@ -206,6 +206,29 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<AdminUserCardResponse> getUserCards(Long userId) {
+
+        log.info("Fetching cards for user [{}]", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return cardRepository.findByAccountUserId(user.getId())
+                .stream()
+                .map(card -> new AdminUserCardResponse(
+
+                        card.getCardNumber(),
+                        card.getCardType(),
+                        card.getCardStatus(),
+                        card.getDailyLimit(),
+                        card.getExpiryDate()
+
+                ))
+                .toList();
+    }
+
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(auth.getName())

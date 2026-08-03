@@ -7,7 +7,7 @@ const TransferForm = ({
     onCancel,
 }) => {
 
-    const [sourceAccount, setSourceAccount] = useState('');
+    const [sourceAccountNumber, setSourceAccountNumber] = useState('');
     const [targetAccount, setTargetAccount] = useState('');
     const [amount, setAmount] = useState('');
     const [remark, setRemark] = useState('');
@@ -20,17 +20,17 @@ const TransferForm = ({
             acc => acc.accountStatus === "ACTIVE"
         );
 
-        if (!sourceAccount && activeAccounts.length > 0) {
-            setSourceAccount(activeAccounts[0].accountNumber);
+        if (!sourceAccountNumber && activeAccounts.length > 0) {
+            setSourceAccountNumber(activeAccounts[0].accountNumber);
         }
-    }, [accounts, sourceAccount]);
+    }, [accounts, sourceAccountNumber]);
 
     const activeAccounts = accounts.filter(
         acc => acc.accountStatus === "ACTIVE"
     );
 
     const selectedAccount = activeAccounts.find(
-        acc => acc.accountNumber === sourceAccount
+        acc => acc.accountNumber === sourceAccountNumber
     );
 
     const handleSubmit = async (e) => {
@@ -41,7 +41,7 @@ const TransferForm = ({
 
         try {
             await transferFunds({
-                sourceAccountNumber: sourceAccount,
+                sourceAccountNumber: sourceAccountNumber,
                 targetAccountNumber: targetAccount,
                 amount: parseFloat(amount),
                 remark: remark,
@@ -51,9 +51,9 @@ const TransferForm = ({
             setTargetAccount('');
             setRemark('');
             if (activeAccounts.length > 0) {
-                setSourceAccount(activeAccounts[0].accountNumber);
+                setSourceAccountNumber(activeAccounts[0].accountNumber);
             } else {
-                setSourceAccount("");
+                setSourceAccountNumber("");
             }
             setSuccess("Transfer completed successfully.");
             onSuccess?.();
@@ -82,8 +82,8 @@ const TransferForm = ({
                     {accounts.length > 0 ? (
                         <>
                             <select
-                                value={sourceAccount}
-                                onChange={(e) => setSourceAccount(e.target.value)}
+                                value={sourceAccountNumber}
+                                onChange={(e) => setSourceAccountNumber(e.target.value)}
                                 required
                                 style={styles.input}
                             >
@@ -113,8 +113,8 @@ const TransferForm = ({
                         <input
                             type="text"
                             placeholder="e.g. BF5891164768"
-                            value={sourceAccount}
-                            onChange={(e) => setSourceAccount(e.target.value)}
+                            value={sourceAccountNumber}
+                            onChange={(e) => setSourceAccountNumber(e.target.value)}
                             required
                             style={styles.input}
                         />

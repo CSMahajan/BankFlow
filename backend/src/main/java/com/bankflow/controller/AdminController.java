@@ -1,9 +1,6 @@
 package com.bankflow.controller;
 
-import com.bankflow.dto.AdminUserAccountResponse;
-import com.bankflow.dto.AdminUserCardResponse;
-import com.bankflow.dto.AdminUserLoanResponse;
-import com.bankflow.dto.CreateAdminRequest;
+import com.bankflow.dto.*;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +52,16 @@ public class AdminController {
 
         return ResponseEntity.ok(
                 userService.getUserLoans(userId)
+        );
+    }
+
+    @GetMapping("/users/{userId}/fixed-deposits")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AdminUserFixedDepositResponse>> getUserFixedDeposits(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                userService.getUserFixedDeposits(userId)
         );
     }
 }

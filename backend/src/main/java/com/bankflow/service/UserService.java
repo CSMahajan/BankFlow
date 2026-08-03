@@ -255,6 +255,30 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<AdminUserFixedDepositResponse> getUserFixedDeposits(Long userId) {
+
+        log.info("Fetching fixed deposits for user [{}]", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return fixedDepositRepository.findByUserId(user.getId())
+                .stream()
+                .map(fd -> new AdminUserFixedDepositResponse(
+
+                        fd.getFdNumber(),
+                        fd.getDepositAmount(),
+                        fd.getInterestRate(),
+                        fd.getMaturityDate(),
+                        fd.getMaturityAmount(),
+                        fd.getStatus()
+
+                ))
+                .toList();
+    }
+
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(auth.getName())

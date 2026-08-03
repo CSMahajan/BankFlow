@@ -161,3 +161,8 @@ export const fetchUserCards = async (userId) => {
   const response = await API.get(`/admin/users/${userId}/cards`);
   return response.data;
 };
+
+export const fetchUserLoans = async (userId) => {
+  const response = await API.get(`/admin/users/${userId}/loans`);
+  return response.data;
+};

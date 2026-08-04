@@ -1,6 +1,6 @@
 import { formatCurrency } from "../utils/formatUtils";
 
-const AccountsSection = ({
+const UserAccountsSection = ({
     accounts,
     accountsLoading,
     showAccounts,
@@ -79,4 +79,4 @@ const styles = {
     },
 }
 
-export default AccountsSection;
+export default UserAccountsSection;

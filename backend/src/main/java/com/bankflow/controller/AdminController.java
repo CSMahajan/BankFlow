@@ -67,6 +67,15 @@ public class AdminController {
         );
     }
 
+    @GetMapping("/accounts")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AccountResponse>> getAllAccounts() {
+
+        return ResponseEntity.ok(
+                accountService.getAllAccountsForAdmin()
+        );
+    }
+
     @PatchMapping("/accounts/{accountNumber}/freeze")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponse> freezeAccount(

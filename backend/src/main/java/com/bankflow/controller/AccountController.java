@@ -51,9 +51,4 @@ public class AccountController {
         );
     }
 
-    @GetMapping("/admin/accounts/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AccountResponse>> getAllAccountsForAdmin() {
-        return ResponseEntity.ok(accountService.getAllAccountsForAdmin());
-    }
 }

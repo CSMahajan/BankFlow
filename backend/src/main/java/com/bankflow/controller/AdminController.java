@@ -1,6 +1,7 @@
 package com.bankflow.controller;
 
 import com.bankflow.dto.*;
+import com.bankflow.service.AccountService;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    private final AccountService accountService;
 
     @PostMapping("/users/create-admin")
     @PreAuthorize("hasRole('ADMIN')") // Blocks non-admins (HTTP 403 Forbidden)
@@ -62,6 +64,26 @@ public class AdminController {
 
         return ResponseEntity.ok(
                 userService.getUserFixedDeposits(userId)
+        );
+    }
+
+    @PatchMapping("/accounts/{accountNumber}/freeze")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AccountResponse> freezeAccount(
+            @PathVariable String accountNumber) {
+
+        return ResponseEntity.ok(
+                accountService.freezeAccountByAdmin(accountNumber)
+        );
+    }
+
+    @PatchMapping("/accounts/{accountNumber}/unfreeze")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AccountResponse> unfreezeAccount(
+            @PathVariable String accountNumber) {
+
+        return ResponseEntity.ok(
+                accountService.unfreezeAccountByAdmin(accountNumber)
         );
     }
 }

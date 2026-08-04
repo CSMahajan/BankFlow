@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LoanApprovalsView from './loans/LoanApprovalsView';
 import AdminDashboardOverview from './AdminDashboardOverview';
 import UserManagementView from "./UserManagementView";
+import AccountManagementView from './accounts/AccountManagementView';
 import AuditLogsView from "./audit/AuditLogsView";
 import { fetchAdminDashboardSummary } from '../api/bankService';
 
@@ -58,6 +59,16 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
               onClick={() => setActiveTab('loanApprovals')}
             >
               💰 Loan Approvals
+            </button>
+            <button
+              style={{
+                ...styles.navBtn,
+                backgroundColor: activeTab === 'accountManage' ? '#1e293b' : 'transparent',
+                color: activeTab === 'accountManage' ? '#ffffff' : '#374151',
+              }}
+              onClick={() => setActiveTab('accountManage')}
+            >
+              🏦 Account Management
             </button>
             <button
               style={{
@@ -120,6 +131,10 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
 
         {activeTab === 'loanApprovals' && (
           <LoanApprovalsView />
+        )}
+
+        {activeTab === 'accountManage' && (
+          <AccountManagementView />
         )}
 
         {activeTab === 'users' && (

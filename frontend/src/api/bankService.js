@@ -171,3 +171,22 @@ export const fetchUserFixedDeposits = async (userId) => {
   const response = await API.get(`/admin/users/${userId}/fixed-deposits`);
   return response.data;
 };
+
+export const fetchAllAccounts = async () => {
+  const response = await API.get("/admin/accounts");
+  return response.data;
+};
+
+export const freezeAccount = async (accountNumber) => {
+  const response = await API.patch(
+    `/admin/accounts/${accountNumber}/freeze`
+  );
+  return response.data;
+};
+
+export const unfreezeAccount = async (accountNumber) => {
+  const response = await API.patch(
+    `/admin/accounts/${accountNumber}/unfreeze`
+  );
+  return response.data;
+};

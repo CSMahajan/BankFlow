@@ -1,8 +1,10 @@
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
     name: bankflow-api
   datasource:
-    url: jdbc:postgresql://${DB_URL:localhost:5432}/banking?currentSchema=retail_banking
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/banking?currentSchema=retail_banking}
     username: ${DB_USER:chaitanyamahajan}
     password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
@@ -12,7 +14,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        default_schema: retail_banking
+        default_schema: ${DB_SCHEMA:retail_banking}
         # dialect removed — Hibernate 6 auto-detects Postgres
   jackson:
     default-property-inclusion: non_null
@@ -35,6 +37,7 @@ springdoc:
 app:
   cors-origin: ${CORS_ORIGIN:http://localhost:5173}
   jwt-secret: ${JWT_SECRET:bankflow-development-key-must-be-replaced-before-production-2026}
+  seed-admin: ${SEED_ADMIN:true}
   default-admin:
     full-name: ${SUPER_ADMIN_NAME}
     email: ${SUPER_ADMIN_EMAIL}

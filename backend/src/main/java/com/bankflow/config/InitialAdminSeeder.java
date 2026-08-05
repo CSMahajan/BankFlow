@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        name = "app.seed-admin",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class InitialAdminSeeder {
 
     @Value("${app.default-admin.email}")
@@ -32,6 +38,7 @@ public class InitialAdminSeeder {
         return args -> {
 
             if (userRepository.existsByEmail(adminEmail)) {
+                log.info("Administrator already exists. Skipping seeding.");
                 return;
             }
 

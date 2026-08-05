@@ -35,3 +35,7 @@ springdoc:
 app:
   cors-origin: ${CORS_ORIGIN:http://localhost:5173}
   jwt-secret: ${JWT_SECRET:bankflow-development-key-must-be-replaced-before-production-2026}
+  default-admin:
+    full-name: ${SUPER_ADMIN_NAME}
+    email: ${SUPER_ADMIN_EMAIL}
+    password: ${SUPER_ADMIN_PASSWORD}

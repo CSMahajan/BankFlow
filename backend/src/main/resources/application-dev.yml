@@ -1,0 +1,12 @@
+springdoc:
+  api-docs:
+    enabled: true
+
+  swagger-ui:
+    enabled: true
+
+app:
+  default-admin:
+    full-name: System Administrator
+    email: admin@bankflow.com
+    password: AdminSecretPass123!

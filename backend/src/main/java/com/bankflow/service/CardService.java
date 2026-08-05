@@ -1,5 +1,6 @@
 package com.bankflow.service;
 
+import com.bankflow.dto.AdminCardResponse;
 import com.bankflow.dto.CardResponse;
 import com.bankflow.dto.IssueCardRequest;
 import com.bankflow.entity.Account;
@@ -154,6 +155,63 @@ public class CardService {
         auditLogService.log(
                 AuditAction.CARD_LIMIT_UPDATED,
                 "Daily limit updated to ₹" + newLimit
+        );
+        return mapToResponse(updatedCard);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminCardResponse> getAllCardsForAdmin() {
+        log.info("ADMIN action: Fetching all cards");
+        return cardRepository.findAll()
+                .stream()
+                .map(card -> new AdminCardResponse(
+
+                        card.getId(),
+                        card.getAccount().getUser().getFullName(),
+                        card.getAccount().getAccountNumber(),
+                        maskCardNumber(card.getCardNumber()),
+                        card.getCardType(),
+                        card.getCardStatus(),
+                        card.getDailyLimit(),
+                        card.getExpiryDate()
+
+                ))
+                .toList();
+    }
+
+    @Transactional
+    public CardResponse blockCardByAdmin(Long cardId) {
+        log.info("ADMIN action: Blocking card [{}]", cardId);
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Card not found with ID: " + cardId));
+
+        if (card.getCardStatus() == CardStatus.BLOCKED) {
+            throw new IllegalStateException("Card is already blocked.");
+        }
+        card.setCardStatus(CardStatus.BLOCKED);
+        Card updatedCard = cardRepository.save(card);
+        auditLogService.log(
+                AuditAction.CARD_BLOCKED,
+                "Card " + maskCardNumber(updatedCard.getCardNumber()) + " blocked"
+        );
+        return mapToResponse(updatedCard);
+    }
+
+    @Transactional
+    public CardResponse unblockCardByAdmin(Long cardId) {
+        log.info("ADMIN action: Unblocking card [{}]", cardId);
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Card not found with ID: " + cardId));
+        if (card.getCardStatus() != CardStatus.BLOCKED) {
+            throw new IllegalStateException("Only blocked cards can be unblocked.");
+        }
+        card.setCardStatus(CardStatus.ACTIVE);
+        Card updatedCard = cardRepository.save(card);
+        auditLogService.log(
+                AuditAction.CARD_UNBLOCKED,
+                "Card " + maskCardNumber(updatedCard.getCardNumber()) + " unblocked"
         );
         return mapToResponse(updatedCard);
     }

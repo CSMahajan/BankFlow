@@ -38,5 +38,9 @@ public enum AuditAction {
 
     CARD_ACTIVATED,
 
+    CARD_BLOCKED,
+
+    CARD_UNBLOCKED,
+
     CARD_LIMIT_UPDATED
 }

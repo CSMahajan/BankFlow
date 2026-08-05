@@ -2,6 +2,7 @@ package com.bankflow.controller;
 
 import com.bankflow.dto.*;
 import com.bankflow.service.AccountService;
+import com.bankflow.service.CardService;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class AdminController {
 
     private final UserService userService;
     private final AccountService accountService;
+    private final CardService cardService;
 
     @PostMapping("/users/create-admin")
     @PreAuthorize("hasRole('ADMIN')") // Blocks non-admins (HTTP 403 Forbidden)
@@ -93,6 +95,35 @@ public class AdminController {
 
         return ResponseEntity.ok(
                 accountService.unfreezeAccountByAdmin(accountNumber)
+        );
+    }
+
+    @GetMapping("/cards")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AdminCardResponse>> getAllCards() {
+
+        return ResponseEntity.ok(
+                cardService.getAllCardsForAdmin()
+        );
+    }
+
+    @PatchMapping("/cards/{cardId}/block")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CardResponse> blockCard(
+            @PathVariable Long cardId) {
+
+        return ResponseEntity.ok(
+                cardService.blockCardByAdmin(cardId)
+        );
+    }
+
+    @PatchMapping("/cards/{cardId}/unblock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CardResponse> unblockCard(
+            @PathVariable Long cardId) {
+
+        return ResponseEntity.ok(
+                cardService.unblockCardByAdmin(cardId)
         );
     }
 }

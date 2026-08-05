@@ -151,50 +151,6 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountResponse freezeAccountByAdmin(String accountNumber) {
-        log.info("ADMIN requested to freeze account [{}]", accountNumber);
-        Account account = getAccount(accountNumber);
-        if (account.getAccountStatus() == Account.AccountStatus.INACTIVE) {
-            throw new IllegalStateException(
-                    "Inactive account cannot be frozen.");
-        }
-        if (account.getAccountStatus() == Account.AccountStatus.FROZEN) {
-            throw new IllegalStateException(
-                    "Account is already frozen.");
-        }
-        account.setAccountStatus(Account.AccountStatus.FROZEN);
-        auditLogService.log(
-                AuditAction.ACCOUNT_FROZEN,
-                "Account " + account.getAccountNumber() + " frozen"
-        );
-        Account updatedAccount = accountRepository.save(account);
-        log.info("ADMIN successfully froze account [{}]", accountNumber);
-        return mapToResponse(updatedAccount);
-    }
-
-    @Transactional
-    public AccountResponse unfreezeAccountByAdmin(String accountNumber) {
-        log.info("ADMIN requested to unfreeze account [{}]", accountNumber);
-        Account account = getAccount(accountNumber);
-        if (account.getAccountStatus() == Account.AccountStatus.INACTIVE) {
-            throw new IllegalStateException(
-                    "Inactive account cannot be activated.");
-        }
-        if (account.getAccountStatus() == Account.AccountStatus.ACTIVE) {
-            throw new IllegalStateException(
-                    "Account is already active.");
-        }
-        account.setAccountStatus(Account.AccountStatus.ACTIVE);
-        auditLogService.log(
-                AuditAction.ACCOUNT_ACTIVATED,
-                "Account " + account.getAccountNumber() + " activated"
-        );
-        Account updatedAccount = accountRepository.save(account);
-        log.info("ADMIN successfully unfroze account [{}]", accountNumber);
-        return mapToResponse(updatedAccount);
-    }
-
-    @Transactional
     public AccountResponse toggleAccountStatus(String accountNumber) {
 
         User currentUser = getAuthenticatedUser();
@@ -242,6 +198,50 @@ public class AccountService {
 
         log.info("ADMIN view retrieved [{}] total accounts", allAccounts.size());
         return allAccounts;
+    }
+
+    @Transactional
+    public AccountResponse freezeAccountByAdmin(String accountNumber) {
+        log.info("ADMIN requested to freeze account [{}]", accountNumber);
+        Account account = getAccount(accountNumber);
+        if (account.getAccountStatus() == Account.AccountStatus.INACTIVE) {
+            throw new IllegalStateException(
+                    "Inactive account cannot be frozen.");
+        }
+        if (account.getAccountStatus() == Account.AccountStatus.FROZEN) {
+            throw new IllegalStateException(
+                    "Account is already frozen.");
+        }
+        account.setAccountStatus(Account.AccountStatus.FROZEN);
+        auditLogService.log(
+                AuditAction.ACCOUNT_FROZEN,
+                "Account " + account.getAccountNumber() + " frozen"
+        );
+        Account updatedAccount = accountRepository.save(account);
+        log.info("ADMIN successfully froze account [{}]", accountNumber);
+        return mapToResponse(updatedAccount);
+    }
+
+    @Transactional
+    public AccountResponse unfreezeAccountByAdmin(String accountNumber) {
+        log.info("ADMIN requested to unfreeze account [{}]", accountNumber);
+        Account account = getAccount(accountNumber);
+        if (account.getAccountStatus() == Account.AccountStatus.INACTIVE) {
+            throw new IllegalStateException(
+                    "Inactive account cannot be activated.");
+        }
+        if (account.getAccountStatus() == Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "Account is already active.");
+        }
+        account.setAccountStatus(Account.AccountStatus.ACTIVE);
+        auditLogService.log(
+                AuditAction.ACCOUNT_ACTIVATED,
+                "Account " + account.getAccountNumber() + " activated"
+        );
+        Account updatedAccount = accountRepository.save(account);
+        log.info("ADMIN successfully unfroze account [{}]", accountNumber);
+        return mapToResponse(updatedAccount);
     }
 
     private void validateAccountOwnership(Account account, User currentUser) {

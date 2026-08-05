@@ -41,6 +41,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Allow public access to authentication endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        //Allow actuator health endpoint
+                        .requestMatchers("/actuator/health").permitAll()
                         // Allow public access to Swagger API docs
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         // Require authentication for any other endpoint

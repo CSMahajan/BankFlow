@@ -1,5 +1,6 @@
 export const actionDisplayNames = {
     LOGIN: "🔐 Login",
+    USER_REGISTERED: "👤 User Registered",
 
     ACCOUNT_CREATED: "🏦 Account Created",
     ACCOUNT_ACTIVATED: "✅ Account Activated",
@@ -41,6 +42,7 @@ export const moduleDisplayNames = {
 export const moduleActions = {
     LOGIN: [
         "LOGIN",
+        "USER_REGISTERED",
     ],
 
     ACCOUNTS: [

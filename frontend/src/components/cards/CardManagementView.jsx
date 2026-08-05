@@ -24,10 +24,13 @@ const CardManagementView = () => {
                     ? await unblockCard(selectedCard.id)
                     : await blockCard(selectedCard.id);
 
-            setCards((prev) =>
-                prev.map((card) =>
+            setCards(prev =>
+                prev.map(card =>
                     card.id === updatedCard.id
-                        ? updatedCard
+                        ? {
+                            ...card,
+                            ...updatedCard,
+                        }
                         : card
                 )
             );

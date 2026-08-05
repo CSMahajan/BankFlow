@@ -177,10 +177,6 @@ const AccountManagementView = () => {
             <div style={styles.pageHeader}>
 
                 <div>
-                    <h2 style={styles.title}>
-                        Account Management
-                    </h2>
-
                     <p style={styles.subtitle}>
                         View customer accounts and freeze or unfreeze them when required.
                     </p>

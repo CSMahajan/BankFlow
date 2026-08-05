@@ -174,10 +174,6 @@ const CardManagementView = () => {
             <div style={styles.pageHeader}>
 
                 <div>
-                    <h2 style={styles.title}>
-                        Card Management
-                    </h2>
-
                     <p style={styles.subtitle}>
                         View debit and credit cards and block or unblock them when required.
                     </p>

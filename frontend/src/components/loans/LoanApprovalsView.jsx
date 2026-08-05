@@ -185,10 +185,6 @@ const LoanApprovalsView = () => {
             <div style={styles.pageHeader}>
 
                 <div>
-                    <h2 style={styles.title}>
-                        Loan Approval Queue
-                    </h2>
-
                     <p style={styles.subtitle}>
                         Review and approve customer loan applications.
                     </p>

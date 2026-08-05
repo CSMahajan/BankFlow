@@ -50,6 +50,11 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         log.info("Customer registered successfully. User ID: [{}], Email: [{}]", savedUser.getId(), savedUser.getEmail());
+        auditLogService.log(
+                savedUser,
+                AuditAction.USER_REGISTERED,
+                "Customer account registered"
+        );
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -104,6 +109,11 @@ public class UserService {
 
         User savedAdmin = userRepository.save(adminUser);
         log.info("ADMIN account created successfully. User ID: [{}], Email: [{}]", savedAdmin.getId(), savedAdmin.getEmail());
+        auditLogService.log(
+                savedAdmin,
+                AuditAction.USER_REGISTERED,
+                "Administrator account created"
+        );
     }
 
     @Transactional(readOnly = true)

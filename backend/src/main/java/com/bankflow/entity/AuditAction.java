@@ -4,6 +4,8 @@ public enum AuditAction {
 
     LOGIN,
 
+    USER_REGISTERED,
+
     ACCOUNT_CREATED,
 
     ACCOUNT_ACTIVATED,

@@ -3,6 +3,7 @@ import LoanApprovalsView from './loans/LoanApprovalsView';
 import AdminDashboardOverview from './AdminDashboardOverview';
 import UserManagementView from "./UserManagementView";
 import AccountManagementView from './accounts/AccountManagementView';
+import CardManagementView from './cards/CardManagementView';
 import AuditLogsView from "./audit/AuditLogsView";
 import { fetchAdminDashboardSummary } from '../api/bankService';
 
@@ -73,6 +74,16 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
             <button
               style={{
                 ...styles.navBtn,
+                backgroundColor: activeTab === 'cardManage' ? '#1e293b' : 'transparent',
+                color: activeTab === 'cardManage' ? '#ffffff' : '#374151',
+              }}
+              onClick={() => setActiveTab('cardManage')}
+            >
+              💳 Card Management
+            </button>
+            <button
+              style={{
+                ...styles.navBtn,
                 backgroundColor: activeTab === 'users' ? '#1e293b' : 'transparent',
                 color: activeTab === 'users' ? '#ffffff' : '#374151',
               }}
@@ -135,6 +146,10 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
 
         {activeTab === 'accountManage' && (
           <AccountManagementView />
+        )}
+
+        {activeTab === 'cardManage' && (
+          <CardManagementView />
         )}
 
         {activeTab === 'users' && (

@@ -190,3 +190,22 @@ export const unfreezeAccount = async (accountNumber) => {
   );
   return response.data;
 };
+
+export const fetchAllCards = async () => {
+  const response = await API.get("/admin/cards");
+  return response.data;
+};
+
+export const blockCard = async (cardId) => {
+  const response = await API.patch(
+    `/admin/cards/${cardId}/block`
+  );
+  return response.data;
+};
+
+export const unblockCard = async (cardId) => {
+  const response = await API.patch(
+    `/admin/cards/${cardId}/unblock`
+  );
+  return response.data;
+};

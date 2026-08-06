@@ -5,10 +5,11 @@ spring:
     name: bankflow-api
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/banking?currentSchema=retail_banking}
-    username: ${DB_USER:chaitanyamahajan}
-    password: ${DB_PASSWORD:}
+    username: ${DB_USER:bankflow}
+    password: ${DB_PASSWORD:bankflow}
     driver-class-name: org.postgresql.Driver
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: ${DDL_AUTO:update} # Allows overriding via env variable in prod
     show-sql: false

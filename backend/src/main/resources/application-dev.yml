@@ -12,3 +12,8 @@ app:
     full-name: System Administrator
     email: admin@bankflow.com
     password: AdminSecretPass123!
+
+spring:
+  sql:
+    init:
+      mode: always

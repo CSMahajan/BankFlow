@@ -1,13 +1,77 @@
+name: bankflow
+
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17.6-alpine
+    container_name: bankflow-postgres
+
     environment:
-      POSTGRES_DB: bankflow
+      POSTGRES_DB: banking
       POSTGRES_USER: bankflow
       POSTGRES_PASSWORD: bankflow
+
     ports:
       - "5432:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bankflow -d banking"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+
+    container_name: bankflow-backend
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+
+      DB_URL: jdbc:postgresql://postgres:5432/banking?currentSchema=retail_banking
+      DB_USER: bankflow
+      DB_PASSWORD: bankflow
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "-q",
+          "http://localhost:8080/actuator/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    ports:
+      - "8080:8080"
+
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: bankflow-frontend
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:80"
+
+    restart: unless-stopped
+
 volumes:
   postgres_data:

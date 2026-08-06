@@ -70,7 +70,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException ex) {
-
         log.warn("No Resource Found: {}", ex.getMessage());
 
         ErrorResponse error = new ErrorResponse(

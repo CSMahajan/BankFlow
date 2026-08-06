@@ -1,7 +1,7 @@
 import React from "react";
 import { formatDate, formatCurrency } from "../utils/formatUtils";
 import { useState } from "react";
-import { fetchUserAccounts, fetchUserCards, fetchUserLoans, fetchUserFixedDeposits } from "../API/bankService";
+import { fetchUserAccounts, fetchUserCards, fetchUserLoans, fetchUserFixedDeposits } from "../api/bankService";
 import UserProfileHeader from "./UserProfileHeader";
 import UserSummaryCards from "./UserSummaryCards";
 import UserInformationSection from "./UserInformationSection";

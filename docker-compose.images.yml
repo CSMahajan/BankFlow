@@ -37,6 +37,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/banking?currentSchema=retail_banking
       DB_USER: bankflow
       DB_PASSWORD: bankflow
+      SUPER_ADMIN_PASSWORD: AdminSecretPass123!
 
     ports:
       - "8080:8080"

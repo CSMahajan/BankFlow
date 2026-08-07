@@ -5,14 +5,6 @@ springdoc:
   swagger-ui:
     enabled: true
 
-app:
-  jwt-secret: bankflow-development-key-must-be-replaced-before-production-2026
-
-  default-admin:
-    full-name: System Administrator
-    email: admin@bankflow.com
-    password: AdminSecretPass123!
-
 spring:
   sql:
     init:

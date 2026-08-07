@@ -38,12 +38,16 @@ springdoc:
 
 app:
   cors-origin: ${CORS_ORIGIN:http://localhost:5173}
-  jwt-secret: ${JWT_SECRET}
+
+  jwt-secret: ${JWT_SECRET:bankflow-development-jwt-secret-only-for-local-development-change-in-production-2026}
+
   seed-admin: ${SEED_ADMIN:true}
+
+  # Defaults for local development. Override via environment variables in production.
   default-admin:
-    full-name: ${SUPER_ADMIN_NAME}
-    email: ${SUPER_ADMIN_EMAIL}
-    password: ${SUPER_ADMIN_PASSWORD}
+    full-name: ${SUPER_ADMIN_NAME:System Administrator}
+    email: ${SUPER_ADMIN_EMAIL:admin@bankflow.com}
+    password: ${SUPER_ADMIN_PASSWORD:AdminSecretPass123!}
 
 management:
   endpoints:

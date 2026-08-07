@@ -58,7 +58,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: csmahajan/bankflow-frontend:local
+    image: csmahajan/bankflow-frontend:latest
     container_name: bankflow-frontend
 
     depends_on:

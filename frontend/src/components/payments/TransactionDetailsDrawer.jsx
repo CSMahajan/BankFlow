@@ -43,14 +43,7 @@ const TransactionDetailsDrawer = ({
 
                 {detailsLoading ? (
 
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            height: "200px",
-                        }}
-                    >
+                    <div style={styles.drawerLoading}>
                         Loading transaction...
                     </div>
 

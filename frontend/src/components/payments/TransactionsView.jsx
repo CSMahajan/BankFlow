@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { getMyTransactions, getTransactionDetails } from "../../api/bankService";
-import { formatDate, formatCurrency } from '../../utils/formatUtils';
 import styles from "./transactionStyles";
 import TransactionDetailsDrawer from "./TransactionDetailsDrawer";
 import TransactionsTable from "./TransactionsTable";
@@ -52,7 +51,7 @@ const TransactionsView = ({
                 setLoading(false);
                 return;
             }
-            const response = await getMyTransactions({
+            const transactionList = await getMyTransactions({
                 page,
                 size: 20,
 
@@ -77,8 +76,8 @@ const TransactionsView = ({
                 }),
             });
 
-            setTransactions(response.data.content);
-            setPageData(response.data);
+            setTransactions(transactionList.content);
+            setPageData(transactionList);
         } catch (err) {
             console.error(err);
             setError("Unable to load transactions.");
@@ -123,10 +122,10 @@ const TransactionsView = ({
             setTransactionDetails(null);
             setSelectedTransactionId(transactionId);
             setDetailsLoading(true);
+            setError("");
+            const transaction = await getTransactionDetails(transactionId);
 
-            const response = await getTransactionDetails(transactionId);
-
-            setTransactionDetails(response.data);
+            setTransactionDetails(transaction);
         } catch (err) {
             console.error(err);
             setError("Unable to load transaction details.");
@@ -175,7 +174,11 @@ const TransactionsView = ({
                 </div>
             )}
 
-            {transactions.length === 0 ? (
+            {loading ? (
+                <div style={styles.emptyState}>
+                    Loading transactions...
+                </div>
+            ) : transactions.length === 0 ? (
                 <div style={styles.emptyState}>
                     <div style={{ fontSize: "42px" }}>📜</div>
                     <h4>No transactions matched your filters.</h4>

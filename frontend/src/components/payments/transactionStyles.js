@@ -274,6 +274,13 @@ const styles = {
         border: "1px solid #fecaca",
         fontWeight: "500",
     },
+
+    drawerLoading: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "200px",
+    },
 };
 
 export default styles;

@@ -127,13 +127,20 @@ export const toggleAccountStatus = async (accountNumber) => {
   return response.data;
 };
 
-export const getMyTransactions = (params) =>
-  API.get("/transactions/my-transactions", {
-    params,
-  });
+export const getMyTransactions = async (params) => {
+  const response = await API.get(
+    "/transactions/my-transactions",
+    { params }
+  );
+  return response.data;
+};
 
-export const getTransactionDetails = (transactionId) =>
-  API.get(`/transactions/${transactionId}`);
+export const getTransactionDetails = async (transactionId) => {
+  const response = await API.get(
+    `/transactions/${transactionId}`
+  );
+  return response.data;
+};
 
 export const createScheduledTransfer = async (request) => {
   const response = await API.post(

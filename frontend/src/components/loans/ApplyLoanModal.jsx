@@ -10,7 +10,6 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
     const [principalAmount, setPrincipalAmount] = useState('');
     const [tenureMonths, setTenureMonths] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         const activeAccounts = accounts.filter(
@@ -36,7 +35,6 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
         e.preventDefault();
 
         setLoading(true);
-        setError(null);
 
         try {
             await applyLoan({
@@ -51,22 +49,16 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
             } else {
                 setSourceAccountNumber("");
             }
-            setError(null);
             setLoanType("PERSONAL");
             setPrincipalAmount("");
             setTenureMonths("");
-            if (activeAccounts.length > 0) {
-                setSourceAccountNumber(activeAccounts[0].accountNumber);
-            } else {
-                setSourceAccountNumber("");
-            }
             await onLoanApplied();
             toast.success("Loan applied successfully");
             onClose();
         } catch (err) {
             console.error('Failed to apply for loan:', err);
 
-            setError(
+            toast.error(
                 err.response?.data?.message ||
                 'Failed to submit loan application.'
             );
@@ -82,14 +74,12 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
                     <h3 style={modalStyles.title}>Apply for Loan</h3>
                     <button style={modalStyles.closeBtn}
                         onClick={() => {
-                            setError(null);
                             onClose();
                         }}>
                         ✕
                     </button>
                 </div>
 
-                {error && <div style={modalStyles.errorBox}>{error}</div>}
                 {activeAccounts.length === 0 ? (
 
                     <div style={modalStyles.errorBox}>

@@ -13,7 +13,6 @@ const PayEmiModal = ({
 }) => {
     const [sourceAccountNumber, setSourceAccountNumber] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         const activeAccounts = accounts.filter(
@@ -37,15 +36,12 @@ const PayEmiModal = ({
         e.preventDefault();
 
         setLoading(true);
-        setError(null);
 
         try {
             await payEmi({
                 loanNumber: loan.loanNumber,
                 sourceAccountNumber
             });
-
-            setError(null);
 
             if (activeAccounts.length > 0) {
                 setSourceAccountNumber(activeAccounts[0].accountNumber);
@@ -59,7 +55,7 @@ const PayEmiModal = ({
         } catch (err) {
             console.error(err);
 
-            setError(
+            toast.error(
                 err.response?.data?.message ||
                 'Failed to pay EMI.'
             );
@@ -80,19 +76,12 @@ const PayEmiModal = ({
                         <button
                             style={modalStyles.closeBtn}
                             onClick={() => {
-                                setError(null);
                                 onClose();
                             }}
                         >
                             ✕
                         </button>
                     </div>
-
-                    {error && (
-                        <div style={modalStyles.errorBox}>
-                            {error}
-                        </div>
-                    )}
 
                     <div style={modalStyles.field}>
                         <label style={modalStyles.label}>Loan Number</label>
@@ -169,7 +158,6 @@ const PayEmiModal = ({
                         <button
                             style={modalStyles.cancelBtn}
                             onClick={() => {
-                                setError(null);
                                 onClose();
                             }}
                         >

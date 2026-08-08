@@ -4,7 +4,7 @@ import PayEmiModal from './PayEmiModal';
 import LoanDetailsModal from './LoanDetailsModal';
 import { formatCurrency, formatDate } from '../../utils/formatUtils';
 import { getLoanStatusStyle } from '../../utils/loanStatusUtils';
-import API from '../../api/axios';
+import { fetchMyLoans, fetchLoanRepayments } from "../../api/bankService";
 
 const LoansView = ({ accounts }) => {
     const [isPayEmiModalOpen, setIsPayEmiModalOpen] = useState(false);
@@ -20,11 +20,13 @@ const LoansView = ({ accounts }) => {
 
     const fetchLoans = async () => {
         try {
-            const response = await API.get('/loans/my-loans');
-            setLoans(response.data);
+            setLoading(true);
+            setError(null);
+            const loans = await fetchMyLoans();
+            setLoans(loans);
         } catch (err) {
             console.error(err);
-            setError('Failed to load loans.');
+            setError("Failed to load loans.");
         } finally {
             setLoading(false);
         }
@@ -53,9 +55,8 @@ const LoansView = ({ accounts }) => {
             setRepaymentError('');
             setRepayments([]);
 
-            const response = await API.get(`/loans/${loanNumber}/repayments`);
-
-            setRepayments(response.data);
+            const repayments = await fetchLoanRepayments(loanNumber);
+            setRepayments(repayments);
         } catch (err) {
             console.error(err);
             setRepaymentError('Failed to load repayment history.');

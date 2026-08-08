@@ -14,11 +14,7 @@ const LoanDetailsModal = ({
 }) => {
 
     if (!isOpen || !loan) return null;
-    <button
-        onClick={() => toast.success("Hello BankFlow!")}
-    >
-        Test Toast
-    </button>
+
     const DetailRow = ({ label, value }) => (
         <div
             style={{

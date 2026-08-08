@@ -24,6 +24,18 @@ export const applyLoan = async (loanData) => {
   return response.data;
 };
 
+export const fetchMyLoans = async () => {
+  const response = await API.get("/loans/my-loans");
+  return response.data;
+};
+
+export const fetchLoanRepayments = async (loanNumber) => {
+  const response = await API.get(
+    `/loans/${loanNumber}/repayments`
+  );
+  return response.data;
+};
+
 export const payEmi = async (paymentData) => {
   const response = await API.post('/loans/pay-emi', paymentData);
   return response.data;

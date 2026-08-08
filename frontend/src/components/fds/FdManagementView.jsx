@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { createFixedDeposit } from "../../api/bankService";
-import { FD_RATES, FD_TENURES } from "./fdConfig";
+import { FD_CONFIG, FD_TENURES } from "./fdConfig";
 import { formatDate, formatCurrency } from "../../utils/formatUtils";
+import toast from "react-hot-toast";
 
 const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
 
   const [sourceAccountNumber, setSourceAccountNumber] = useState('');
   const [depositAmount, setDepositAmount] = useState(
-    initialConfig?.depositAmount ?? ""
+    initialConfig?.depositAmount ?? 0
   );
   const [tenureYears, setTenureYears] = useState(initialConfig?.tenureYears || 3);
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     const activeAccounts = accounts.filter(
@@ -34,23 +33,38 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
 
   const handleCreateFd = async (e) => {
     e.preventDefault();
+
+    if (!selectedAccount) {
+      toast.error("Please select a valid account.");
+      return;
+    }
+
+    if (Number(depositAmount) > selectedAccount.currentBalance) {
+      toast.error("Insufficient balance in selected account.");
+      return;
+    }
+
+    if (Number(depositAmount) < 10000) {
+      toast.error("Minimum FD amount is ₹10,000.");
+      return;
+    }
     setLoading(true);
-    setSuccessMsg(null);
-    setErrorMsg(null);
 
     try {
+
       await createFixedDeposit({
         sourceAccountNumber,
         depositAmount: Number(depositAmount),
         tenureYears: Number(tenureYears),
       });
 
-      setSuccessMsg('Your Fixed Deposit has been opened successfully.');
+      toast.success('Your Fixed Deposit has been opened successfully.');
       if (activeAccounts.length > 0) {
         setSourceAccountNumber(activeAccounts[0].accountNumber);
       } else {
         setSourceAccountNumber("");
-      } setDepositAmount("");
+      }
+      setDepositAmount(0);
       setTenureYears(FD_TENURES[0]);
 
       setTimeout(() => {
@@ -58,7 +72,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
       }, 1200);
     } catch (err) {
       console.error('Failed to create FD:', err);
-      setErrorMsg(err.response?.data?.message || 'Failed to create Fixed Deposit.');
+      toast.error(err.response?.data?.message || 'Failed to create Fixed Deposit.');
     } finally {
       setLoading(false);
     }
@@ -68,9 +82,6 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
     <div style={styles.card}>
       <h2 style={styles.title}>📄 Open Fixed Deposit</h2>
       <p style={styles.subtitle}>Lock in high returns with guaranteed interest rates.</p>
-
-      {successMsg && <div style={styles.successBox}>✅ {successMsg}</div>}
-      {errorMsg && <div style={styles.errorBox}>⚠️ {errorMsg}</div>}
 
       <form onSubmit={handleCreateFd} style={styles.form}>
         <div style={styles.inputGroup}>
@@ -106,7 +117,6 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
           <input
             type="number"
             step="0.01"
-            min="10000"
             value={depositAmount}
             placeholder="Minimum ₹10,000"
             onChange={(e) => setDepositAmount(e.target.value)}
@@ -143,7 +153,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
           <label style={styles.label}>Applicable Interest Rate</label>
           <input
             type="text"
-            value={FD_RATES[tenureYears]}
+            value={FD_CONFIG[tenureYears].label}
             disabled
             style={{ ...styles.input, backgroundColor: '#f3f4f6', fontWeight: '700', color: '#0d6360' }}
           />
@@ -173,8 +183,6 @@ const styles = {
   label: { fontSize: '13px', fontWeight: '600', color: '#374151' },
   input: { padding: '10px 14px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', outline: 'none' },
   button: { backgroundColor: '#0d6360', color: '#ffffff', padding: '12px', borderRadius: '8px', border: 'none', fontWeight: '700', fontSize: '14px', cursor: 'pointer', marginTop: '12px' },
-  successBox: { backgroundColor: '#dcfce7', color: '#15803d', padding: '12px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' },
-  errorBox: { backgroundColor: '#fee2e2', color: '#991b1b', padding: '12px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' },
 };
 
 export default FdManagementView;

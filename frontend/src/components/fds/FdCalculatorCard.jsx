@@ -1,25 +1,12 @@
-import React, { useState } from 'react';
-import { formatDate, formatCurrency } from "../../utils/formatUtils";
+import React, { useState } from "react";
+import { formatCurrency } from "../../utils/formatUtils";
+import { FD_CONFIG, FD_TENURES } from "./fdConfig";
 
 const FdCalculatorCard = ({ onOpenFd, defaultAccountNumber }) => {
     const [amount, setAmount] = useState(50000); // Default ₹50,000
     const [tenureYears, setTenureYears] = useState(3); // Default 3 years (Options: 1, 3, 5)
 
-    // Rate mapping based on selected tenure
-    const getInterestRate = (tenure) => {
-        switch (Number(tenure)) {
-            case 1:
-                return 6.5;
-            case 3:
-                return 7.0;
-            case 5:
-                return 7.5;
-            default:
-                return 7.0;
-        }
-    };
-
-    const interestRate = getInterestRate(tenureYears);
+    const interestRate = FD_CONFIG[tenureYears].interestRate;
 
     // Quarterly Compounding FD Formula: A = P * (1 + r/4)^(4*t)
     const calculateMaturity = () => {
@@ -59,7 +46,7 @@ const FdCalculatorCard = ({ onOpenFd, defaultAccountNumber }) => {
                         Calculate guaranteed returns on your savings
                     </p>
                 </div>
-                <div style={styles.rateBadge}>{interestRate}% p.a.</div>
+                <div style={styles.rateBadge}>{FD_CONFIG[tenureYears].label}</div>
             </div>
 
             <div style={styles.grid}>
@@ -96,9 +83,11 @@ const FdCalculatorCard = ({ onOpenFd, defaultAccountNumber }) => {
                             onChange={(e) => setTenureYears(Number(e.target.value))}
                             style={styles.selectInput}
                         >
-                            <option value={1}>1 Year (6.5% p.a.)</option>
-                            <option value={3}>3 Years (7.0% p.a.)</option>
-                            <option value={5}>5 Years (7.5% p.a.)</option>
+                            {FD_TENURES.map((year) => (
+                                <option key={year} value={year}>
+                                    {year} Year{year > 1 ? "s" : ""} ({FD_CONFIG[year].label})
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>

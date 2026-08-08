@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { fetchMyFixedDeposits, closeFixedDeposit } from "../../api/bankService";
 import { formatDate, formatCurrency } from "../../utils/formatUtils";
+import toast from "react-hot-toast";
 
 const ViewFds = ({ onFdClosed }) => {
     const [fds, setFds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const isPrematureFd = (fd) =>
+        new Date(fd.maturityDate) > new Date();
+
     const handleCloseFd = async (fd) => {
 
-        const isPremature =
-            new Date(fd.maturityDate) > new Date();
-
         const confirmed = window.confirm(
-            isPremature
+            isPrematureFd(fd)
                 ? `This Fixed Deposit has not matured yet.
 Deposit Amount: ${formatCurrency(fd.depositAmount)}
 Amount to be credited: ${formatCurrency(fd.depositAmount)}
@@ -33,20 +34,18 @@ Do you want to continue?`
         try {
             await closeFixedDeposit(fd.fdNumber);
 
-            alert(
-                isPremature
-                    ? `✅ Principal amount of ${formatCurrency(fd.depositAmount)} credited successfully.`
-                    : `✅ ${formatCurrency(fd.maturityAmount)} credited successfully.`
+            toast.success(
+                isPrematureFd(fd)
+                    ? `Principal amount of ${formatCurrency(fd.depositAmount)} credited successfully.`
+                    : `${formatCurrency(fd.maturityAmount)} credited successfully.`
             );
 
-            await Promise.all([
-                loadFds(),
-                onFdClosed?.()
-            ]);
+            await loadFds();
+            await onFdClosed?.();
 
         } catch (err) {
             console.error(err);
-            alert(
+            toast.error(
                 err.response?.data?.message ??
                 "Failed to close Fixed Deposit."
             );
@@ -77,8 +76,25 @@ Do you want to continue?`
             Loading Fixed Deposits...
         </div>
 
-    if (error)
-        return <div>{error}</div>;
+    if (error) {
+        return (
+            <div
+                style={{
+                    textAlign: "center",
+                    padding: "50px",
+                }}
+            >
+                <p>{error}</p>
+
+                <button
+                    style={styles.refreshBtn}
+                    onClick={loadFds}
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
 
     if (fds.length === 0)
         return <div style={{
@@ -106,8 +122,6 @@ Do you want to continue?`
 
             <div style={styles.grid}>
                 {fds.map(fd => {
-                    const isPremature =
-                        new Date(fd.maturityDate) > new Date();
 
                     return (
                         <div key={fd.id} style={styles.card}>
@@ -198,13 +212,13 @@ Do you want to continue?`
                                 <button
                                     style={{
                                         ...styles.closeButton,
-                                        backgroundColor: isPremature
+                                        backgroundColor: isPrematureFd(fd)
                                             ? "#ea580c"
                                             : "#b91c1c",
                                     }}
                                     onClick={() => handleCloseFd(fd)}
                                 >
-                                    {isPremature
+                                    {isPrematureFd(fd)
                                         ? "Premature Close FD"
                                         : "Close FD"}
                                 </button>

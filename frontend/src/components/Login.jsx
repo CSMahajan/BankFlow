@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import API from '../api/axios';
+import { login } from '../api/bankService';
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
@@ -16,9 +16,9 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
     setError(null);
 
     try {
-      const response = await API.post('/auth/login', {
-        email: email,
-        password: password,
+      const response = await login({
+        email,
+        password,
       });
 
       const data = response.data;
@@ -57,6 +57,9 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
       setError(
         err.response?.data?.message || 'Invalid email or password. Please try again.'
       );
+
+    }
+    finally {
       setLoading(false);
     }
   };

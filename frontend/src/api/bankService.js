@@ -226,3 +226,27 @@ export const fetchMonthlyAnalytics = async () => {
   const response = await API.get("/dashboard/analytics/monthly");
   return response.data;
 };
+
+export const login = async (credentials) => {
+  const response = await API.post("/auth/login", credentials);
+  return response.data;
+};
+
+export const registerCustomer = async (request) => {
+  const response = await API.post("/auth/register", request);
+  return response.data;
+};
+
+export const registerAdmin = async (request, token) => {
+  const response = await API.post(
+    "/admin/users/create-admin",
+    request,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};

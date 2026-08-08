@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import API from '../api/axios';
-import { Eye, EyeOff } from "lucide-react";
+import { registerCustomer, registerAdmin } from '../api/bankService';
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
@@ -22,27 +21,20 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
     setSuccessMsg(null);
 
     try {
-      if (role === 'CUSTOMER') {
-        // Customer Register Endpoint
-        await API.post('/auth/register', {
+      if (role === "CUSTOMER") {
+        await registerCustomer({
           email,
           fullName,
           password,
         });
       } else {
-        // Admin Register Endpoint (requires Super Admin Bearer token)
-        await API.post(
-          '/admin/users/create-admin',
+        await registerAdmin(
           {
             email,
             fullName,
             password,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${adminToken.trim()}`,
-            },
-          }
+          adminToken.trim()
         );
       }
 

@@ -168,7 +168,7 @@ Do you want to continue?`
 
                             <div style={styles.row}>
                                 <span>Interest Rate</span>
-                                <strong>{fd.interestRate}%</strong>
+                                <strong>{fd.interestRate}% p.a.</strong>
                             </div>
 
                             <div style={styles.row}>

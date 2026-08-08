@@ -6,6 +6,7 @@ import FinancialSummaryCard from './FinancialSummaryCard';
 const DashboardOverview = ({
     accounts,
     refreshAccounts,
+    refreshSummary,
     summary,
     loadingSummary,
     summaryError,
@@ -15,6 +16,7 @@ const DashboardOverview = ({
             <BalanceSummaryCard
                 accounts={accounts}
                 refreshAccounts={refreshAccounts}
+                refreshSummary={refreshSummary}
             />
 
             <DashboardSummaryCard

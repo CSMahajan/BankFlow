@@ -4,6 +4,7 @@ import styles from "./transactionStyles";
 import TransactionDetailsDrawer from "./TransactionDetailsDrawer";
 import TransactionsTable from "./TransactionsTable";
 import TransactionFilters from "./TransactionFilters";
+import { getTodayDate } from "../../utils/formatUtils";
 
 const TransactionsView = ({
     accounts = [],
@@ -34,7 +35,7 @@ const TransactionsView = ({
         search: "",
     });
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = getTodayDate();
 
     const loadTransactions = async (page = 0) => {
         try {

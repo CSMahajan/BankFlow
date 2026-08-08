@@ -6,7 +6,10 @@ import CardsHeader from "./CardsHeader";
 import BankCard from "./BankCard";
 import toast from "react-hot-toast";
 
-const CardsView = () => {
+const CardsView = ({
+    refreshSummary,
+    refreshAccounts,
+}) => {
 
     const [cards, setCards] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -50,6 +53,9 @@ const CardsView = () => {
                     card.id === updatedCard.id ? updatedCard : card
                 )
             );
+            if (refreshSummary) {
+                await refreshSummary();
+            }
 
         } catch (err) {
             console.error(err);
@@ -74,6 +80,10 @@ const CardsView = () => {
                         : card
                 )
             );
+
+            if (refreshSummary) {
+                await refreshSummary();
+            }
         } catch (err) {
             console.error(err);
             toast.error(
@@ -163,7 +173,16 @@ const CardsView = () => {
                 onClose={() => setIsIssueCardModalOpen(false)}
                 onCardIssued={async () => {
                     setIsIssueCardModalOpen(false);
+
                     await loadCards();
+
+                    if (refreshAccounts) {
+                        await refreshAccounts();
+                    }
+
+                    if (refreshSummary) {
+                        await refreshSummary();
+                    }
                 }}
             />
         </div>

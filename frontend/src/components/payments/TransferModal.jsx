@@ -24,8 +24,8 @@ const TransferModal = ({ isOpen, onClose, onTransferSuccess, accounts = [] }) =>
 
         <TransferForm
           accounts={accounts}
-          onSuccess={() => {
-            onTransferSuccess?.();
+          onSuccess={async () => {
+            await onTransferSuccess?.();
             onClose();
           }}
           onCancel={onClose}

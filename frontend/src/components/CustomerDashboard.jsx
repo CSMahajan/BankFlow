@@ -282,6 +282,7 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
           <DashboardOverview
             accounts={accounts}
             refreshAccounts={fetchAccounts}
+            refreshSummary={fetchDashboardSummary}
             summary={summary}
             loadingSummary={loadingSummary}
             summaryError={summaryError}
@@ -313,7 +314,10 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
         )}
 
         {activeTab === 'cards' && (
-          <CardsView />
+          <CardsView
+            refreshSummary={fetchDashboardSummary}
+            refreshAccounts={fetchAccounts}
+          />
         )}
 
         {activeTab === 'fd' && fdSubTab === 'calculator' && (

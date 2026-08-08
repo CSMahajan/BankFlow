@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createScheduledTransfer } from "../../api/bankService";
-import { formatCurrency } from "../../utils/formatUtils";
+import { formatCurrency, getTodayDate } from "../../utils/formatUtils";
 import { getActiveAccounts, getSelectedAccount } from "../../utils/accountUtils";
 import toast from "react-hot-toast";
 
@@ -14,7 +14,7 @@ const ScheduledTransferForm = ({
     const [recipientAccountNumber, setRecipientAccountNumber] = useState('');
     const [amount, setAmount] = useState('');
     const [remark, setRemark] = useState('');
-    const today = new Date().toISOString().split("T")[0];
+    const today = getTodayDate();
     const [frequency, setFrequency] = useState("MONTHLY");
     const [startDate, setStartDate] = useState(today);
     const [submitting, setSubmitting] = useState(false);

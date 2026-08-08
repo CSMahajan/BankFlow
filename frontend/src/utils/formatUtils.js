@@ -13,3 +13,6 @@ export const formatDate = (date) => {
         year: 'numeric'
     });
 };
+
+export const getTodayDate = () =>
+    new Date().toLocaleDateString("en-CA");

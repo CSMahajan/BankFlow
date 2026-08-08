@@ -3,6 +3,7 @@ import BalanceSummaryCard from '../BalanceSummaryCard';
 import { toggleAccountStatus } from "../../api/bankService";
 import { formatDate, formatCurrency } from "../../utils/formatUtils";
 import { getAccountStatusStyle } from '../../utils/accountStatusUtils';
+import toast from "react-hot-toast";
 
 const AccountsView = ({
   accounts,

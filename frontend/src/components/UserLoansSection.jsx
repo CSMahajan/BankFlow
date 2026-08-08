@@ -1,4 +1,5 @@
 import { formatCurrency, formatDate } from "../utils/formatUtils";
+import { getLoanStatusStyle } from "../utils/loanStatusUtils";
 
 const UserLoansSection = ({
     loans,
@@ -7,35 +8,6 @@ const UserLoansSection = ({
     styles,
 }) => {
 
-    const getLoanStatusStyle = (status) => {
-        switch (status) {
-            case "ACTIVE":
-                return {
-                    backgroundColor: "#dcfce7",
-                    color: "#15803d",
-                };
-            case "PENDING":
-                return {
-                    backgroundColor: "#fef3c7",
-                    color: "#b45309",
-                };
-            case "REJECTED":
-                return {
-                    backgroundColor: "#fee2e2",
-                    color: "#b91c1c",
-                };
-            case "PAID_OFF":
-                return {
-                    backgroundColor: "#dbeafe",
-                    color: "#1d4ed8",
-                };
-            default:
-                return {
-                    backgroundColor: "#f3f4f6",
-                    color: "#6b7280",
-                };
-        }
-    };
     const getLoanStatusLabel = (status) => {
         switch (status) {
             case "ACTIVE":
@@ -52,71 +24,68 @@ const UserLoansSection = ({
     };
 
     return (
-        <>
-            {showLoans && (
-                <div style={styles.section}>
-                    <h3 style={styles.sectionTitle}>
-                        Loans
-                    </h3>
-                    {loansLoading ? (
-                        <p>Loading loans...</p>
-                    ) : loans.length === 0 ? (
-                        <div style={styles.emptyAccounts}>
-                            No loans found.
-                        </div>
-                    ) : (
-                        loans.map(loan => (
-                            <div
-                                key={loan.loanNumber}
-                                style={styles.accountCard}
-                            >
-                                <div style={styles.loanContent}>
-                                    <div style={styles.accountHeader}>
-                                        <strong>
-                                            🏦 {loan.loanType} Loan
-                                        </strong>
-                                        <span
-                                            style={{
-                                                ...styles.accountStatus,
-                                                ...getLoanStatusStyle(loan.status),
-                                            }}
-                                        >
-                                            {getLoanStatusLabel(loan.status)}
-                                        </span>
-                                    </div>
-                                    <div style={styles.accountNumber}>
-                                        {loan.loanNumber}
-                                    </div>
-                                    {loan.status === "ACTIVE" && (
-                                        <>
-                                            <div style={styles.loanMeta}>
-                                                EMI {formatCurrency(loan.monthlyEmi)}
-                                            </div>
-
-                                            <div style={styles.loanMeta}>
-                                                Next Due : {formatDate(loan.nextDueDate)}
-                                            </div>
-                                        </>
-                                    )}
+        showLoans && (
+            <div style={styles.section}>
+                <h3 style={styles.sectionTitle}>
+                    Loans
+                </h3>
+                {loansLoading ? (
+                    <p>Loading loans...</p>
+                ) : loans.length === 0 ? (
+                    <div style={styles.emptyAccounts}>
+                        No loans found.
+                    </div>
+                ) : (
+                    loans.map(loan => (
+                        <div
+                            key={loan.loanNumber}
+                            style={styles.accountCard}
+                        >
+                            <div style={styles.loanContent}>
+                                <div style={styles.accountHeader}>
+                                    <strong>
+                                        🏦 {loan.loanType} Loan
+                                    </strong>
+                                    <span
+                                        style={{
+                                            ...styles.accountStatus,
+                                            ...getLoanStatusStyle(loan.status),
+                                        }}
+                                    >
+                                        {getLoanStatusLabel(loan.status)}
+                                    </span>
+                                </div>
+                                <div style={styles.accountNumber}>
+                                    {loan.loanNumber}
                                 </div>
                                 {loan.status === "ACTIVE" && (
-                                    <div style={styles.balanceSection}>
-                                        <div style={styles.balanceLabel}>
-                                            Outstanding
+                                    <>
+                                        <div style={styles.loanMeta}>
+                                            EMI {formatCurrency(loan.monthlyEmi)}
                                         </div>
 
-                                        <div style={styles.balanceValue}>
-                                            {formatCurrency(loan.remainingBalance)}
+                                        <div style={styles.loanMeta}>
+                                            Next Due : {formatDate(loan.nextDueDate)}
                                         </div>
-                                    </div>
+                                    </>
                                 )}
                             </div>
-                        ))
-                    )}
-                </div>
-            )}
+                            {loan.status === "ACTIVE" && (
+                                <div style={styles.balanceSection}>
+                                    <div style={styles.balanceLabel}>
+                                        Outstanding
+                                    </div>
 
-        </>
+                                    <div style={styles.balanceValue}>
+                                        {formatCurrency(loan.remainingBalance)}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))
+                )}
+            </div>
+        )
     );
 };
 

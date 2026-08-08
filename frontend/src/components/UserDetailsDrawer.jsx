@@ -40,8 +40,8 @@ const UserDetailsDrawer = ({
         }
         try {
             setAccountsLoading(true);
-            const response = await fetchUserAccounts(user.id);
-            setAccounts(response);
+            const accountList = await fetchUserAccounts(user.id);
+            setAccounts(accountList);
             setShowAccounts(true);
         } finally {
             setAccountsLoading(false);
@@ -56,8 +56,8 @@ const UserDetailsDrawer = ({
         }
         try {
             setCardsLoading(true);
-            const response = await fetchUserCards(user.id);
-            setCards(response);
+            const cardList = await fetchUserCards(user.id);
+            setCards(cardList);
             setShowCards(true);
         } finally {
             setCardsLoading(false);
@@ -71,8 +71,8 @@ const UserDetailsDrawer = ({
         }
         try {
             setLoansLoading(true);
-            const response = await fetchUserLoans(user.id);
-            setLoans(response);
+            const loanList = await fetchUserLoans(user.id);
+            setLoans(loanList);
             setShowLoans(true);
         } finally {
             setLoansLoading(false);
@@ -86,9 +86,8 @@ const UserDetailsDrawer = ({
         }
         try {
             setFixedDepositsLoading(true);
-            const response =
-                await fetchUserFixedDeposits(user.id);
-            setFixedDeposits(response);
+            const fixedDepositList = await fetchUserFixedDeposits(user.id);
+            setFixedDeposits(fixedDepositList);
             setShowFixedDeposits(true);
         } finally {
             setFixedDepositsLoading(false);

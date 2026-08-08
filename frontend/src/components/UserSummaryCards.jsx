@@ -13,20 +13,24 @@ const UserSummaryCards = ({
     showLoans,
     showFixedDeposits,
 }) => {
+
+    const handleMouseEnter = (e) => {
+        e.currentTarget.style.transform = "translateY(-3px)";
+        e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
+    };
+
+    const handleMouseLeave = (e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "none";
+    };
     return (
         <>
             <div style={styles.statsGrid}>
                 <div
                     style={styles.statCard}
                     onClick={loadAccounts}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-3px)";
-                        e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "none";
-                    }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                 >
                     <div style={styles.statIcon}>🏦</div>
                     <div style={styles.statTitle}>
@@ -42,14 +46,8 @@ const UserSummaryCards = ({
                 <div
                     style={styles.statCard}
                     onClick={loadCards}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-3px)";
-                        e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "none";
-                    }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                 >
                     <div style={styles.statIcon}>💳</div>
                     <div style={styles.statTitle}>
@@ -65,14 +63,8 @@ const UserSummaryCards = ({
                 <div
                     style={styles.statCard}
                     onClick={loadLoans}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-3px)";
-                        e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "none";
-                    }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                 >
                     <div style={styles.statIcon}>📄</div>
                     <div style={styles.statTitle}>
@@ -88,14 +80,8 @@ const UserSummaryCards = ({
                 <div
                     style={styles.statCard}
                     onClick={loadFixedDeposits}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-3px)";
-                        e.currentTarget.style.boxShadow = "0 10px 22px rgba(0,0,0,.08)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "none";
-                    }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                 >
                     <div style={styles.statIcon}>💰</div>
                     <div style={styles.statTitle}>

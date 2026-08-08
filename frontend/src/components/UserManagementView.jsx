@@ -3,6 +3,8 @@ import { fetchUsers, fetchUserDetails } from "../api/bankService";
 import { tableHeader, tableCell } from "../styles/tableStyles";
 import PageCard from "./PageCard";
 import UserDetailsDrawer from "./UserDetailsDrawer";
+import { getUserRoleStyle } from "../utils/userRoleUtils";
+import { formatDate } from "../utils/formatUtils";
 
 const UserManagementView = () => {
     const [users, setUsers] = useState([]);
@@ -65,12 +67,6 @@ const UserManagementView = () => {
 
     };
 
-    const closeDrawer = () => {
-        setDrawerOpen(false);
-        setSelectedUserId(null);
-        setSelectedUser(null);
-    };
-
     if (loading) {
         return <p>Loading users...</p>;
     }
@@ -78,6 +74,18 @@ const UserManagementView = () => {
     if (error) {
         return <p>{error}</p>;
     }
+
+    const USER_ROLE_FILTERS = [
+        "ALL",
+        "CUSTOMER",
+        "ADMIN",
+    ];
+
+    const closeDrawer = () => {
+        setDrawerOpen(false);
+        setSelectedUserId(null);
+        setSelectedUser(null);
+    };
 
     const filteredUsers = users.filter((user) => {
         const matchesSearch =
@@ -125,7 +133,7 @@ const UserManagementView = () => {
                             marginBottom: "20px",
                         }}
                     >
-                        {["ALL", "CUSTOMER", "ADMIN"].map((role) => (
+                        {USER_ROLE_FILTERS.map((role) => (
                             <button
                                 key={role}
                                 onClick={() => setRoleFilter(role)}
@@ -202,14 +210,7 @@ const UserManagementView = () => {
                                                 borderRadius: "20px",
                                                 fontSize: "12px",
                                                 fontWeight: 600,
-                                                backgroundColor:
-                                                    user.role === "ADMIN"
-                                                        ? "#dbeafe"
-                                                        : "#dcfce7",
-                                                color:
-                                                    user.role === "ADMIN"
-                                                        ? "#1d4ed8"
-                                                        : "#15803d",
+                                                ...getUserRoleStyle(user.role)
                                             }}
                                         >
                                             {user.role}
@@ -221,7 +222,7 @@ const UserManagementView = () => {
                                         </td>
                                     )}
                                     <td style={tableCell}>
-                                        {new Date(user.createdAt).toLocaleDateString("en-IN")}
+                                        {formatDate(user.createdAt)}
                                     </td>
                                 </tr>
                             ))}

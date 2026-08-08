@@ -300,11 +300,13 @@ const styles = {
     },
 
     emptyAccounts: {
-        padding: "24px",
+        padding: "20px",
         textAlign: "center",
-        color: "#6b7280",
+        color: "#64748b",
+        fontSize: "14px",
         border: "1px dashed #d1d5db",
         borderRadius: "10px",
+        backgroundColor: "#f8fafc",
     },
 };
 

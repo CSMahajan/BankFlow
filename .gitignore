@@ -1,12 +1,81 @@
-.DS_Store
-.idea/
-*.iml
-*.log
+# =========================
+# 🔐 ENV / SECRETS
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# 🐳 DOCKER
+# =========================
+docker-compose.override.yml
+
+# =========================
+# ☕ JAVA / SPRING BOOT
+# =========================
 backend/target/
+backend/*.log
+backend/*.class
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# Maven
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# =========================
+# ⚛️ FRONTEND (React / Vite)
+# =========================
 frontend/node_modules/
 frontend/dist/
-frontend/.env
-backend/logs/bankflow-2026-07-29.log
-backend/logs/bankflow.log
-backend/logs/bankflow.log
-backend/logs/bankflow.log
+frontend/.vite/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# =========================
+# 🧠 IDE / EDITOR
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# 🍏 MAC OS
+# =========================
+.DS_Store
+
+# =========================
+# 🧾 LOGS
+# =========================
+*.log
+
+# =========================
+# 🧪 TEST / COVERAGE
+# =========================
+coverage/
+
+# =========================
+# 🧱 BUILD ARTIFACTS
+# =========================
+*.jar
+*.war
+*.ear
+
+# =========================
+# 🔑 MISC SECRETS
+# =========================
+*.pem
+*.key
+*.crt
+
+# =========================
+# 🚫 TEMP FILES
+# =========================
+*.swp
+*.swo
+*~

@@ -4,6 +4,7 @@ import { formatDate, formatCurrency } from '../../utils/formatUtils';
 import modalStyles from "../../styles/modalStyles";
 import toast from "react-hot-toast";
 import PageCard from '../PageCard';
+import { getLoanTypeStyle, getLoanTypeIcon } from '../../utils/loanTypeUtils';
 
 const LoanApprovalsView = () => {
     const [pendingLoans, setPendingLoans] = useState([]);
@@ -17,20 +18,22 @@ const LoanApprovalsView = () => {
     const [loanTypeFilter, setLoanTypeFilter] = useState("ALL");
     const [expandedLoanId, setExpandedLoanId] = useState(null);
 
-    useEffect(() => {
-        const loadPendingLoans = async () => {
-            try {
-                const data = await fetchPendingLoans();
-                console.log(data);
-                setPendingLoans(data);
-            } catch (err) {
-                console.error(err);
-                setError('Unable to load pending loan applications.');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const loadPendingLoans = async () => {
+        try {
+            setLoading(true);
+            setError("");
 
+            const loans = await fetchPendingLoans();
+            setPendingLoans(loans);
+        } catch (err) {
+            console.error(err);
+            setError("Unable to load pending loan applications.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         loadPendingLoans();
     }, []);
 
@@ -123,18 +126,7 @@ const LoanApprovalsView = () => {
 
     });
 
-    const getLoanTypeIcon = (loanType) => {
-        switch (loanType) {
-            case "HOME":
-                return "🏠";
-            case "PERSONAL":
-                return "👤";
-            case "VEHICLE":
-                return "🚗";
-            default:
-                return "📄";
-        }
-    };
+
 
     const formatLoanType = (loanType) => {
         switch (loanType) {
@@ -273,7 +265,7 @@ const LoanApprovalsView = () => {
 
                             <tbody>
                                 {filteredLoans.map((loan, index) => (
-                                    <>
+                                    <React.Fragment key={loan.id}>
                                         <tr
                                             key={loan.id}
                                             onClick={() =>
@@ -309,20 +301,9 @@ const LoanApprovalsView = () => {
                                                 style={{
                                                     padding: "4px 10px",
                                                     borderRadius: "999px",
-                                                    background:
-                                                        loan.loanType === "HOME"
-                                                            ? "#dbeafe"
-                                                            : loan.loanType === "PERSONAL"
-                                                                ? "#fef3c7"
-                                                                : "#dcfce7",
-                                                    color:
-                                                        loan.loanType === "HOME"
-                                                            ? "#1d4ed8"
-                                                            : loan.loanType === "PERSONAL"
-                                                                ? "#92400e"
-                                                                : "#15803d",
                                                     fontWeight: 600,
                                                     fontSize: "12px",
+                                                    ...getLoanTypeStyle(loan.loanType)
                                                 }}
                                             >
                                                 {loan.loanType}
@@ -473,7 +454,7 @@ const LoanApprovalsView = () => {
                                                 </td>
                                             </tr>
                                         )}
-                                    </>
+                                    </React.Fragment>
                                 ))}
                             </tbody>
                         </table>

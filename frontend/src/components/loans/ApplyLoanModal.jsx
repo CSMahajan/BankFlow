@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { applyLoan } from '../../api/bankService';
 import modalStyles from '../../styles/modalStyles';
 import toast from "react-hot-toast";
-import { formatDate, formatCurrency } from "../../utils/formatUtils";
+import { formatCurrency } from "../../utils/formatUtils";
 
 const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
     const [sourceAccountNumber, setSourceAccountNumber] = useState('');
@@ -33,9 +33,7 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         setLoading(true);
-
         try {
             await applyLoan({
                 accountNumber: sourceAccountNumber,
@@ -72,13 +70,14 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
             <div style={modalStyles.modal}>
                 <div style={modalStyles.header}>
                     <h3 style={modalStyles.title}>Apply for Loan</h3>
-                    <button style={modalStyles.closeBtn}
-                        onClick={() => {
-                            onClose();
-                        }}>
+                    <button
+                        style={modalStyles.closeBtn}
+                        onClick={onClose}
+                    >
                         ✕
                     </button>
                 </div>
+
 
                 {activeAccounts.length === 0 ? (
 
@@ -168,10 +167,7 @@ const ApplyLoanModal = ({ isOpen, onClose, accounts, onLoanApplied }) => {
                             <div style={modalStyles.actions}>
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setError(null);
-                                        onClose();
-                                    }}
+                                    onClick={onClose}
                                     style={modalStyles.cancelBtn}
                                 >
                                     Cancel

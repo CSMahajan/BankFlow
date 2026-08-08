@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { createBankAccount } from '../../api/bankService';
+import toast from "react-hot-toast";
 
 const CreateAccountModal = ({ isOpen, onClose, onAccountCreated }) => {
   const [accountType, setAccountType] = useState('SAVINGS');
   const [initialDeposit, setInitialDeposit] = useState('');
   const [branchName, setBranchName] = useState(''); // 🟢 Added branchName state
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     try {
       await createBankAccount({
@@ -21,7 +20,7 @@ const CreateAccountModal = ({ isOpen, onClose, onAccountCreated }) => {
         initialDeposit: initialDeposit ? parseFloat(initialDeposit) : 0,
         branchName: branchName.trim(), // 🟢 Included in API payload
       });
-
+      toast.success("Account created successfully.");
       setLoading(false);
       setInitialDeposit('');
       setBranchName('');
@@ -30,9 +29,9 @@ const CreateAccountModal = ({ isOpen, onClose, onAccountCreated }) => {
       onClose();
     } catch (err) {
       console.error('Failed to create account:', err);
-      setError(
-        err.response?.data?.message ||
-        'Failed to open bank account. Please try again.'
+      toast.error(
+        err.response?.data?.message ??
+        "Failed to open bank account."
       );
       setLoading(false);
     }
@@ -47,8 +46,6 @@ const CreateAccountModal = ({ isOpen, onClose, onAccountCreated }) => {
             ✕
           </button>
         </div>
-
-        {error && <div style={modalStyles.errorBox}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={modalStyles.form}>
           <div style={modalStyles.field}>

@@ -2,6 +2,7 @@ import React from 'react';
 import BalanceSummaryCard from '../BalanceSummaryCard';
 import { toggleAccountStatus } from "../../api/bankService";
 import { formatDate, formatCurrency } from "../../utils/formatUtils";
+import { getAccountStatusStyle } from '../../utils/accountStatusUtils';
 
 const AccountsView = ({
   accounts,
@@ -21,12 +22,12 @@ const AccountsView = ({
 
     try {
       await toggleAccountStatus(account.accountNumber);
-      alert(account.accountStatus === "ACTIVE"
+      toast.success(account.accountStatus === "ACTIVE"
         ? "✅ Account frozen successfully." : "✅ Account activated successfully.");
       await refreshAccounts();
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message ?? "Failed to update account status.");
+      toast.error(err.response?.data?.message ?? "Failed to update account status.");
     }
   };
 
@@ -86,14 +87,7 @@ const AccountsView = ({
                     <div
                       style={{
                         ...styles.statusBadge,
-                        backgroundColor:
-                          acc.accountStatus === "ACTIVE"
-                            ? "#dcfce7"
-                            : "#fed7aa",
-                        color:
-                          acc.accountStatus === "ACTIVE"
-                            ? "#15803d"
-                            : "#c2410c",
+                        ...getAccountStatusStyle(acc.accountStatus),
                       }}
                     >
                       {acc.accountStatus === "ACTIVE"
@@ -159,14 +153,7 @@ const AccountsView = ({
                     <div
                       style={{
                         ...styles.statusBadge,
-                        backgroundColor:
-                          acc.accountStatus === "ACTIVE"
-                            ? "#dcfce7"
-                            : "#fed7aa",
-                        color:
-                          acc.accountStatus === "ACTIVE"
-                            ? "#15803d"
-                            : "#c2410c",
+                        ...getAccountStatusStyle(acc.accountStatus),
                       }}
                     >
                       {acc.accountStatus === "ACTIVE"

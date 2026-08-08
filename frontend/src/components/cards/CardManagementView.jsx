@@ -89,13 +89,6 @@ const CardManagementView = () => {
     ).length;
 
     const filteredCards = cards.filter((card) => {
-
-        console.log(card);
-
-        console.log("customerName", card.customerName);
-        console.log("maskedCardNumber", card.maskedCardNumber);
-        console.log("accountNumber", card.accountNumber);
-
         const matchesSearch =
             (card.customerName ?? "").toLowerCase().includes(search.toLowerCase()) ||
             (card.maskedCardNumber ?? "").toLowerCase().includes(search.toLowerCase()) ||

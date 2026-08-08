@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from "react";
 import { fetchAllAccounts, freezeAccount, unfreezeAccount } from '../../api/bankService';
 import { formatDate, formatCurrency } from '../../utils/formatUtils';
+import { getAccountStatusStyle } from '../../utils/accountStatusUtils';
 import modalStyles from "../../styles/modalStyles";
 import toast from "react-hot-toast";
 import PageCard from '../PageCard';
@@ -8,7 +9,6 @@ import PageCard from '../PageCard';
 const AccountManagementView = () => {
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [search, setSearch] = useState("");
     const [accountStatusFilter, setAccountStatusFilter] = useState("ALL");
     const [expandedAccountId, setExpandedAccountId] = useState(null);
@@ -53,12 +53,11 @@ const AccountManagementView = () => {
     useEffect(() => {
         const loadAccounts = async () => {
             try {
-                const data = await fetchAllAccounts();
-                console.log(data);
-                setAccounts(data);
+                const accountList = await fetchAllAccounts();
+                setAccounts(accountList);
             } catch (err) {
                 console.error(err);
-                setError("Unable to load accounts.");
+                toast.error("Unable to load accounts.");
             } finally {
                 setLoading(false);
             }
@@ -67,11 +66,9 @@ const AccountManagementView = () => {
     }, []);
 
     if (loading) {
-        return <p>Loading accounts...</p>;
-    }
-
-    if (error) {
-        return <p>{error}</p>;
+        <PageCard title="🏦 Account Management">
+            <p>Loading accounts...</p>
+        </PageCard>
     }
 
     const activeCount = accounts.filter(
@@ -93,8 +90,8 @@ const AccountManagementView = () => {
     const filteredAccounts = accounts.filter((account) => {
 
         const matchesSearch =
-            account.customerName.toLowerCase().includes(search.toLowerCase()) ||
-            account.accountNumber.toLowerCase().includes(search.toLowerCase());
+            (account.customerName ?? "").toLowerCase().includes(search.toLowerCase()) ||
+            (account.accountNumber.toLowerCase().includes(search.toLowerCase()));
 
         const matchesStatus =
             accountStatusFilter === "ALL" ||
@@ -103,34 +100,6 @@ const AccountManagementView = () => {
         return matchesSearch && matchesStatus;
 
     });
-
-    const getAccountStatusStyle = (status) => {
-        switch (status) {
-            case "ACTIVE":
-                return {
-                    background: "#dcfce7",
-                    color: "#15803d",
-                };
-
-            case "FROZEN":
-                return {
-                    background: "#fee2e2",
-                    color: "#b91c1c",
-                };
-
-            case "INACTIVE":
-                return {
-                    background: "#f3f4f6",
-                    color: "#6b7280",
-                };
-
-            default:
-                return {
-                    background: "#f3f4f6",
-                    color: "#6b7280",
-                };
-        }
-    };
 
     const accountSummaryCards = [
         {
@@ -170,6 +139,12 @@ const AccountManagementView = () => {
             },
         },
     ];
+
+    const handleRowClick = (accountId) => {
+        setExpandedAccountId(prev =>
+            prev === accountId ? null : accountId
+        );
+    };
 
     return (
         <PageCard title="🏦 Account Management">
@@ -261,331 +236,326 @@ const AccountManagementView = () => {
                             </thead>
 
                             <tbody>
-                                {filteredAccounts.map((account, index) => (
-                                    <>
-                                        <tr
-                                            key={account.id}
-                                            onClick={() =>
-                                                setExpandedAccountId(
-                                                    expandedAccountId === account.id ? null : account.id
-                                                )
-                                            }
-                                            style={{
-                                                cursor: "pointer",
-                                                transition: ".15s",
-                                                background:
-                                                    expandedAccountId === account.id
-                                                        ? "#eff6ff"
-                                                        : index % 2 === 0
-                                                            ? "#ffffff"
-                                                            : "#fafafa",
+                                {filteredAccounts.map((account, index) => {
+                                    const statusStyle = getAccountStatusStyle(account.accountStatus);
 
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (expandedAccountId !== account.id) {
-                                                    e.currentTarget.style.background = "#eff6ff";
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (expandedAccountId !== account.id) {
-                                                    e.currentTarget.style.background =
-                                                        index % 2 === 0 ? "#ffffff" : "#fafafa";
-                                                }
-                                            }}
-                                        >
-                                            <td style={styles.cell}>{account.customerName}</td>
-                                            <td style={styles.cell}>
-                                                <span
-                                                    style={{
-                                                        fontFamily: "monospace",
-                                                        fontWeight: 600,
-                                                        color: "#15803d",
-                                                    }}
-                                                >
-                                                    {account.accountNumber}
-                                                </span>
-                                            </td>
-                                            <td style={styles.cell}>{account.accountType}</td>
-                                            <td style={styles.cell}>{formatCurrency(account.currentBalance)}</td>
-                                            <td style={styles.cell}>
-                                                <span
-                                                    style={{
-                                                        padding: "5px 10px",
-                                                        borderRadius: "999px",
-                                                        background: "#fef3c7",
-                                                        color: "#92400e",
-                                                        fontWeight: 600,
-                                                        fontSize: "12px",
-                                                        ...getAccountStatusStyle(account.accountStatus),
-                                                    }}
-                                                >
-                                                    {account.accountStatus}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        {expandedAccountId === account.id && (
-                                            <tr>
-                                                <td
-                                                    colSpan={5}
-                                                    style={{
-                                                        padding: "18px",
-                                                        background: "#fff",
-                                                        borderBottom: "1px solid #e5e7eb",
-                                                    }}
-                                                >
-                                                    <div style={styles.loanDetailsContainer}>
-                                                        <div style={styles.detailsHeader}>
-                                                            <div>
-                                                                <h3 style={styles.customerName}>
-                                                                    👤 {account.customerName}
-                                                                </h3>
+                                    return (
+                                        <Fragment key={account.id}>
+                                            <tr
+                                                onClick={() => handleRowClick(account.id)}
+                                                style={{
+                                                    cursor: "pointer",
+                                                    transition: ".15s",
+                                                    background:
+                                                        expandedAccountId === account.id
+                                                            ? "#eff6ff"
+                                                            : index % 2 === 0
+                                                                ? "#ffffff"
+                                                                : "#fafafa",
 
-                                                                <p style={styles.detailsSubtitle}>
-                                                                    Manage account status and review account information.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <div style={styles.loanDetailsGrid}>
-                                                            <div
-                                                                style={{
-                                                                    ...styles.detailCard,
-                                                                    background: "#eff6ff",
-                                                                    border: "1px solid #bfdbfe",
-                                                                }}
-                                                            >
-                                                                <div style={styles.detailLabel}>
-                                                                    💰 Available Balance
-                                                                </div>
-                                                                <div
-                                                                    style={{
-                                                                        ...styles.detailValue,
-                                                                        fontSize: "22px",
-                                                                        fontWeight: 700,
-                                                                        color: "#1d4ed8",
-                                                                    }}
-                                                                >
-                                                                    {formatCurrency(account.currentBalance)}
-                                                                </div>
-                                                            </div>
-                                                            <div
-                                                                style={{
-                                                                    ...styles.detailCard,
-                                                                    background: "#ecfdf5",
-                                                                    border: "1px solid #a7f3d0",
-                                                                }}
-                                                            >
-                                                                <div style={styles.detailLabel}>
-                                                                    🟢 Status
-                                                                </div>
-
-                                                                <div
-                                                                    style={{
-                                                                        ...styles.detailValue,
-                                                                        color:
-                                                                            account.accountStatus === "ACTIVE"
-                                                                                ? "#15803d"
-                                                                                : "#b91c1c",
-                                                                    }}
-                                                                >
-                                                                    {account.accountStatus}
-                                                                </div>
-                                                            </div>
-                                                            <div style={styles.detailCard}>
-                                                                <div style={styles.detailLabel}>
-                                                                    🔢 Account Number
-                                                                </div>
-
-                                                                <div
-                                                                    style={{
-                                                                        ...styles.detailValue,
-                                                                        fontFamily: "monospace",
-                                                                    }}
-                                                                >
-                                                                    {account.accountNumber}
-                                                                </div>
-                                                            </div>
-                                                            <div style={styles.detailCard}>
-                                                                <div style={styles.detailLabel}>
-                                                                    🏦 Branch
-                                                                </div>
-
-                                                                <div style={styles.detailValue}>
-                                                                    {account.branchName}
-                                                                </div>
-                                                            </div>
-                                                            <div style={styles.detailCard}>
-                                                                <div style={styles.detailLabel}>
-                                                                    📄 Account Type
-                                                                </div>
-
-                                                                <div style={styles.detailValue}>
-                                                                    {account.accountType}
-                                                                </div>
-                                                            </div>
-                                                            <div style={styles.detailCard}>
-                                                                <div style={styles.detailLabel}>
-                                                                    📅 Created On
-                                                                </div>
-
-                                                                <div style={styles.detailValue}>
-                                                                    {formatDate(account.createdAt)}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <hr
-                                                            style={{
-                                                                border: "none",
-                                                                borderTop: "1px solid #e5e7eb",
-                                                                margin: "28px 0",
-                                                            }}
-                                                        />
-                                                        <div style={styles.actionSection}>
-                                                            <div style={styles.actionInfo}>
-                                                                <h4 style={styles.actionTitle}>
-                                                                    Account Actions
-                                                                </h4>
-
-                                                                <p style={styles.actionSubtitle}>
-                                                                    Freeze or unfreeze this account when required.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <div style={styles.detailsActions}>
-                                                            <button
-                                                                style={
-                                                                    account.accountStatus === "ACTIVE"
-                                                                        ? styles.freezeButton
-                                                                        : styles.unfreezeButton
-                                                                }
-                                                                onClick={() => handleStatusClick(account)}
-                                                            >
-                                                                {account.accountStatus === "ACTIVE"
-                                                                    ? "🔒 Freeze Account"
-                                                                    : "🔓 Unfreeze Account"}
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (expandedAccountId !== account.id) {
+                                                        e.currentTarget.style.background = "#eff6ff";
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (expandedAccountId !== account.id) {
+                                                        e.currentTarget.style.background =
+                                                            index % 2 === 0 ? "#ffffff" : "#fafafa";
+                                                    }
+                                                }}
+                                            >
+                                                <td style={styles.cell}>{account.customerName}</td>
+                                                <td style={styles.cell}>
+                                                    <span
+                                                        style={{
+                                                            fontFamily: "monospace",
+                                                            fontWeight: 600,
+                                                            color: "#15803d",
+                                                        }}
+                                                    >
+                                                        {account.accountNumber}
+                                                    </span>
+                                                </td>
+                                                <td style={styles.cell}>{account.accountType}</td>
+                                                <td style={styles.cell}>{formatCurrency(account.currentBalance)}</td>
+                                                <td style={styles.cell}>
+                                                    <span
+                                                        style={{
+                                                            padding: "5px 10px",
+                                                            borderRadius: "999px",
+                                                            fontWeight: 600,
+                                                            fontSize: "12px",
+                                                            ...statusStyle,
+                                                        }}
+                                                    >
+                                                        {account.accountStatus}
+                                                    </span>
                                                 </td>
                                             </tr>
-                                        )}
+                                            {expandedAccountId === account.id && (
+                                                <tr>
+                                                    <td
+                                                        colSpan={5}
+                                                        style={{
+                                                            padding: "18px",
+                                                            background: "#fff",
+                                                            borderBottom: "1px solid #e5e7eb",
+                                                        }}
+                                                    >
+                                                        <div style={styles.loanDetailsContainer}>
+                                                            <div style={styles.detailsHeader}>
+                                                                <div>
+                                                                    <h3 style={styles.customerName}>
+                                                                        👤 {account.customerName}
+                                                                    </h3>
 
-                                        {showStatusModal && (
-                                            <div style={modalStyles.overlay}>
-                                                <div style={modalStyles.modal}>
+                                                                    <p style={styles.detailsSubtitle}>
+                                                                        Manage account status and review account information.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div style={styles.loanDetailsGrid}>
+                                                                <div
+                                                                    style={{
+                                                                        ...styles.detailCard,
+                                                                        background: "#eff6ff",
+                                                                        border: "1px solid #bfdbfe",
+                                                                    }}
+                                                                >
+                                                                    <div style={styles.detailLabel}>
+                                                                        💰 Available Balance
+                                                                    </div>
+                                                                    <div
+                                                                        style={{
+                                                                            ...styles.detailValue,
+                                                                            fontSize: "22px",
 
-                                                    <h3>
-                                                        {selectedAccount.accountStatus === "ACTIVE"
-                                                            ? "🔒 Freeze Account"
-                                                            : "🔓 Unfreeze Account"}
-                                                    </h3>
+                                                                            fontWeight: 700,
+                                                                            color: "#1d4ed8",
+                                                                        }}
+                                                                    >
+                                                                        {formatCurrency(account.currentBalance)}
+                                                                    </div>
+                                                                </div>
+                                                                <div
+                                                                    style={{
+                                                                        ...styles.detailCard,
+                                                                        ...statusStyle,
+                                                                    }}
+                                                                >
+                                                                    <div style={styles.detailLabel}>
+                                                                        {statusStyle.icon} Status
+                                                                    </div>
+                                                                    <div
+                                                                        style={{
+                                                                            ...styles.detailValue,
+                                                                            color: statusStyle.color,
+                                                                            fontWeight: 700,
+                                                                        }}
+                                                                    >
+                                                                        {account.accountStatus}
+                                                                    </div>
+                                                                </div>
+                                                                <div style={styles.detailCard}>
+                                                                    <div style={styles.detailLabel}>
+                                                                        🔢 Account Number
+                                                                    </div>
 
-                                                    <p style={{ color: "#64748b", marginBottom: "20px" }}>
-                                                        Please review the account details before continuing.
-                                                    </p>
+                                                                    <div
+                                                                        style={{
+                                                                            ...styles.detailValue,
+                                                                            fontFamily: "monospace",
+                                                                        }}
+                                                                    >
+                                                                        {account.accountNumber}
+                                                                    </div>
+                                                                </div>
+                                                                <div style={styles.detailCard}>
+                                                                    <div style={styles.detailLabel}>
+                                                                        🏦 Branch
+                                                                    </div>
 
-                                                    <div style={styles.confirmationCard}>
+                                                                    <div style={styles.detailValue}>
+                                                                        {account.branchName}
+                                                                    </div>
+                                                                </div>
+                                                                <div style={styles.detailCard}>
+                                                                    <div style={styles.detailLabel}>
+                                                                        📄 Account Type
+                                                                    </div>
 
-                                                        <div style={styles.confirmationRow}>
-                                                            <strong>Customer</strong>
-                                                            <span>{selectedAccount.customerName}</span>
-                                                        </div>
+                                                                    <div style={styles.detailValue}>
+                                                                        {account.accountType}
+                                                                    </div>
+                                                                </div>
+                                                                <div style={styles.detailCard}>
+                                                                    <div style={styles.detailLabel}>
+                                                                        📅 Created On
+                                                                    </div>
 
-                                                        <div style={styles.confirmationRow}>
-                                                            <strong>Account Number</strong>
-                                                            <span
+                                                                    <div style={styles.detailValue}>
+                                                                        {formatDate(account.createdAt)}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr
                                                                 style={{
-                                                                    fontFamily: "monospace",
+                                                                    border: "none",
+                                                                    borderTop: "1px solid #e5e7eb",
+                                                                    margin: "28px 0",
                                                                 }}
-                                                            >
-                                                                {selectedAccount.accountNumber}
-                                                            </span>
+                                                            />
+                                                            <div style={styles.actionSection}>
+                                                                <div style={styles.actionInfo}>
+                                                                    <h4 style={styles.actionTitle}>
+                                                                        Account Actions
+                                                                    </h4>
+
+                                                                    <p style={styles.actionSubtitle}>
+                                                                        Freeze or unfreeze this account when required.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div style={styles.detailsActions}>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleStatusClick(account);
+                                                                    }}
+                                                                    style={
+                                                                        account.accountStatus === "ACTIVE"
+                                                                            ? styles.freezeButton
+                                                                            : styles.unfreezeButton
+                                                                    }
+                                                                >
+                                                                    {account.accountStatus === "ACTIVE"
+                                                                        ? "🔒 Freeze Account"
+                                                                        : "🔓 Unfreeze Account"}
+                                                                </button>
+                                                            </div>
                                                         </div>
-
-                                                        <div style={styles.confirmationRow}>
-                                                            <strong>Account Type</strong>
-                                                            <span>{selectedAccount.accountType}</span>
-                                                        </div>
-
-                                                        <div style={styles.confirmationRow}>
-                                                            <strong>Available Balance</strong>
-                                                            <span>
-                                                                {formatCurrency(selectedAccount.currentBalance)}
-                                                            </span>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div
-                                                        style={{
-                                                            ...styles.alertCard,
-                                                            ...(selectedAccount.accountStatus === "ACTIVE"
-                                                                ? styles.warningAlert
-                                                                : styles.successAlert),
-                                                        }}
-                                                    >
-                                                        {selectedAccount.accountStatus === "ACTIVE" ? (
-                                                            <>
-                                                                <strong>⚠️ Important</strong>
-                                                                <br />
-                                                                Freezing this account will temporarily disable all deposits,
-                                                                withdrawals and fund transfers until it is unfrozen.
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <strong>ℹ️ Information</strong>
-                                                                <br />
-                                                                Unfreezing this account will restore all banking operations
-                                                                immediately.
-                                                            </>
-                                                        )}
-                                                    </div>
-
-                                                    <div
-                                                        style={{
-                                                            display: "flex",
-                                                            justifyContent: "flex-end",
-                                                            gap: "12px",
-                                                            marginTop: "24px",
-                                                        }}
-                                                    >
-                                                        <button
-                                                            style={styles.cancelButton}
-                                                            onClick={() => setShowStatusModal(false)}
-                                                            onMouseEnter={(e) => {
-                                                                e.currentTarget.style.background = "#f8fafc";
-                                                            }}
-                                                            onMouseLeave={(e) => {
-                                                                e.currentTarget.style.background = "#ffffff";
-                                                            }}
-                                                        >
-                                                            Cancel
-                                                        </button>
-
-                                                        <button
-                                                            onClick={handleToggleStatus}
-                                                            style={
-                                                                selectedAccount.accountStatus === "ACTIVE"
-                                                                    ? styles.freezeButton
-                                                                    : styles.unfreezeButton
-                                                            }
-                                                        >
-                                                            {selectedAccount.accountStatus === "ACTIVE"
-                                                                ? "Freeze Account"
-                                                                : "Unfreeze Account"}
-                                                        </button>
-
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                ))}
+                                                    </td>
+                                                </tr >
+                                            )}
+                                        </Fragment>
+                                    );
+                                })}
                             </tbody>
                         </table>
+                        {showStatusModal && selectedAccount && (
+                            <div style={modalStyles.overlay}>
+                                <div style={modalStyles.modal}>
+
+                                    <h3>
+                                        {selectedAccount.accountStatus === "ACTIVE"
+                                            ? "🔒 Freeze Account"
+                                            : "🔓 Unfreeze Account"}
+                                    </h3>
+
+                                    <p style={{ color: "#64748b", marginBottom: "20px" }}>
+                                        Please review the account details before continuing.
+                                    </p>
+
+                                    <div style={styles.confirmationCard}>
+
+                                        <div style={styles.confirmationRow}>
+                                            <strong>Customer</strong>
+                                            <span>{selectedAccount.customerName}</span>
+                                        </div>
+
+                                        <div style={styles.confirmationRow}>
+                                            <strong>Account Number</strong>
+                                            <span
+                                                style={{
+                                                    fontFamily: "monospace",
+                                                }}
+                                            >
+                                                {selectedAccount.accountNumber}
+                                            </span>
+                                        </div>
+
+                                        <div style={styles.confirmationRow}>
+                                            <strong>Account Type</strong>
+                                            <span>{selectedAccount.accountType}</span>
+                                        </div>
+
+                                        <div style={styles.confirmationRow}>
+                                            <strong>Available Balance</strong>
+                                            <span>
+                                                {formatCurrency(selectedAccount.currentBalance)}
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            ...styles.alertCard,
+                                            ...(selectedAccount.accountStatus === "ACTIVE"
+                                                ? styles.warningAlert
+                                                : styles.successAlert),
+                                        }}
+                                    >
+                                        {selectedAccount.accountStatus === "ACTIVE" ? (
+                                            <>
+                                                <strong>⚠️ Important</strong>
+                                                <br />
+                                                Freezing this account will temporarily disable all deposits,
+                                                withdrawals and fund transfers until it is unfrozen.
+                                            </>
+                                        ) : (
+                                            <>
+                                                <strong>ℹ️ Information</strong>
+                                                <br />
+                                                Unfreezing this account will restore all banking operations
+                                                immediately.
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "flex-end",
+                                            gap: "12px",
+                                            marginTop: "24px",
+                                        }}
+                                    >
+                                        <button
+                                            style={styles.cancelButton}
+                                            onClick={() => setShowStatusModal(false)}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = "#f8fafc";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = "#ffffff";
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+
+                                        <button
+                                            onClick={handleToggleStatus}
+                                            style={
+                                                selectedAccount.accountStatus === "ACTIVE"
+                                                    ? styles.freezeButton
+                                                    : styles.unfreezeButton
+                                            }
+                                        >
+                                            {selectedAccount.accountStatus === "ACTIVE"
+                                                ? "Freeze Account"
+                                                : "Unfreeze Account"}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div >
                 </>
-            )}
+            )
+            }
         </PageCard >
     );
 };

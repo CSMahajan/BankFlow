@@ -16,12 +16,11 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
     setError(null);
 
     try {
-      const response = await login({
+      const data = await login({
         email,
         password,
       });
 
-      const data = response.data;
       const token = data.token || data.accessToken || data.jwt;
       const userRole = data.role || data.userRole || role;
 

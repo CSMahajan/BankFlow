@@ -5,18 +5,19 @@ import FinancialSummaryCard from './FinancialSummaryCard';
 
 const DashboardOverview = ({
     accounts,
-    refreshAccounts,
-    refreshSummary,
+    refreshDashboard,
     summary,
     loadingSummary,
     summaryError,
+    analytics,
+    loadingAnalytics,
+    analyticsError,
 }) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <BalanceSummaryCard
                 accounts={accounts}
-                refreshAccounts={refreshAccounts}
-                refreshSummary={refreshSummary}
+                refreshDashboard={refreshDashboard}
             />
 
             <DashboardSummaryCard
@@ -25,7 +26,11 @@ const DashboardOverview = ({
                 error={summaryError}
             />
 
-            <FinancialSummaryCard />
+            <FinancialSummaryCard
+                analytics={analytics}
+                loading={loadingAnalytics}
+                error={analyticsError}
+            />
         </div>
     );
 };

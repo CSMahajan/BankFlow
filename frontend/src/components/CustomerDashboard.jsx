@@ -8,7 +8,7 @@ import CreateAccountModal from './accounts/CreateAccountModal';
 import PaymentsView from "./payments/PaymentsView";
 import LoansView from './loans/LoansView';
 import CardsView from "./cards/CardsView";
-import API from '../api/axios';
+import { fetchMyAccounts, fetchDashboardSummary, fetchMonthlyAnalytics } from "../api/bankService";
 
 const CustomerDashboard = ({ userRole, onLogout }) => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -20,6 +20,9 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
   const [loadingAccounts, setLoadingAccounts] = useState(true);
   const [accountsError, setAccountsError] = useState(null);
   const [summary, setSummary] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+  const [analyticsError, setAnalyticsError] = useState(null);
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [summaryError, setSummaryError] = useState(null);
 
@@ -28,13 +31,13 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     localStorage.getItem('name') ||
     'Customer';
 
-  const fetchDashboardSummary = async () => {
+  const loadDashboardSummary = async () => {
     setLoadingSummary(true);
     setSummaryError(null);
 
     try {
-      const response = await API.get('/dashboard/summary');
-      setSummary(response.data);
+      const dashboardSummaryData = await fetchDashboardSummary();
+      setSummary(dashboardSummaryData);
     } catch (err) {
       console.error(err);
       setSummaryError('Unable to load dashboard summary.');
@@ -43,8 +46,25 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     }
   };
 
+  const loadAnalytics = async () => {
+    setLoadingAnalytics(true);
+    setAnalyticsError(null);
+
+    try {
+      const data = await fetchMonthlyAnalytics();
+      setAnalytics(data);
+    } catch (err) {
+      console.error(err);
+      setAnalyticsError("Unable to load financial summary.");
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  };
+
   useEffect(() => {
-    fetchDashboardSummary();
+    loadAccounts();
+    loadDashboardSummary();
+    loadAnalytics();
   }, []);
 
   const roleDisplay = userRole || localStorage.getItem('userRole') || 'CUSTOMER';
@@ -56,17 +76,16 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
   };
 
   const handleAccountCreated = async () => {
-    await fetchAccounts();
-    await fetchDashboardSummary();
+    await refreshDashboard();
   };
 
-  const fetchAccounts = async () => {
+  const loadAccounts = async () => {
     setLoadingAccounts(true);
     setAccountsError(null);
 
     try {
-      const response = await API.get('/accounts/my-accounts');
-      setAccounts(response.data || []);
+      const accountList = await fetchMyAccounts();
+      setAccounts(accountList || []);
     } catch (err) {
       console.error(err);
       setAccountsError('Unable to load accounts.');
@@ -75,9 +94,13 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     }
   };
 
-  useEffect(() => {
-    fetchAccounts();
-  }, []);
+  const refreshDashboard = async () => {
+    await Promise.all([
+      loadAccounts(),
+      loadDashboardSummary(),
+      loadAnalytics(),
+    ]);
+  };
 
   return (
     <div style={styles.layout}>
@@ -281,11 +304,13 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
         {activeTab === 'dashboard' && (
           <DashboardOverview
             accounts={accounts}
-            refreshAccounts={fetchAccounts}
-            refreshSummary={fetchDashboardSummary}
+            refreshDashboard={refreshDashboard}
             summary={summary}
             loadingSummary={loadingSummary}
             summaryError={summaryError}
+            analytics={analytics}
+            loadingAnalytics={loadingAnalytics}
+            analyticsError={analyticsError}
           />
         )}
 
@@ -294,7 +319,7 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             accounts={accounts}
             loading={loadingAccounts}
             error={accountsError}
-            refreshAccounts={fetchAccounts}
+            refreshAccounts={loadAccounts}
           />
         )}
 
@@ -302,8 +327,8 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
           <PaymentsView
             activeTab={paymentSubTab}
             accounts={accounts}
-            refreshAccounts={fetchAccounts}
-            refreshSummary={fetchDashboardSummary}
+            refreshAccounts={loadAccounts}
+            refreshSummary={loadDashboardSummary}
           />
         )}
 
@@ -315,8 +340,8 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
 
         {activeTab === 'cards' && (
           <CardsView
-            refreshSummary={fetchDashboardSummary}
-            refreshAccounts={fetchAccounts}
+            refreshSummary={loadDashboardSummary}
+            refreshAccounts={loadAccounts}
           />
         )}
 
@@ -329,8 +354,7 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             accounts={accounts}
             initialConfig={fdDraftConfig}
             onFdCreated={async () => {
-              await fetchAccounts();
-              await fetchDashboardSummary();
+              await refreshDashboard();
               setActiveTab("accounts");
             }}
           />
@@ -338,10 +362,7 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
 
         {activeTab === 'fd' && fdSubTab === 'view' && (
           <ViewFds
-            onFdClosed={async () => {
-              await fetchAccounts();
-              await fetchDashboardSummary();
-            }}
+            onFdClosed={refreshDashboard}
           />
         )}
       </main>

@@ -1,29 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import API from '../api/axios';
+import React from 'react';
 
-const FinancialSummaryCard = () => {
-    const [analytics, setAnalytics] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const fetchAnalytics = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const response = await API.get('/dashboard/analytics/monthly');
-            setAnalytics(response.data);
-        } catch (err) {
-            console.error(err);
-            setError('Unable to load financial summary.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchAnalytics();
-    }, []);
+const FinancialSummaryCard = ({
+    analytics,
+    loading,
+    error,
+}) => {
 
     if (loading) {
         return <div>Loading financial summary...</div>;

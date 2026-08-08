@@ -4,8 +4,7 @@ import { formatDate, formatCurrency } from "../utils/formatUtils";
 
 const BalanceSummaryCard = ({
     accounts = [],
-    refreshAccounts,
-    refreshSummary,
+    refreshDashboard,
 }) => {
     const [isTransferOpen, setIsTransferOpen] = useState(false);
 
@@ -14,12 +13,6 @@ const BalanceSummaryCard = ({
         0
     );
 
-    const handleRefresh = async () => {
-        await Promise.all([
-            refreshAccounts(),
-            refreshSummary(),
-        ]);
-    };
     return (
         <>
             <div style={styles.summaryCard}>
@@ -43,13 +36,7 @@ const BalanceSummaryCard = ({
 
                     <button
                         style={styles.actionBtnSecondary}
-                        onClick={async () => {
-                            await refreshAccounts();
-
-                            if (refreshSummary) {
-                                await refreshSummary();
-                            }
-                        }}
+                        onClick={refreshDashboard}
                     >
                         🔄 Refresh
                     </button>
@@ -60,13 +47,7 @@ const BalanceSummaryCard = ({
                 isOpen={isTransferOpen}
                 onClose={() => setIsTransferOpen(false)}
                 accounts={accounts}
-                onTransferSuccess={async () => {
-                    await refreshAccounts();
-
-                    if (refreshSummary) {
-                        await refreshSummary();
-                    }
-                }}
+                onTransferSuccess={refreshDashboard}
             />
         </>
     );

@@ -221,3 +221,8 @@ export const unblockCard = async (cardId) => {
   );
   return response.data;
 };
+
+export const fetchMonthlyAnalytics = async () => {
+  const response = await API.get("/dashboard/analytics/monthly");
+  return response.data;
+};

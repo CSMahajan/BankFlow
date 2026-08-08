@@ -5,7 +5,9 @@ import modalStyles from "../../styles/modalStyles";
 import toast from "react-hot-toast";
 import PageCard from '../PageCard';
 
-const CardManagementView = () => {
+const CardManagementView = ({
+    refreshDashboard,
+}) => {
     const [cards, setCards] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -34,8 +36,12 @@ const CardManagementView = () => {
                         : card
                 )
             );
+
+            await refreshDashboard?.();
+
             setSelectedCard(updatedCard);
             setShowBlockModal(false);
+
             toast.success(
                 selectedCard.cardStatus === "BLOCKED"
                     ? "Card unblocked successfully."
@@ -252,9 +258,8 @@ const CardManagementView = () => {
 
                             <tbody>
                                 {filteredCards.map((card, index) => (
-                                    <>
+                                    <React.Fragment key={card.id}>
                                         <tr
-                                            key={card.id}
                                             onClick={() =>
                                                 setExpandedCardId(
                                                     expandedCardId === card.id ? null : card.id
@@ -581,7 +586,7 @@ const CardManagementView = () => {
                                                 </div>
                                             </div>
                                         )}
-                                    </>
+                                    </React.Fragment>
                                 ))}
                             </tbody>
                         </table>

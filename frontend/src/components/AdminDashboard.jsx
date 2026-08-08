@@ -16,19 +16,26 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
     userName || localStorage.getItem('fullName') || localStorage.getItem('name') || 'Admin User'
   );
 
-  useEffect(() => {
-    const loadSummary = async () => {
-      try {
-        const data = await fetchAdminDashboardSummary();
-        setSummary(data);
-      } catch (err) {
-        console.error(err);
-        setSummaryError('Unable to load admin dashboard.');
-      } finally {
-        setLoadingSummary(false);
-      }
-    };
+  const loadSummary = async () => {
+    setLoadingSummary(true);
+    setSummaryError(null);
 
+    try {
+      const data = await fetchAdminDashboardSummary();
+      setSummary(data);
+    } catch (err) {
+      console.error(err);
+      setSummaryError("Unable to load admin dashboard.");
+    } finally {
+      setLoadingSummary(false);
+    }
+  };
+
+  const refreshDashboard = async () => {
+    await loadSummary();
+  };
+
+  useEffect(() => {
     loadSummary();
   }, []);
 
@@ -141,19 +148,27 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
         )}
 
         {activeTab === 'loanApprovals' && (
-          <LoanApprovalsView />
+          <LoanApprovalsView
+            refreshDashboard={refreshDashboard}
+          />
         )}
 
         {activeTab === 'accountManage' && (
-          <AccountManagementView />
+          <AccountManagementView
+            refreshDashboard={refreshDashboard}
+          />
         )}
 
         {activeTab === 'cardManage' && (
-          <CardManagementView />
+          <CardManagementView
+            refreshDashboard={refreshDashboard}
+          />
         )}
 
         {activeTab === 'users' && (
-          <UserManagementView />
+          <UserManagementView
+            refreshDashboard={refreshDashboard}
+          />
         )}
 
         {activeTab === "logs" && (

@@ -6,7 +6,9 @@ import modalStyles from "../../styles/modalStyles";
 import toast from "react-hot-toast";
 import PageCard from '../PageCard';
 
-const AccountManagementView = () => {
+const AccountManagementView = ({
+    refreshDashboard,
+}) => {
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -31,6 +33,8 @@ const AccountManagementView = () => {
                         : account
                 )
             );
+            await refreshDashboard?.();
+
             setSelectedAccount(updatedAccount);
             setShowStatusModal(false);
             toast.success(
@@ -66,9 +70,11 @@ const AccountManagementView = () => {
     }, []);
 
     if (loading) {
-        <PageCard title="🏦 Account Management">
-            <p>Loading accounts...</p>
-        </PageCard>
+        return (
+            <PageCard title="🏦 Account Management">
+                <p>Loading accounts...</p>
+            </PageCard>
+        );
     }
 
     const activeCount = accounts.filter(

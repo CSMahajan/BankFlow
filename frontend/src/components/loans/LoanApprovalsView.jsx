@@ -6,7 +6,9 @@ import toast from "react-hot-toast";
 import PageCard from '../PageCard';
 import { getLoanTypeStyle, getLoanTypeIcon } from '../../utils/loanTypeUtils';
 
-const LoanApprovalsView = () => {
+const LoanApprovalsView = ({
+    refreshDashboard,
+}) => {
     const [pendingLoans, setPendingLoans] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -49,11 +51,13 @@ const LoanApprovalsView = () => {
         try {
             await approveLoan(loanId);
 
-            setPendingLoans((prevLoans) =>
-                prevLoans.filter((loan) => loan.id !== loanId)
+            setPendingLoans(prev =>
+                prev.filter(loan => loan.id !== loanId)
             );
 
-            toast.success('Loan approved successfully.');
+            await refreshDashboard?.();
+
+            toast.success("Loan approved successfully.");
         } catch (err) {
             console.error(err);
             toast.error('Failed to approve loan.');
@@ -76,9 +80,11 @@ const LoanApprovalsView = () => {
         try {
             await rejectLoan(selectedLoanId, rejectionRemarks.trim());
 
-            setPendingLoans((prevLoans) =>
-                prevLoans.filter((loan) => loan.id !== selectedLoanId)
+            setPendingLoans(prev =>
+                prev.filter(loan => loan.id !== selectedLoanId)
             );
+
+            await refreshDashboard?.();
 
             setShowRejectModal(false);
             setSelectedLoanId(null);

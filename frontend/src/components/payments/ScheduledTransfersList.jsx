@@ -41,7 +41,7 @@ const ScheduledTransfersList = ({ refreshTrigger }) => {
 
         try {
             await cancelScheduledTransfer(transferId);
-            loadTransfers();
+            await loadTransfers();
         } catch (err) {
             console.error(err);
             alert("Unable to cancel scheduled transfer.");

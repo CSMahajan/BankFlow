@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { transferFunds } from "../../api/bankService";
-import { formatDate, formatCurrency } from "../../utils/formatUtils";
+import { formatCurrency } from "../../utils/formatUtils";
+import { getActiveAccounts, getSelectedAccount } from "../../utils/accountUtils";
+import toast from "react-hot-toast";
 
 const TransferForm = ({
     accounts = [],
@@ -9,73 +11,58 @@ const TransferForm = ({
 }) => {
 
     const [sourceAccountNumber, setSourceAccountNumber] = useState('');
-    const [targetAccount, setTargetAccount] = useState('');
+    const [targetAccountNumber, setTargetAccountNumber] = useState('');
     const [amount, setAmount] = useState('');
     const [remark, setRemark] = useState('');
     const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState("");
+
+    const activeAccounts = getActiveAccounts(accounts);
 
     useEffect(() => {
-        const activeAccounts = accounts.filter(
-            acc => acc.accountStatus === "ACTIVE"
-        );
-
         if (!sourceAccountNumber && activeAccounts.length > 0) {
             setSourceAccountNumber(activeAccounts[0].accountNumber);
         }
-    }, [accounts, sourceAccountNumber]);
+    }, [activeAccounts, sourceAccountNumber]);
 
-    const activeAccounts = accounts.filter(
-        acc => acc.accountStatus === "ACTIVE"
+    const selectedAccount = getSelectedAccount(
+        activeAccounts,
+        sourceAccountNumber
     );
 
-    const selectedAccount = activeAccounts.find(
-        acc => acc.accountNumber === sourceAccountNumber
-    );
+    const resetForm = () => {
+        setAmount("");
+        setTargetAccountNumber("");
+        setRemark("");
+        setSourceAccountNumber(activeAccounts[0]?.accountNumber ?? "");
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
-        setError(null);
-        setSuccess("");
 
         try {
             await transferFunds({
                 sourceAccountNumber: sourceAccountNumber,
-                targetAccountNumber: targetAccount,
+                targetAccountNumber: targetAccountNumber,
                 amount: parseFloat(amount),
                 remark: remark,
             });
-            setSubmitting(false);
-            setAmount('');
-            setTargetAccount('');
-            setRemark('');
-            if (activeAccounts.length > 0) {
-                setSourceAccountNumber(activeAccounts[0].accountNumber);
-            } else {
-                setSourceAccountNumber("");
-            }
-            setSuccess("Transfer completed successfully.");
-            onSuccess?.();
+            resetForm();
+            toast.success("Transfer completed successfully.");
+            await onSuccess?.();
         } catch (err) {
             console.error('Transfer error:', err);
-            setError(
+            toast.error(
                 err.response?.data?.message ||
                 'Transfer failed. Please check the account numbers and balance.'
             );
+        } finally {
             setSubmitting(false);
         }
     };
 
     return (
         <>
-            {error && <div style={styles.errorBox}>{error}</div>}
-            {success && (
-                <div style={styles.successBox}>
-                    {success}
-                </div>
-            )}
             <form onSubmit={handleSubmit} style={styles.form}>
                 <div style={styles.field}>
                     <label style={styles.label}>Source Account Number</label>
@@ -124,8 +111,8 @@ const TransferForm = ({
                     <input
                         type="text"
                         placeholder="e.g. BF8490652259"
-                        value={targetAccount}
-                        onChange={(e) => setTargetAccount(e.target.value)}
+                        value={targetAccountNumber}
+                        onChange={(e) => setTargetAccountNumber(e.target.value)}
                         required
                         style={styles.input}
                     />
@@ -189,7 +176,6 @@ const styles = {
     actions: { display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' },
     cancelBtn: { padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db', backgroundColor: '#fff', cursor: 'pointer', fontWeight: '600' },
     submitBtn: { padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#0d6360', color: '#fff', cursor: 'pointer', fontWeight: '700' },
-    errorBox: { backgroundColor: '#fee2e2', color: '#991b1b', padding: '10px', borderRadius: '8px', fontSize: '13px', marginBottom: '12px' },
     balanceInfo: {
         marginTop: "6px",
         fontSize: "13px",
@@ -205,16 +191,7 @@ const styles = {
         fontSize: "13px",
         fontWeight: "700",
         color: "#0d6360",
-    },
-
-    successBox: {
-        background: "#dcfce7",
-        color: "#166534",
-        padding: "10px",
-        borderRadius: "8px",
-        marginBottom: "12px",
-        fontSize: "13px",
-    },
+    }
 };
 
 export default TransferForm;

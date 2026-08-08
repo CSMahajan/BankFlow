@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { createScheduledTransfer } from "../../api/bankService";
-import { formatDate, formatCurrency } from "../../utils/formatUtils";
+import { formatCurrency } from "../../utils/formatUtils";
+import { getActiveAccounts, getSelectedAccount } from "../../utils/accountUtils";
+import toast from "react-hot-toast";
 
 const ScheduledTransferForm = ({
     accounts = [],
@@ -9,71 +11,56 @@ const ScheduledTransferForm = ({
 }) => {
 
     const [sourceAccountNumber, setSourceAccountNumber] = useState('');
-    const [targetAccount, setTargetAccount] = useState('');
+    const [recipientAccountNumber, setRecipientAccountNumber] = useState('');
     const [amount, setAmount] = useState('');
     const [remark, setRemark] = useState('');
     const today = new Date().toISOString().split("T")[0];
     const [frequency, setFrequency] = useState("MONTHLY");
     const [startDate, setStartDate] = useState(today);
     const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState("");
+
+    const activeAccounts = getActiveAccounts(accounts);
 
     useEffect(() => {
-        const activeAccounts = accounts.filter(
-            acc => acc.accountStatus === "ACTIVE"
-        );
-
         if (!sourceAccountNumber && activeAccounts.length > 0) {
             setSourceAccountNumber(activeAccounts[0].accountNumber);
         }
-    }, [accounts, sourceAccountNumber]);
+    }, [activeAccounts, sourceAccountNumber]);
 
-    const activeAccounts = accounts.filter(
-        acc => acc.accountStatus === "ACTIVE"
+    const selectedAccount = getSelectedAccount(
+        activeAccounts,
+        sourceAccountNumber
     );
 
-    const selectedAccount = activeAccounts.find(
-        acc => acc.accountNumber === sourceAccountNumber
-    );
-
+    const resetForm = () => {
+        setAmount("");
+        setRecipientAccountNumber("");
+        setRemark("");
+        setFrequency("MONTHLY");
+        setStartDate(today);
+        setSourceAccountNumber(activeAccounts[0]?.accountNumber ?? "");
+    };
 
     const handleSubmit = async (e) => {
-        setSuccess("");
-        setError(null);
         e.preventDefault();
         setSubmitting(true);
-        setError(null);
 
         try {
             await createScheduledTransfer({
                 sourceAccountNumber: sourceAccountNumber,
-                recipientAccountNumber: targetAccount,
+                recipientAccountNumber: recipientAccountNumber,
                 amount: parseFloat(amount),
                 description: remark,
                 frequency,
                 startDate,
             });
-
-            setAmount("");
-            setTargetAccount("");
-            setRemark("");
-            setFrequency("MONTHLY");
-            setStartDate(today);
-
-            if (activeAccounts.length > 0) {
-                setSourceAccountNumber(activeAccounts[0].accountNumber);
-            } else {
-                setSourceAccountNumber("");
-            }
-
-            setSuccess("Scheduled transfer created successfully.");
-            onSuccess?.();
-
+            resetForm();
+            toast.success("Scheduled transfer created successfully.");
+            await onSuccess?.();
         } catch (err) {
             console.error("Scheduled transfer error:", err);
 
-            setError(
+            toast.error(
                 err.response?.data?.message ??
                 "Unable to schedule transfer. Please verify the details."
             );
@@ -83,12 +70,6 @@ const ScheduledTransferForm = ({
     };
     return (
         <>
-            {error && <div style={styles.errorBox}>{error}</div>}
-            {success && (
-                <div style={styles.successBox}>
-                    {success}
-                </div>
-            )}
             <form onSubmit={handleSubmit} style={styles.form}>
                 <div style={styles.field}>
                     <label style={styles.label}>Source Account Number</label>
@@ -137,8 +118,8 @@ const ScheduledTransferForm = ({
                     <input
                         type="text"
                         placeholder="Enter recipient account number"
-                        value={targetAccount}
-                        onChange={(e) => setTargetAccount(e.target.value)}
+                        value={recipientAccountNumber}
+                        onChange={(e) => setRecipientAccountNumber(e.target.value)}
                         required
                         style={styles.input}
                     />
@@ -231,7 +212,6 @@ const styles = {
     actions: { display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' },
     cancelBtn: { padding: '10px 16px', borderRadius: '8px', border: '1px solid #d1d5db', backgroundColor: '#fff', cursor: 'pointer', fontWeight: '600' },
     submitBtn: { padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: '#0d6360', color: '#fff', cursor: 'pointer', fontWeight: '700' },
-    errorBox: { backgroundColor: '#fee2e2', color: '#991b1b', padding: '10px', borderRadius: '8px', fontSize: '13px', marginBottom: '12px' },
     balanceInfo: {
         marginTop: "6px",
         fontSize: "13px",
@@ -247,15 +227,6 @@ const styles = {
         fontSize: "13px",
         fontWeight: "700",
         color: "#0d6360",
-    },
-
-    successBox: {
-        background: "#dcfce7",
-        color: "#166534",
-        padding: "10px",
-        borderRadius: "8px",
-        marginBottom: "12px",
-        fontSize: "13px",
     },
 };
 

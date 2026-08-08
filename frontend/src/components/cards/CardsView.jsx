@@ -23,8 +23,8 @@ const CardsView = () => {
             setLoading(true);
             setError("");
 
-            const response = await fetchMyCards();
-            setCards(response);
+            const cardList = await fetchMyCards();
+            setCards(cardList);
         } catch (err) {
             console.error(err);
             setError("Failed to load cards.");
@@ -45,11 +45,17 @@ const CardsView = () => {
                     : "Card frozen successfully."
             );
 
-            await loadCards();
+            setCards(prev =>
+                prev.map(card =>
+                    card.id === updatedCard.id ? updatedCard : card
+                )
+            );
 
         } catch (err) {
             console.error(err);
-            toast.error("Failed to update card status.");
+            toast.error(
+                err.response?.data?.message ?? "Failed to update card status."
+            );
         } finally {
             setUpdatingCardId(null);
         }
@@ -57,15 +63,26 @@ const CardsView = () => {
 
     const handleUpdateLimit = async (cardId, newLimit) => {
         try {
-            await updateCardLimit(cardId, newLimit);
+            const updatedCard = await updateCardLimit(cardId, newLimit);
 
-            await loadCards();
+            toast.success("Daily limit updated successfully.");
 
+            setCards(prev =>
+                prev.map(card =>
+                    card.id === updatedCard.id
+                        ? updatedCard
+                        : card
+                )
+            );
         } catch (err) {
             console.error(err);
-            toast.error("Failed to update limit.");
+            toast.error(
+                err.response?.data?.message ?? "Failed to update daily limit."
+            );
         }
     };
+
+
 
     if (loading) return <p>Loading cards...</p>;
 

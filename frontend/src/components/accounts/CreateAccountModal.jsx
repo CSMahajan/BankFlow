@@ -18,7 +18,7 @@ const CreateAccountModal = ({ isOpen, onClose, onAccountCreated }) => {
       await createBankAccount({
         accountType: accountType,
         initialDeposit: initialDeposit ? parseFloat(initialDeposit) : 0,
-        branchName: branchName.trim(), // 🟢 Included in API payload
+        branchName: branchName.trim(),
       });
       toast.success("Account created successfully.");
       setLoading(false);

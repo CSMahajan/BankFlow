@@ -1,5 +1,7 @@
 import { useState } from "react";
 import UpdateCardLimitModal from "./UpdateCardLimitModal";
+import { formatCurrency } from "../../utils/formatUtils";
+import { getCardStatusStyle } from "../../utils/cardStatusUtils";
 
 const CardManagementPanel = ({
     card,
@@ -8,7 +10,15 @@ const CardManagementPanel = ({
     updating,
 }) => {
     const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
-
+    const isBlocked = card.cardStatus === "BLOCKED";
+    const accountInactive = card.accountStatus !== "ACTIVE";
+    const statusStyle = getCardStatusStyle(card.cardStatus);
+    const canUpdateLimit =
+        card.cardStatus === "ACTIVE" &&
+        card.accountStatus === "ACTIVE";
+    const updateLimitDisabledReason = card.cardStatus === "BLOCKED" ? "Card is blocked by the bank."
+        : card.cardStatus === "FROZEN" ? "Card must be active to update the daily limit."
+            : card.accountStatus !== "ACTIVE" ? "Linked account must be active." : "";
     return (
         <>
             <div
@@ -76,7 +86,7 @@ const CardManagementPanel = ({
                         </div>
 
                         <strong>
-                            ₹{Number(card.dailyLimit).toLocaleString("en-IN")}
+                            {formatCurrency(card.dailyLimit)}
                         </strong>
                     </div>
 
@@ -111,21 +121,14 @@ const CardManagementPanel = ({
 
                         <span
                             style={{
-                                backgroundColor:
-                                    card.cardStatus === "ACTIVE"
-                                        ? "#dcfce7"
-                                        : "#fee2e2",
-                                color:
-                                    card.cardStatus === "ACTIVE"
-                                        ? "#166534"
-                                        : "#991b1b",
+                                ...statusStyle,
                                 padding: "5px 12px",
                                 borderRadius: "999px",
                                 fontWeight: "700",
                                 fontSize: "12px",
                             }}
                         >
-                            {card.cardStatus}
+                            {statusStyle.icon} {card.cardStatus}
                         </span>
                     </div>
 
@@ -154,7 +157,7 @@ const CardManagementPanel = ({
                 >
 
                     <button
-                        disabled={updating}
+                        disabled={updating || isBlocked || accountInactive}
                         onClick={() => onToggleStatus(card.id)}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = "translateY(-1px)";
@@ -182,22 +185,31 @@ const CardManagementPanel = ({
                             fontWeight: "700",
                             fontSize: "14px",
                             transition: "all .25s ease",
-                            opacity: updating ? 0.65 : 1,
-                            cursor: updating ? "not-allowed" : "pointer",
+                            opacity: (updating || isBlocked || accountInactive) ? 0.6 : 1,
+                            cursor: (updating || isBlocked || accountInactive)
+                                ? "not-allowed"
+                                : "pointer",
                         }}
+
+                        title={
+                            isBlocked
+                                ? "This card has been blocked by the bank. Please contact customer support."
+                                : accountInactive
+                                    ? "The linked account is frozen. Activate the account before managing this card."
+                                    : ""
+                        }
                     >
-                        {updating
-                            ? "Updating..."
-                            : card.cardStatus === "ACTIVE"
-                                ? "❄ Freeze Card"
-                                : "✓ Activate Card"}
+                        {updating ? "Updating..." : isBlocked
+                            ? "🚫 Card Blocked" : accountInactive
+                                ? "🔒 Account Frozen" : card.cardStatus === "ACTIVE"
+                                    ? "❄ Freeze Card" : "✓ Activate Card"}
                     </button>
 
                     <button
-                        disabled={card.cardStatus === "FROZEN"}
+                        disabled={!canUpdateLimit}
                         title={
-                            card.cardStatus === "FROZEN"
-                                ? "Card must be active to update the daily limit."
+                            !canUpdateLimit
+                                ? updateLimitDisabledReason
                                 : "Update your daily transaction limit"
                         }
                         onClick={() => setIsLimitModalOpen(true)}
@@ -221,15 +233,11 @@ const CardManagementPanel = ({
                             fontWeight: "700",
                             fontSize: "14px",
                             transition: "all .25s ease",
-                            opacity: card.cardStatus === "FROZEN" ? 0.55 : 1,
-                            cursor: card.cardStatus === "FROZEN"
-                                ? "not-allowed"
-                                : "pointer",
+                            opacity: !canUpdateLimit ? 0.55 : 1,
+                            cursor: !canUpdateLimit ? "not-allowed" : "pointer",
                         }}
                     >
-                        {card.cardStatus === "FROZEN"
-                            ? "🔒 Update Disabled"
-                            : "✏ Update Limit"}
+                        {!canUpdateLimit ? "🔒 Update Disabled" : "✏ Update Limit"}
                     </button>
                 </div>
             </div>

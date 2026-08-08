@@ -1,5 +1,7 @@
-const BankCard = ({ card }) => {
+import { getCardStatusStyle } from "../../utils/cardStatusUtils";
 
+const BankCard = ({ card }) => {
+    const statusStyle = getCardStatusStyle(card.cardStatus);
     return (
         <div
             style={{
@@ -106,23 +108,15 @@ const BankCard = ({ card }) => {
                 </div>
                 <span
                     style={{
-                        backgroundColor:
-                            card.cardStatus === "ACTIVE"
-                                ? "#dcfce7"
-                                : "#fee2e2",
-                        color:
-                            card.cardStatus === "ACTIVE"
-                                ? "#166534"
-                                : "#991b1b",
+                        ...statusStyle,
                         padding: "4px 10px",
                         borderRadius: "999px",
                         fontWeight: "700",
                         fontSize: "10px",
                     }}
                 >
-                    {card.cardStatus}
+                    {statusStyle.icon} {card.cardStatus}
                 </span>
-
             </div>
             <div
                 style={{

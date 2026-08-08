@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { formatCurrency } from "../../utils/formatUtils";
 
 const UpdateCardLimitModal = ({
     isOpen,
@@ -10,6 +11,12 @@ const UpdateCardLimitModal = ({
 }) => {
 
     const [newLimit, setNewLimit] = useState(currentLimit);
+
+    useEffect(() => {
+        if (isOpen) {
+            setNewLimit(currentLimit);
+        }
+    }, [isOpen, currentLimit]);
 
     if (!isOpen) return null;
 
@@ -31,7 +38,7 @@ const UpdateCardLimitModal = ({
 
                     <input
                         disabled
-                        value={`₹${Number(currentLimit).toLocaleString("en-IN")}`}
+                        value={formatCurrency(currentLimit)}
                         style={styles.input}
                     />
 
@@ -67,6 +74,11 @@ const UpdateCardLimitModal = ({
 
                             if (Number(newLimit) <= 0) {
                                 toast.error("Daily limit must be greater than ₹0");
+                                return;
+                            }
+
+                            if (Number(newLimit) === Number(currentLimit)) {
+                                toast("Daily limit is already set to this value.");
                                 return;
                             }
 

@@ -84,14 +84,7 @@ export const toggleCardStatus = async (cardId) => {
 
 export const updateCardLimit = async (cardId, newLimit) => {
   const response = await API.patch(
-    `/cards/${cardId}/limit`,
-    null,
-    {
-      params: {
-        newLimit,
-      },
-    }
-  );
+    `/cards/${cardId}/limit`, null, { params: { newLimit, }, });
   return response.data;
 };
 

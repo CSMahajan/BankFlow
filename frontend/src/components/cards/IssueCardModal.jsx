@@ -33,26 +33,19 @@ const IssueCardModal = ({
 
             setLoading(true);
 
-            const response = await fetchMyAccounts();
-
-            const activeAccounts = response.filter(
+            const loanAccountersList = await fetchMyAccounts();
+            const activeAccounts = loanAccountersList.filter(
                 account => account.accountStatus === "ACTIVE"
             );
-
             setAccounts(activeAccounts);
-
             if (activeAccounts.length > 0) {
                 setAccountNumber(activeAccounts[0].accountNumber);
             }
-
         } catch (err) {
-
             console.error(err);
-
+            toast.error("Failed to load active accounts.");
         } finally {
-
             setLoading(false);
-
         }
 
     };

@@ -2,14 +2,23 @@ export const getCardStatusStyle = (status) => {
     switch (status) {
         case "ACTIVE":
             return {
-                backgroundColor: "#dcfce7",
+                background: "#dcfce7",
                 color: "#15803d",
+                icon: "🟢",
+            };
+
+        case "FROZEN":
+            return {
+                background: "#fee2e2",
+                color: "#b91c1c",
+                icon: "🔒",
             };
 
         default:
             return {
-                backgroundColor: "#fee2e2",
-                color: "#b91c1c",
+                background: "#f3f4f6",
+                color: "#6b7280",
+                icon: "⚪",
             };
     }
 };

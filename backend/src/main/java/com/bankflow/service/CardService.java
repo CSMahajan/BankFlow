@@ -112,6 +112,12 @@ public class CardService {
             throw new IllegalStateException("Blocked cards cannot be modified");
         }
 
+        if (card.getAccount().getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "The linked account must be active before this card can be managed."
+            );
+        }
+
         if (card.getCardStatus() == CardStatus.ACTIVE) {
             card.setCardStatus(CardStatus.FROZEN);
             log.info("Card [{}] has been FROZEN", cardId);
@@ -146,6 +152,12 @@ public class CardService {
         if (card.getCardStatus() != CardStatus.ACTIVE) {
             throw new IllegalStateException(
                     "Daily limit can only be updated for active cards."
+            );
+        }
+
+        if (card.getAccount().getAccountStatus() != Account.AccountStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "The linked account must be active before the daily limit can be updated."
             );
         }
 
@@ -243,6 +255,7 @@ public class CardService {
                 maskCardNumber(card.getCardNumber()),
                 card.getCardType(),
                 card.getCardStatus(),
+                card.getAccount().getAccountStatus(),
                 card.getCardHolderName(),
                 card.getExpiryDate(),
                 card.getCvv(),

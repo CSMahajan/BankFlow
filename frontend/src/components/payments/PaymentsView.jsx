@@ -7,10 +7,8 @@ import ScheduledTransfersList from "./ScheduledTransfersList";
 const PaymentsView = ({
     activeTab,
     accounts,
-    refreshAccounts,
-    refreshSummary,
+    refreshDashboard,
 }) => {
-
     const [scheduledRefreshKey, setScheduledRefreshKey] = useState(0);
 
     return (
@@ -22,10 +20,7 @@ const PaymentsView = ({
 
                     <TransferForm
                         accounts={accounts}
-                        onSuccess={async () => {
-                            await refreshAccounts();
-                            await refreshSummary();
-                        }}
+                        onSuccess={refreshDashboard}
                     />
                 </div>
             )}
@@ -42,8 +37,7 @@ const PaymentsView = ({
                             <ScheduledTransferForm
                                 accounts={accounts}
                                 onSuccess={async () => {
-                                    await refreshAccounts();
-                                    await refreshSummary();
+                                    await refreshDashboard();
                                     setScheduledRefreshKey(prev => prev + 1);
                                 }}
                             />

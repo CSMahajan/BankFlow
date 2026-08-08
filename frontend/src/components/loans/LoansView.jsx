@@ -6,7 +6,10 @@ import { formatCurrency, formatDate } from '../../utils/formatUtils';
 import { getLoanStatusStyle } from '../../utils/loanStatusUtils';
 import { fetchMyLoans, fetchLoanRepayments } from "../../api/bankService";
 
-const LoansView = ({ accounts }) => {
+const LoansView = ({
+    accounts,
+    refreshDashboard,
+}) => {
     const [isPayEmiModalOpen, setIsPayEmiModalOpen] = useState(false);
     const [isLoanDetailsModalOpen, setIsLoanDetailsModalOpen] = useState(false);
     const [selectedLoan, setSelectedLoan] = useState(null);
@@ -185,7 +188,10 @@ const LoansView = ({ accounts }) => {
                 isOpen={isApplyLoanModalOpen}
                 onClose={() => setIsApplyLoanModalOpen(false)}
                 accounts={accounts}
-                onLoanApplied={fetchLoans}
+                onLoanApplied={async () => {
+                    await fetchLoans();
+                    await refreshDashboard();
+                }}
             />
             <PayEmiModal
                 isOpen={isPayEmiModalOpen}
@@ -195,7 +201,10 @@ const LoansView = ({ accounts }) => {
                 }}
                 loan={selectedLoan}
                 accounts={accounts}
-                onPaymentSuccess={fetchLoans}
+                onPaymentSuccess={async () => {
+                    await fetchLoans();
+                    await refreshDashboard();
+                }}
             />
             <LoanDetailsModal
                 isOpen={isLoanDetailsModalOpen}

@@ -6,7 +6,9 @@ import toast from "react-hot-toast";
 
 const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
 
-  const [sourceAccountNumber, setSourceAccountNumber] = useState('');
+  const [sourceAccountNumber, setSourceAccountNumber] = useState(
+    initialConfig?.sourceAccountNumber ?? ""
+  );
   const [depositAmount, setDepositAmount] = useState(
     initialConfig?.depositAmount ?? 0
   );
@@ -67,9 +69,7 @@ const FdManagementView = ({ initialConfig, onFdCreated, accounts = [] }) => {
       setDepositAmount(0);
       setTenureYears(FD_TENURES[0]);
 
-      setTimeout(() => {
-        if (onFdCreated) onFdCreated();
-      }, 1200);
+      await onFdCreated?.();
     } catch (err) {
       console.error('Failed to create FD:', err);
       toast.error(err.response?.data?.message || 'Failed to create Fixed Deposit.');

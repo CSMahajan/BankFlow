@@ -327,21 +327,20 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
           <PaymentsView
             activeTab={paymentSubTab}
             accounts={accounts}
-            refreshAccounts={loadAccounts}
-            refreshSummary={loadDashboardSummary}
+            refreshDashboard={refreshDashboard}
           />
         )}
 
         {activeTab === 'loans' && (
           <LoansView
             accounts={accounts}
+            refreshDashboard={refreshDashboard}
           />
         )}
 
         {activeTab === 'cards' && (
           <CardsView
-            refreshSummary={loadDashboardSummary}
-            refreshAccounts={loadAccounts}
+            refreshDashboard={refreshDashboard}
           />
         )}
 

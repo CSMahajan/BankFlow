@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionService {
 
+    private final PdfExportService pdfExportService;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
@@ -39,11 +41,8 @@ public class TransactionService {
         log.debug("Generating dashboard summary for account [{}]", accountNumber);
         Account account = getAuthorizedAccount(accountNumber);
 
-        List<TransactionResponse> recent10 = transactionRepository
-                .findTop10ByAccountIdOrderByTransactionDateDesc(account.getId())
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        List<TransactionResponse> recent10 =
+                transactionRepository.findTop10ByAccountIdOrderByTransactionDateDesc(account.getId()).stream().map(this::mapToResponse).toList();
 
         BigDecimal totalCredit = transactionRepository.sumAmountByAccountIdAndTransactionType(account.getId(), TransactionType.CREDIT);
         BigDecimal totalDebit = transactionRepository.sumAmountByAccountIdAndTransactionType(account.getId(), TransactionType.DEBIT);
@@ -55,20 +54,12 @@ public class TransactionService {
         log.info("Dashboard summary generated for account [{}]. Balance: [Rs. {}], Recent Tx Count: [{}]",
                 accountNumber, account.getCurrentBalance(), recent10.size());
 
-        return new AccountDashboardSummary(
-                account.getAccountNumber(),
-                account.getCurrentBalance(),
-                totalCredit,
-                totalDebit,
-                recent10
-        );
+        return new AccountDashboardSummary(account.getAccountNumber(), account.getCurrentBalance(), totalCredit, totalDebit, recent10);
     }
 
     @Transactional(readOnly = true)
     public Page<TransactionResponse> getMyTransactions(
-            String accountNumber, TransactionType type,
-            LocalDate startDate, LocalDate endDate,
-            String search, Pageable pageable) {
+            String accountNumber, TransactionType type, LocalDate startDate, LocalDate endDate, String search, Pageable pageable) {
         User currentUser = getAuthenticatedUser();
 
         if (pageable.getPageSize() > 100) {
@@ -83,47 +74,50 @@ public class TransactionService {
         }
 
 
-        log.info(
-                "Fetching transactions for user [{}], account [{}], type [{}], from [{}], to [{}], search [{}], page [{}]",
-                currentUser.getEmail(),
-                accountNumber,
-                type,
-                startDate,
-                endDate,
-                search,
-                pageable.getPageNumber()
-        );
+        log.info("Fetching transactions for user [{}], account [{}], type [{}], from [{}], to [{}], search [{}], page [{}]",
+                currentUser.getEmail(), accountNumber, type, startDate, endDate, search, pageable.getPageNumber());
 
-        Specification<Transaction> specification =
-                Specification.where(TransactionSpecification.belongsToUser(currentUser.getId()));
+        Specification<Transaction> specification = buildTransactionSpecification(currentUser.getId(), accountNumber, type, startDate, endDate, search);
 
-        specification = specification.and(TransactionSpecification.accountNumber(accountNumber));
-        specification = specification.and(TransactionSpecification.transactionType(type));
-
-        if (startDate != null) {
-            specification = specification.and(
-                    TransactionSpecification.dateRange(startDate, endDate));
-        }
-
-        specification = specification.and(TransactionSpecification.search(search));
-
-        Page<Transaction> page =
-                transactionRepository.findAll(specification, pageable);
+        Page<Transaction> page = transactionRepository.findAll(specification, pageable);
 
         return page.map(this::mapToResponse);
     }
 
     @Transactional(readOnly = true)
+    public byte[] exportTransactionsPdf(
+            String accountNumber, TransactionType type, LocalDate startDate, LocalDate endDate, String search) {
+
+        User currentUser = getAuthenticatedUser();
+
+        if (startDate != null && endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        if (startDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date");
+        }
+
+        Specification<Transaction> specification =
+                buildTransactionSpecification(currentUser.getId(), accountNumber, type, startDate, endDate, search);
+
+        List<TransactionResponse> transactions =
+                transactionRepository
+                        .findAll(specification, Sort.by(Sort.Direction.DESC, "transactionDate"))
+                        .stream()
+                        .map(this::mapToResponse)
+                        .toList();
+
+        return pdfExportService.generateTransactionPdf(transactions);
+    }
+
+    @Transactional(readOnly = true)
     public List<TransactionResponse> getAllTransactionsForAdmin(String accountNumber) {
         User currentUser = getAuthenticatedUser();
-        log.info("ADMIN action: User [{}] requesting full transaction history for account [{}]",
-                currentUser.getEmail(), accountNumber);
+        log.info("ADMIN action: User [{}] requesting full transaction history for account [{}]", currentUser.getEmail(), accountNumber);
 
-        List<TransactionResponse> transactions = transactionRepository
-                .findByAccountAccountNumberOrderByTransactionDateDesc(accountNumber)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        List<TransactionResponse> transactions =
+                transactionRepository.findByAccountAccountNumberOrderByTransactionDateDesc(accountNumber).stream().map(this::mapToResponse).toList();
 
         log.info("ADMIN lookup completed. Retrieved [{}] transactions for account [{}]", transactions.size(), accountNumber);
         return transactions;
@@ -134,12 +128,10 @@ public class TransactionService {
 
         User currentUser = getAuthenticatedUser();
 
-        Transaction transaction = transactionRepository.findByTransactionId(transactionId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Transaction not found"));
+        Transaction transaction =
+                transactionRepository.findByTransactionId(transactionId).orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
-        if (!currentUser.getRole().equals(User.Role.ADMIN)
-                && !transaction.getAccount().getUser().getId().equals(currentUser.getId())) {
+        if (!currentUser.getRole().equals(User.Role.ADMIN) && !transaction.getAccount().getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not authorized to view this transaction");
         }
 
@@ -148,18 +140,34 @@ public class TransactionService {
         return mapToResponse(transaction);
     }
 
+    private Specification<Transaction> buildTransactionSpecification(
+            Long userId, String accountNumber, TransactionType type, LocalDate startDate, LocalDate endDate, String search) {
+
+        Specification<Transaction> specification = Specification.where(TransactionSpecification.belongsToUser(userId));
+
+        specification = specification.and(TransactionSpecification.accountNumber(accountNumber));
+
+        specification = specification.and(TransactionSpecification.transactionType(type));
+
+        if (startDate != null) {
+            specification = specification.and(TransactionSpecification.dateRange(startDate, endDate));
+        }
+
+        specification = specification.and(TransactionSpecification.search(search));
+
+        return specification;
+    }
+
     // Security Helper: Enforces that regular customers can only view their own account activity
     private Account getAuthorizedAccount(String accountNumber) {
         User currentUser = getAuthenticatedUser();
-        Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> {
-                    log.error("Transaction service error: Account [{}] not found", accountNumber);
-                    return new IllegalArgumentException("Account not found");
-                });
+        Account account = accountRepository.findByAccountNumber(accountNumber).orElseThrow(() -> {
+            log.error("Transaction service error: Account [{}] not found", accountNumber);
+            return new IllegalArgumentException("Account not found");
+        });
 
         if (!currentUser.getRole().equals(User.Role.ADMIN) && !account.getUser().getId().equals(currentUser.getId())) {
-            log.warn("Security Alert: User [{}] attempted unauthorized access to transactions of account [{}]",
-                    currentUser.getEmail(), accountNumber);
+            log.warn("Security Alert: User [{}] attempted unauthorized access to transactions of account [{}]", currentUser.getEmail(), accountNumber);
             throw new AccessDeniedException("You are not authorized to view transactions for this account");
         }
 
@@ -168,22 +176,15 @@ public class TransactionService {
 
     private User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> {
-                    log.error("Authentication Context Error: User [{}] not found in database", auth.getName());
-                    return new IllegalArgumentException("Authenticated user not found");
-                });
+        return userRepository.findByEmail(auth.getName()).orElseThrow(() -> {
+            log.error("Authentication Context Error: User [{}] not found in database", auth.getName());
+            return new IllegalArgumentException("Authenticated user not found");
+        });
     }
 
     private TransactionResponse mapToResponse(Transaction tx) {
         return new TransactionResponse(
-                tx.getTransactionId(),
-                tx.getAccount().getAccountNumber(),
-                tx.getTransactionDate(),
-                tx.getTransactionType(),
-                tx.getAmount(),
-                tx.getAvailableBalance(),
-                tx.getDescription()
-        );
+                tx.getTransactionId(), tx.getAccount().getAccountNumber(), tx.getTransactionDate(),
+                tx.getTransactionType(), tx.getAmount(), tx.getAvailableBalance(), tx.getDescription());
     }
 }

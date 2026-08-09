@@ -3,6 +3,7 @@ import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./auditCo
 const AuditFilterBar = ({
     search,
     setSearch,
+    applySearch,
     roleFilter,
     setRoleFilter,
     moduleFilter,
@@ -10,7 +11,6 @@ const AuditFilterBar = ({
     actionFilter,
     setActionFilter,
     availableActions,
-    loadLogs,
     setCurrentPage
 }) => {
 
@@ -31,9 +31,11 @@ const AuditFilterBar = ({
                 type="text"
                 placeholder="🔍 Search by user email or description..."
                 value={search}
-                onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(0);
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        applySearch();
+                    }
                 }}
                 style={{
                     flex: "1",
@@ -51,6 +53,7 @@ const AuditFilterBar = ({
                 value={roleFilter}
                 onChange={(e) => {
                     setRoleFilter(e.target.value);
+                    setSearch(search.trim());
                     setCurrentPage(0);
                 }}
                 style={styles.filterSelect}
@@ -67,6 +70,7 @@ const AuditFilterBar = ({
                 onChange={(e) => {
                     setModuleFilter(e.target.value);
                     setActionFilter("ALL");
+                    setSearch(search.trim());
                     setCurrentPage(0);
                 }}
                 style={styles.filterSelect}
@@ -84,6 +88,7 @@ const AuditFilterBar = ({
                 value={actionFilter}
                 onChange={(e) => {
                     setActionFilter(e.target.value);
+                    setSearch(search.trim());
                     setCurrentPage(0);
                 }}
                 style={styles.filterSelect}
@@ -100,15 +105,12 @@ const AuditFilterBar = ({
                 ))}
             </select>
 
-            {/* Refresh */}
-
             <button
-                onClick={loadLogs}
-                style={styles.refreshButton}
+                onClick={applySearch}
+                style={styles.searchButton}
             >
-                ↻ Refresh
+                🔍 Search
             </button>
-
         </div>
     );
 
@@ -125,15 +127,16 @@ const styles = {
         cursor: "pointer",
     },
 
-    refreshButton: {
+    searchButton: {
         padding: "12px 22px",
         borderRadius: "10px",
-        border: "1px solid #22c55e",
-        backgroundColor: "#ffffff",
-        color: "#16a34a",
+        border: "none",
+        backgroundColor: "#0d6360",
+        color: "#ffffff",
         fontWeight: "700",
         cursor: "pointer",
-    }
+    },
+
 };
 
 export default AuditFilterBar;

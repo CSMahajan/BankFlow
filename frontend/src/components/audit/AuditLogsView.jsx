@@ -4,7 +4,7 @@ import PageCard from "../PageCard";
 import AuditFilterBar from "./AuditFilterBar";
 import AuditPagination from "./AuditPagination";
 import AuditTable from "./AuditTable";
-import { actionDisplayNames, moduleDisplayNames, moduleActions } from "./auditConfig";
+import { moduleActions } from "./auditConfig";
 
 const AuditLogsView = () => {
 
@@ -12,67 +12,59 @@ const AuditLogsView = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [search, setSearch] = useState("");
+    const [searchInput, setSearchInput] = useState("");
     const [roleFilter, setRoleFilter] = useState("ALL");
     const [moduleFilter, setModuleFilter] = useState("ALL");
     const [actionFilter, setActionFilter] = useState("ALL");
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
 
     useEffect(() => {
         loadLogs();
-    }, [currentPage]);
+    }, [
+        currentPage,
+        search,
+        roleFilter,
+        moduleFilter,
+        actionFilter,
+    ]);
 
     const loadLogs = async () => {
-
         try {
             setLoading(true);
-
-            const response = await fetchAuditLogs(currentPage, 10);
-
+            const response = await fetchAuditLogs({
+                page: currentPage,
+                size: 10,
+                search,
+                role: roleFilter,
+                ...(actionFilter !== "ALL"
+                    ? {
+                        action: actionFilter,
+                    }
+                    : moduleFilter !== "ALL"
+                        ? {
+                            actions: moduleActions[moduleFilter],
+                        }
+                        : {}),
+            });
             setLogs(response.content);
-
             setTotalPages(response.totalPages);
-
+            setTotalElements(response.totalElements);
         } catch (err) {
-
             console.error(err);
             setError("Failed to load audit logs.");
-
         } finally {
-
             setLoading(false);
         }
     };
+
 
     if (loading) return <p>Loading audit logs...</p>;
 
     if (error) return <p>{error}</p>;
 
-    const filteredLogs = logs.filter((log) => {
-
-        const matchesSearch =
-            log.performedBy.toLowerCase().includes(search.toLowerCase()) ||
-            log.description.toLowerCase().includes(search.toLowerCase());
-
-        const matchesRole =
-            roleFilter === "ALL" ||
-            log.role === roleFilter;
-
-        const matchesModule =
-            moduleFilter === "ALL" ||
-            moduleActions[moduleFilter]?.includes(log.action);
-
-        const matchesAction =
-            actionFilter === "ALL" ||
-            log.action === actionFilter;
-
-        return (
-            matchesSearch &&
-            matchesRole &&
-            matchesModule &&
-            matchesAction
-        );
-    });
+    const filteredLogs = logs;
 
     const availableActions =
         moduleFilter === "ALL"
@@ -87,8 +79,12 @@ const AuditLogsView = () => {
         >
 
             <AuditFilterBar
-                search={search}
-                setSearch={setSearch}
+                search={searchInput}
+                setSearch={setSearchInput}
+                applySearch={() => {
+                    setCurrentPage(0);
+                    setSearch(searchInput.trim());
+                }}
                 roleFilter={roleFilter}
                 setRoleFilter={setRoleFilter}
                 moduleFilter={moduleFilter}
@@ -96,7 +92,6 @@ const AuditLogsView = () => {
                 actionFilter={actionFilter}
                 setActionFilter={setActionFilter}
                 availableActions={availableActions}
-                loadLogs={loadLogs}
                 setCurrentPage={setCurrentPage}
             />
 
@@ -116,13 +111,14 @@ const AuditLogsView = () => {
                     }}
                 >
                     Showing <strong>{filteredLogs.length}</strong> of{" "}
-                    <strong>{logs.length}</strong> audit logs
+                    <strong>{totalElements}</strong> audit logs
                 </div>
 
                 {(search || roleFilter !== "ALL" || moduleFilter !== "ALL" || actionFilter !== "ALL") && (
                     <button
                         onClick={() => {
                             setSearch("");
+                            setSearchInput("");
                             setRoleFilter("ALL");
                             setModuleFilter("ALL");
                             setActionFilter("ALL");

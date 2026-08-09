@@ -69,9 +69,34 @@ export const fetchUsers = async () => {
   return response.data;
 };
 
-export const fetchAuditLogs = (page = 0, size = 10) =>
-  API.get(`/admin/audit-logs?page=${page}&size=${size}`)
-    .then(res => res.data);
+export const fetchAuditLogs = async ({
+  page = 0,
+  size = 10,
+  search = "",
+  role,
+  action,
+  actions,
+}) => {
+
+  const response = await API.get("/admin/audit-logs", {
+    params: {
+      page,
+      size,
+      ...(search && { search }),
+      ...(role && role !== "ALL" && {
+        role,
+      }),
+      ...(action && action !== "ALL" && {
+        action,
+      }),
+      ...(actions?.length && {
+        actions,
+      }),
+    }, paramsSerializer: { indexes: null, },
+  });
+
+  return response.data;
+};
 
 export const fetchMyCards = () =>
   API.get("/cards/my-cards")

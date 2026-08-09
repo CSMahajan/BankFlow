@@ -56,8 +56,28 @@ public class TransactionController {
         byte[] pdf = transactionService.exportTransactionsPdf(accountNumber, type, startDate, endDate, search);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=transaction-history.pdf")
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=transaction-history.pdf")
                 .contentType(MediaType.APPLICATION_PDF).contentLength(pdf.length).body(new ByteArrayResource(pdf));
+    }
+
+    @GetMapping("/export/excel")
+    public ResponseEntity<ByteArrayResource> exportTransactionsExcel(
+            @RequestParam(required = false) String accountNumber,
+            @RequestParam(required = false) Transaction.TransactionType type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String search) {
+
+        byte[] pdf = transactionService.exportTransactionsExcel(accountNumber, type, startDate, endDate, search);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=transaction-history.xlsx")
+                .contentType(
+                        MediaType.parseMediaType(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentLength(pdf.length).body(new ByteArrayResource(pdf));
     }
 
     @GetMapping("/{transactionId}")
@@ -70,7 +90,8 @@ public class TransactionController {
     // Admin endpoint: Search transactions for any customer account
     @GetMapping("/admin/search/{accountNumber}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<TransactionResponse>> searchAccountTransactionsAdmin(@PathVariable String accountNumber) {
+    public ResponseEntity<List<TransactionResponse>> searchAccountTransactionsAdmin(
+            @PathVariable String accountNumber) {
         return ResponseEntity.ok(transactionService.getAllTransactionsForAdmin(accountNumber));
     }
 }

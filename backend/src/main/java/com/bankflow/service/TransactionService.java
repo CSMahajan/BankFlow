@@ -32,6 +32,7 @@ import java.util.List;
 public class TransactionService {
 
     private final PdfExportService pdfExportService;
+    private final ExcelExportService excelExportService;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
@@ -109,6 +110,33 @@ public class TransactionService {
                         .toList();
 
         return pdfExportService.generateTransactionPdf(transactions);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportTransactionsExcel(
+            String accountNumber, TransactionType type, LocalDate startDate, LocalDate endDate, String search) {
+
+        User currentUser = getAuthenticatedUser();
+
+        if (startDate != null && endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        if (startDate != null && startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date");
+        }
+
+        Specification<Transaction> specification =
+                buildTransactionSpecification(currentUser.getId(), accountNumber, type, startDate, endDate, search);
+
+        List<TransactionResponse> transactions =
+                transactionRepository
+                        .findAll(specification, Sort.by(Sort.Direction.DESC, "transactionDate"))
+                        .stream()
+                        .map(this::mapToResponse)
+                        .toList();
+
+        return excelExportService.generateTransactionExcel(transactions);
     }
 
     @Transactional(readOnly = true)

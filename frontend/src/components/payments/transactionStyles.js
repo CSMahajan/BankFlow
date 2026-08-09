@@ -281,6 +281,17 @@ const styles = {
         alignItems: "center",
         height: "200px",
     },
+
+    exportButton: {
+        padding: "10px 18px",
+        border: "none",
+        borderRadius: "8px",
+        backgroundColor: "#0d6360",
+        color: "#ffffff",
+        cursor: "pointer",
+        fontWeight: "600",
+        whiteSpace: "nowrap",
+    },
 };
 
 export default styles;

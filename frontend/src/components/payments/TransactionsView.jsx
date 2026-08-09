@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getMyTransactions, getTransactionDetails } from "../../api/bankService";
+import { getMyTransactions, getTransactionDetails, exportTransactionsPdf } from "../../api/bankService";
 import styles from "./transactionStyles";
 import TransactionDetailsDrawer from "./TransactionDetailsDrawer";
 import TransactionsTable from "./TransactionsTable";
@@ -141,6 +141,53 @@ const TransactionsView = ({
         setTransactionDetails(null);
     };
 
+    const handleExportPdf = async () => {
+        try {
+
+            const pdf = await exportTransactionsPdf({
+
+                ...(appliedFilters.accountNumber && {
+                    accountNumber: appliedFilters.accountNumber,
+                }),
+
+                ...(appliedFilters.transactionType && {
+                    type: appliedFilters.transactionType,
+                }),
+
+                ...(appliedFilters.fromDate && {
+                    startDate: appliedFilters.fromDate,
+                }),
+
+                ...(appliedFilters.toDate && {
+                    endDate: appliedFilters.toDate,
+                }),
+
+                ...(appliedFilters.search && {
+                    search: appliedFilters.search,
+                }),
+            });
+
+            const url = window.URL.createObjectURL(pdf);
+
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = "transaction-history.pdf";
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            link.remove();
+
+            window.URL.revokeObjectURL(url);
+
+        } catch (err) {
+            console.error(err);
+            setError("Failed to export PDF.");
+        }
+    };
+
     return (
         <div style={styles.card}>
 
@@ -155,6 +202,13 @@ const TransactionsView = ({
                         Browse and filter transactions across your accounts
                     </p>
                 </div>
+
+                <button
+                    onClick={handleExportPdf}
+                    style={styles.exportButton}
+                >
+                    📄 Export PDF
+                </button>
 
             </div>
 

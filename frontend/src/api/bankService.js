@@ -275,3 +275,12 @@ export const registerAdmin = async (request, token) => {
 
   return response.data;
 };
+
+export const exportTransactionsPdf = async (params) => {
+  const response = await API.get(
+    "/transactions/export/pdf", {
+    params, responseType: "blob",
+  });
+
+  return response.data;
+};

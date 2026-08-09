@@ -6,10 +6,12 @@ import com.bankflow.entity.AuditLog;
 import com.bankflow.entity.User;
 import com.bankflow.repository.AuditLogRepository;
 import com.bankflow.repository.UserRepository;
+import com.bankflow.specification.AuditLogSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -51,7 +53,8 @@ public class AuditLogService {
         auditLogRepository.save(auditLog);
     }
 
-    public Page<AuditLogResponse> getAuditLogs(int page, int size) {
+    public Page<AuditLogResponse> getAuditLogs(
+            int page, int size, String search, User.Role role, AuditAction action) {
 
         PageRequest pageable = PageRequest.of(
                 page,
@@ -59,8 +62,14 @@ public class AuditLogService {
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
+        Specification<AuditLog> specification = Specification.where(AuditLogSpecification.search(search));
+
+        specification = specification.and(AuditLogSpecification.role(role));
+
+        specification = specification.and(AuditLogSpecification.action(action));
+
         return auditLogRepository
-                .findAllByOrderByCreatedAtDesc(pageable)
+                .findAll(specification, pageable)
                 .map(this::mapToResponse);
     }
 

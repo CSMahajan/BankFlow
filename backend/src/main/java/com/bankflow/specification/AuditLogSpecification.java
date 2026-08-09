@@ -40,4 +40,14 @@ public class AuditLogSpecification {
             return cb.equal(root.get("action"), action);
         };
     }
+
+    public static Specification<AuditLog> actions(
+            java.util.List<AuditAction> actions) {
+        return (root, query, cb) -> {
+            if (actions == null || actions.isEmpty()) {
+                return cb.conjunction();
+            }
+            return root.get("action").in(actions);
+        };
+    }
 }

@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuditLogService {
@@ -54,7 +56,7 @@ public class AuditLogService {
     }
 
     public Page<AuditLogResponse> getAuditLogs(
-            int page, int size, String search, User.Role role, AuditAction action) {
+            int page, int size, String search, User.Role role, AuditAction action, List<AuditAction> actions) {
 
         PageRequest pageable = PageRequest.of(
                 page,
@@ -66,7 +68,15 @@ public class AuditLogService {
 
         specification = specification.and(AuditLogSpecification.role(role));
 
-        specification = specification.and(AuditLogSpecification.action(action));
+        if (action != null) {
+            specification = specification.and(
+                    AuditLogSpecification.action(action));
+        }
+
+        if (actions != null && !actions.isEmpty()) {
+            specification = specification.and(
+                    AuditLogSpecification.actions(actions));
+        }
 
         return auditLogRepository
                 .findAll(specification, pageable)

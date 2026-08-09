@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/admin/audit-logs")
 @RequiredArgsConstructor
@@ -26,7 +28,8 @@ public class AuditLogController {
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) User.Role role,
-            @RequestParam(required = false) AuditAction action) {
-        return ResponseEntity.ok(auditLogService.getAuditLogs(page, size, search, role, action));
+            @RequestParam(required = false) AuditAction action,
+            @RequestParam(required = false) List<AuditAction> actions) {
+        return ResponseEntity.ok(auditLogService.getAuditLogs(page, size, search, role, action, actions));
     }
 }

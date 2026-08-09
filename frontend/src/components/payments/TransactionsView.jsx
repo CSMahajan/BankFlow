@@ -288,16 +288,12 @@ const TransactionsView = ({
                     }}
                 >
                     <button
-                        disabled={loading}
-                        onClick={() => {
-                            if (!loading) {
-                                setShowExportMenu(prev => !prev);
-                            }
-                        }}
+                        disabled={loading || transactions.length === 0}
+                        onClick={() => setShowExportMenu(prev => !prev)}
                         style={{
                             ...styles.exportButton,
-                            opacity: loading ? 0.6 : 1,
-                            cursor: loading ? "not-allowed" : "pointer",
+                            opacity: loading || transactions.length === 0 ? 0.6 : 1,
+                            cursor: loading || transactions.length === 0 ? "not-allowed" : "pointer",
                         }}
                     >
                         📤 Export ▼

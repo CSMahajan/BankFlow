@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { getMyTransactions, getTransactionDetails, exportTransactionsPdf } from "../../api/bankService";
+import React, { useEffect, useState, useRef } from "react";
+import {
+    getMyTransactions, getTransactionDetails,
+    exportTransactionsPdf, exportTransactionsExcel
+} from "../../api/bankService";
 import styles from "./transactionStyles";
 import TransactionDetailsDrawer from "./TransactionDetailsDrawer";
 import TransactionsTable from "./TransactionsTable";
@@ -18,6 +21,32 @@ const TransactionsView = ({
     const [error, setError] = useState("");
     const [page, setPage] = useState(0);
     const [pageData, setPageData] = useState(null);
+    const [showExportMenu, setShowExportMenu] = useState(false);
+
+    const exportMenuRef = useRef(null);
+
+    useEffect(() => {
+
+        const handleClickOutside = (event) => {
+
+            if (
+                exportMenuRef.current &&
+                !exportMenuRef.current.contains(event.target)
+            ) {
+                setShowExportMenu(false);
+            }
+
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () =>
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+
+    }, []);
 
     const [filters, setFilters] = useState({
         accountNumber: "",
@@ -109,6 +138,7 @@ const TransactionsView = ({
 
         setFilters(defaultFilters);
         setAppliedFilters(defaultFilters);
+        setShowExportMenu(false);
         closeDrawer();
 
         setPage(0);
@@ -188,6 +218,54 @@ const TransactionsView = ({
         }
     };
 
+    const handleExportExcel = async () => {
+
+        try {
+
+            const excel = await exportTransactionsExcel({
+
+                ...(appliedFilters.accountNumber && {
+                    accountNumber: appliedFilters.accountNumber,
+                }),
+
+                ...(appliedFilters.transactionType && {
+                    type: appliedFilters.transactionType,
+                }),
+
+                ...(appliedFilters.fromDate && {
+                    startDate: appliedFilters.fromDate,
+                }),
+
+                ...(appliedFilters.toDate && {
+                    endDate: appliedFilters.toDate,
+                }),
+
+                ...(appliedFilters.search && {
+                    search: appliedFilters.search,
+                }),
+            });
+
+            const url = window.URL.createObjectURL(excel);
+
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = "transaction-history.xlsx";
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            link.remove();
+
+            window.URL.revokeObjectURL(url);
+
+        } catch (err) {
+            console.error(err);
+            setError("Failed to export Excel.");
+        }
+    };
+
     return (
         <div style={styles.card}>
 
@@ -203,12 +281,70 @@ const TransactionsView = ({
                     </p>
                 </div>
 
-                <button
-                    onClick={handleExportPdf}
-                    style={styles.exportButton}
+                <div
+                    ref={exportMenuRef}
+                    style={{
+                        position: "relative",
+                    }}
                 >
-                    📄 Export PDF
-                </button>
+                    <button
+                        disabled={loading}
+                        onClick={() => {
+                            if (!loading) {
+                                setShowExportMenu(prev => !prev);
+                            }
+                        }}
+                        style={{
+                            ...styles.exportButton,
+                            opacity: loading ? 0.6 : 1,
+                            cursor: loading ? "not-allowed" : "pointer",
+                        }}
+                    >
+                        📤 Export ▼
+                    </button>
+
+                    {showExportMenu && (
+                        <div style={styles.exportMenu}>
+
+                            <button
+                                style={styles.exportMenuItem}
+                                disabled={loading}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = "#f3f4f6";
+                                }}
+
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = "#ffffff";
+                                }}
+                                onClick={() => {
+                                    setShowExportMenu(false);
+                                    handleExportPdf();
+                                }}
+                            >
+                                📄 Export PDF
+                            </button>
+
+                            <button
+                                style={styles.exportMenuItem}
+                                disabled={loading}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = "#f3f4f6";
+                                }}
+
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = "#ffffff";
+                                }}
+                                onClick={() => {
+                                    setShowExportMenu(false);
+                                    handleExportExcel();
+                                }}
+                            >
+                                📊 Export Excel
+                            </button>
+
+                        </div>
+                    )}
+                </div>
 
             </div>
 

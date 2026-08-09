@@ -284,3 +284,11 @@ export const exportTransactionsPdf = async (params) => {
 
   return response.data;
 };
+
+export const exportTransactionsExcel = async (params) => {
+  const response = await API.get(
+    "/transactions/export/excel", {
+    params, responseType: "blob",
+  });
+  return response.data;
+};

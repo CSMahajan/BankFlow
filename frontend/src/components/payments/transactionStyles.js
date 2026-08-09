@@ -292,6 +292,31 @@ const styles = {
         fontWeight: "600",
         whiteSpace: "nowrap",
     },
+
+    exportMenu: {
+        position: "absolute",
+        top: "46px",
+        right: 0,
+        minWidth: "190px",
+        backgroundColor: "#ffffff",
+        border: "1px solid #d1d5db",
+        borderRadius: "10px",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+        overflow: "hidden",
+        zIndex: 100,
+    },
+
+    exportMenuItem: {
+        width: "100%",
+        padding: "12px 16px",
+        border: "none",
+        backgroundColor: "#ffffff",
+        textAlign: "left",
+        cursor: "pointer",
+        fontSize: "14px",
+        opacity: loading ? 0.6 : 1,
+        cursor: loading ? "not-allowed" : "pointer",
+    },
 };
 
 export default styles;

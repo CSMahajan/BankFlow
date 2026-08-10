@@ -222,20 +222,20 @@ public class UserService {
         log.info("Reset password requested");
 
         if (!request.newPassword().equals(request.confirmPassword())) {
-            throw new IllegalArgumentException(
-                    "Passwords do not match.");
+            throw new IllegalArgumentException("Passwords do not match.");
         }
 
         VerificationToken verificationToken =
-                verificationTokenService
-                        .validatePasswordResetToken(
-                                request.token());
+                verificationTokenService.validatePasswordResetToken(request.token());
 
         User user = verificationToken.getUser();
 
-        user.setPassword(
-                passwordEncoder.encode(
-                        request.newPassword()));
+        if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+            throw new IllegalArgumentException(
+                    "New password must be different from the current password.");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
 
         // Our agreed design
         user.setEmailVerified(true);

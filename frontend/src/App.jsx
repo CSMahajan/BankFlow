@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './pages/Dashboard';
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { Toaster } from "react-hot-toast";
 import VerifyEmailPage from '../src/pages/VerifyEmailPage';
 
 function App() {
   const [verificationToken, setVerificationToken] = useState(null);
+  const [resetPasswordToken, setResetPasswordToken] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || 'CUSTOMER');
   const [userName, setUserName] = useState(localStorage.getItem('fullName') || '');
@@ -24,12 +27,18 @@ function App() {
   }, [token, userRole, userName]);
 
   useEffect(() => {
+
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
 
     if (window.location.pathname === "/verify-email" && token) {
       setVerificationToken(token);
     }
+
+    if (window.location.pathname === "/reset-password" && token) {
+      setResetPasswordToken(token);
+    }
+
   }, []);
 
   const handleLoginSuccess = () => {
@@ -63,28 +72,44 @@ function App() {
     );
   }
 
-  if (!token) {
-    return screen === 'login' ? (
-      <Login
-        onLoginSuccess={handleLoginSuccess}
-        onSwitchToRegister={() => setScreen('register')}
+  if (resetPasswordToken) {
+    return (
+      <ResetPasswordPage
+        token={resetPasswordToken}
       />
-    ) : (
-      <Register
-        onRegisterSuccess={() => setScreen('login')}
-        onSwitchToLogin={() => setScreen('login')}
+    );
+  }
+
+  if (!token) {
+
+    if (screen === "login") {
+      return (
+        <Login
+          onLoginSuccess={handleLoginSuccess}
+          onSwitchToRegister={() => setScreen("register")}
+          onSwitchToForgotPassword={() => setScreen("forgot-password")}
+        />
+      );
+    }
+
+    if (screen === "register") {
+      return (
+        <Register
+          onRegisterSuccess={() => setScreen("login")}
+          onSwitchToLogin={() => setScreen("login")}
+        />
+      );
+    }
+
+    return (
+      <ForgotPassword
+        onBackToLogin={() => setScreen("login")}
       />
     );
   }
 
   return (
     <>
-      <Dashboard
-        userRole={userRole}
-        userName={userName}
-        onLogout={handleLogout}
-      />
-
       <Toaster
         position="top-right"
         toastOptions={{
@@ -101,6 +126,12 @@ function App() {
             },
           },
         }}
+      />
+
+      <Dashboard
+        userRole={userRole}
+        userName={userName}
+        onLogout={handleLogout}
       />
     </>
   );

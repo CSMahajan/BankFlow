@@ -3,7 +3,11 @@ import { login, resendVerificationEmail } from '../api/bankService';
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 
-const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
+const Login = ({
+  onLoginSuccess,
+  onSwitchToRegister,
+  onSwitchToForgotPassword
+}) => {
   const [role, setRole] = useState('CUSTOMER');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -239,6 +243,23 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
                 )}
               </button>
             </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: "-8px",
+              marginBottom: "6px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={onSwitchToForgotPassword}
+              style={styles.linkBtn}
+            >
+              Forgot Password?
+            </button>
           </div>
 
           <button type="submit" disabled={loading} style={styles.submitBtn}>

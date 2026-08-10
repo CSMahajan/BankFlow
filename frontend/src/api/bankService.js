@@ -294,21 +294,20 @@ export const exportTransactionsExcel = async (params) => {
 };
 
 export const verifyEmail = async (token) => {
-
   const response = await API.get(
     `/auth/verify-email?token=${token}`
   );
-
   return response.data;
 };
 
 export const resendVerificationEmail = async (email) => {
+  await API.post("/auth/resend-verification", { email, });
+};
 
-  await API.post(
-    "/auth/resend-verification",
-    {
-      email,
-    }
-  );
+export const forgotPassword = async (request) => {
+  await API.post("/auth/forgot-password", request);
+};
 
+export const resetPassword = async (request) => {
+  await API.post("/auth/reset-password", request);
 };

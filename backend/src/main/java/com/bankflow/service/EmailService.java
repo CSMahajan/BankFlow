@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +55,33 @@ public class EmailService {
                 Regards,
                 BankFlow Team
                 """.formatted(user.getFullName(), verificationUrl);
+
+        sendEmail(user.getEmail(), subject, body);
+    }
+
+    public void sendPasswordResetEmail(User user, String token) {
+
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+
+        String subject = "Reset your BankFlow password";
+
+        String body =
+                """
+                        Hello %s,
+                        
+                        We received a request to reset your BankFlow password.
+                        
+                        Click the link below to create a new password:
+                        
+                        %s
+                        
+                        This link expires in 1 hour.
+                        
+                        If you didn't request this, please ignore this email.
+                        
+                        Regards,
+                        BankFlow Team
+                        """.formatted(user.getFullName(), resetLink);
 
         sendEmail(user.getEmail(), subject, body);
     }

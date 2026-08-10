@@ -108,6 +108,35 @@ public class UserService {
     }
 
     @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+
+        User currentUser = getAuthenticatedUser();
+
+        log.info("Password change requested by [{}]", currentUser.getEmail());
+
+        if (!passwordEncoder.matches(request.currentPassword(), currentUser.getPassword())) {
+            throw new BadCredentialsException("Current password is incorrect.");
+        }
+
+        if (!request.newPassword().equals(request.confirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match.");
+        }
+
+        if (passwordEncoder.matches(request.newPassword(), currentUser.getPassword())) {
+            throw new IllegalArgumentException(
+                    "New password must be different from the current password.");
+        }
+
+        currentUser.setPassword(passwordEncoder.encode(request.newPassword()));
+
+        userRepository.save(currentUser);
+
+        auditLogService.log(AuditAction.PASSWORD_CHANGED, "Password changed successfully");
+
+        log.info("Password changed successfully for [{}]", currentUser.getEmail());
+    }
+
+    @Transactional
     public void createAdminAccount(CreateAdminRequest request) {
         log.info("Attempting ADMIN account creation for email [{}]", request.email());
 
@@ -165,6 +194,62 @@ public class UserService {
         );
     }
 
+    @Transactional
+    public void forgotPassword(
+            ForgotPasswordRequest request) {
+
+        log.info("Forgot password requested for email [{}]",
+                request.email());
+
+        User user = userRepository.findByEmail(request.email()).orElse(null);
+
+        if (user == null) {
+            log.info("Forgot password requested for non-existing email [{}]", request.email());
+            return;
+        }
+
+        VerificationToken token = verificationTokenService.createPasswordResetToken(user);
+
+        emailService.sendPasswordResetEmail(user, token.getToken());
+
+        log.info("Password reset email sent to [{}]",
+                user.getEmail());
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+
+        log.info("Reset password requested");
+
+        if (!request.newPassword().equals(request.confirmPassword())) {
+            throw new IllegalArgumentException(
+                    "Passwords do not match.");
+        }
+
+        VerificationToken verificationToken =
+                verificationTokenService
+                        .validatePasswordResetToken(
+                                request.token());
+
+        User user = verificationToken.getUser();
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.newPassword()));
+
+        // Our agreed design
+        user.setEmailVerified(true);
+
+        userRepository.save(user);
+
+        verificationToken.setUsed(true);
+
+        log.info("Password reset successful for user [{}]", user.getEmail());
+
+        auditLogService.log(user, AuditAction.PASSWORD_CHANGED, "Password reset successfully"
+        );
+    }
+
     @Transactional(readOnly = true)
     public List<UserSummaryResponse> getAllUsers() {
         log.info("Fetching all users for admin");
@@ -185,7 +270,8 @@ public class UserService {
     @Transactional
     public void updateCustomerProfile(UpdateProfileRequest request) {
         User currentUser = getAuthenticatedUser();
-        log.info("Updating profile details for user [{}]. New Name: [{}]", currentUser.getEmail(), request.fullName());
+        log.info("Updating profile details for user [{}]. New Name: [{}]",
+                currentUser.getEmail(), request.fullName());
 
         currentUser.setFullName(request.fullName());
         userRepository.save(currentUser);

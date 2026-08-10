@@ -1,12 +1,10 @@
 package com.bankflow.controller;
 
-import com.bankflow.dto.UpdateProfileRequest;
-import com.bankflow.dto.UserDetailsResponse;
-import com.bankflow.dto.UserMeResponse;
-import com.bankflow.dto.UserSummaryResponse;
+import com.bankflow.dto.*;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -30,6 +28,15 @@ public class UserController {
     public ResponseEntity<Void> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
         userService.updateCustomerProfile(request);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        userService.changePassword(request);
+
     }
 
     @GetMapping

@@ -1,5 +1,6 @@
 package com.bankflow.repository;
 
+import com.bankflow.entity.TokenType;
 import com.bankflow.entity.User;
 import com.bankflow.entity.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ public interface VerificationTokenRepository
 
     Optional<VerificationToken> findByUser(User user);
 
-    void deleteByUser(User user);
+    void deleteByUserAndTokenType(User user, TokenType tokenType);
+
+    Optional<VerificationToken> findByTokenAndTokenType(String token, TokenType tokenType);
 }

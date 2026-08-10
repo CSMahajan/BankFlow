@@ -8,6 +8,10 @@ public enum AuditAction {
 
     VERIFICATION_EMAIL_RESENT,
 
+    PASSWORD_RESET,
+
+    PASSWORD_CHANGED,
+
     EMAIL_VERIFIED,
 
     PROFILE_UPDATED,

@@ -1,9 +1,6 @@
 package com.bankflow.controller;
 
-import com.bankflow.dto.AuthResponse;
-import com.bankflow.dto.LoginRequest;
-import com.bankflow.dto.RegisterRequest;
-import com.bankflow.dto.ResendVerificationRequest;
+import com.bankflow.dto.*;
 import com.bankflow.service.UserService;
 import com.bankflow.service.VerificationTokenService;
 import jakarta.validation.Valid;
@@ -43,6 +40,24 @@ public class AuthController {
     public void resendVerificationEmail(
             @Valid @RequestBody ResendVerificationRequest request) {
         userService.resendVerificationEmail(request);
+    }
+
+    @PostMapping("/forgot-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
+        userService.forgotPassword(request);
+
+    }
+
+    @PostMapping("/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        userService.resetPassword(request);
+
     }
 
 }

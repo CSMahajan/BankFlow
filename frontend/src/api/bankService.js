@@ -292,3 +292,23 @@ export const exportTransactionsExcel = async (params) => {
   });
   return response.data;
 };
+
+export const verifyEmail = async (token) => {
+
+  const response = await API.get(
+    `/auth/verify-email?token=${token}`
+  );
+
+  return response.data;
+};
+
+export const resendVerificationEmail = async (email) => {
+
+  await API.post(
+    "/auth/resend-verification",
+    {
+      email,
+    }
+  );
+
+};

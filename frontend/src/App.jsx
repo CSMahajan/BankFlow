@@ -3,8 +3,10 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './pages/Dashboard';
 import { Toaster } from "react-hot-toast";
+import VerifyEmailPage from '../src/pages/VerifyEmailPage';
 
 function App() {
+  const [verificationToken, setVerificationToken] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || 'CUSTOMER');
   const [userName, setUserName] = useState(localStorage.getItem('fullName') || '');
@@ -21,6 +23,15 @@ function App() {
     }
   }, [token, userRole, userName]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (window.location.pathname === "/verify-email" && token) {
+      setVerificationToken(token);
+    }
+  }, []);
+
   const handleLoginSuccess = () => {
     const storedToken = localStorage.getItem('token');
     const storedRole = localStorage.getItem('userRole') || 'CUSTOMER';
@@ -31,7 +42,6 @@ function App() {
     setUserName(storedName);
   };
 
-
   const handleLogout = () => {
     localStorage.clear();
     setToken(null);
@@ -39,6 +49,19 @@ function App() {
     setUserName('');
     setScreen('login');
   };
+
+  if (verificationToken) {
+    return (
+      <VerifyEmailPage
+        token={verificationToken}
+        onGoToLogin={() => {
+          window.history.replaceState({}, "", "/");
+          setVerificationToken(null);
+          setScreen("login");
+        }}
+      />
+    );
+  }
 
   if (!token) {
     return screen === 'login' ? (

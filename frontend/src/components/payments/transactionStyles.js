@@ -314,8 +314,6 @@ const styles = {
         textAlign: "left",
         cursor: "pointer",
         fontSize: "14px",
-        opacity: loading ? 0.6 : 1,
-        cursor: loading ? "not-allowed" : "pointer",
     },
 };
 

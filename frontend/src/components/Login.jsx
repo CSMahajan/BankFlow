@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { login } from '../api/bankService';
+import React, { useState, useEffect } from 'react';
+import { login, resendVerificationEmail } from '../api/bankService';
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import toast from "react-hot-toast";
 
 const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
   const [role, setRole] = useState('CUSTOMER');
@@ -9,6 +10,9 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [sendingVerification, setSendingVerification] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -53,9 +57,11 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
       onLoginSuccess();
     } catch (err) {
       console.error('Login error:', err);
-      setError(
-        err.response?.data?.message || 'Invalid email or password. Please try again.'
-      );
+      const backendMessage = err.response?.data?.message || "Invalid email or password.";
+
+      setError(backendMessage);
+
+      setShowResend(backendMessage === "Please verify your email address before logging in.");
 
     }
     finally {
@@ -63,6 +69,50 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
     }
   };
 
+  const handleResendVerification = async () => {
+
+    if (!email) {
+      toast.error("Please enter your email address.");
+      return;
+    }
+
+    try {
+
+      setSendingVerification(true);
+
+      await resendVerificationEmail(email);
+
+      toast.success("Verification email sent successfully.");
+
+      setCountdown(60);
+
+    } catch (err) {
+
+      toast.error(
+        err.response?.data?.message ||
+        "Unable to resend verification email."
+      );
+
+    } finally {
+
+      setSendingVerification(false);
+
+    }
+
+  };
+
+  useEffect(() => {
+    if (countdown <= 0) {
+      return;
+    }
+    const timer = setInterval(() => {
+      setCountdown(previous => previous - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const formattedCountdown =
+    `${String(Math.floor(countdown / 60)).padStart(2, "0")}:${String(countdown % 60).padStart(2, "0")}`;
 
   return (
     <div style={styles.container}>
@@ -99,6 +149,38 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
         </div>
 
         {error && <div style={styles.errorBox}>⚠️ {error}</div>}
+        {showResend && (
+
+          <div style={styles.resendContainer}>
+
+            <p style={styles.resendText}>
+              Didn't receive the verification email?
+            </p>
+
+            <button
+
+              style={styles.linkBtn}
+
+              disabled={
+                sendingVerification ||
+                countdown > 0
+              }
+
+              onClick={handleResendVerification}
+
+            >
+
+              {sendingVerification
+                ? "Sending..."
+                : countdown > 0
+                  ? `Resend available in ${formattedCountdown}s`
+                  : "Resend Verification Email"}
+
+            </button>
+
+          </div>
+
+        )}
 
         <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.field}>

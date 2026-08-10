@@ -3,6 +3,8 @@ package com.bankflow.service;
 import com.bankflow.dto.*;
 import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.User;
+import com.bankflow.entity.VerificationToken;
+import com.bankflow.exception.EmailVerificationException;
 import com.bankflow.exception.ResourceNotFoundException;
 import com.bankflow.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,8 @@ public class UserService {
     private final LoanRepository loanRepository;
     private final FixedDepositRepository fixedDepositRepository;
     private final JwtService jwtService;
+    private final VerificationTokenService verificationTokenService;
+    private final EmailService emailService;
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
 
@@ -49,7 +53,14 @@ public class UserService {
                 .build();
 
         User savedUser = userRepository.save(user);
-        log.info("Customer registered successfully. User ID: [{}], Email: [{}]", savedUser.getId(), savedUser.getEmail());
+
+        VerificationToken verificationToken = verificationTokenService.createVerificationToken(savedUser);
+
+        emailService.sendVerificationEmail(savedUser, verificationToken.getToken());
+        emailService.sendVerificationEmail(savedUser, verificationToken.getToken());
+
+        log.info("Customer registered successfully. User ID: [{}], Email: [{}]",
+                savedUser.getId(), savedUser.getEmail());
         auditLogService.log(
                 savedUser,
                 AuditAction.USER_REGISTERED,
@@ -73,13 +84,20 @@ public class UserService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
+        if (!user.isEmailVerified()) {
+            log.warn("Authentication failed for email [{}]: Email not verified",
+                    request.email());
+
+            throw new EmailVerificationException(
+                    "Please verify your email address before logging in."
+            );
+        }
+
         // 3. Generate JWT token
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
 
         log.info("User [{}] authenticated successfully with role [{}]", user.getEmail(), user.getRole());
 
-        //****IMPORTANT---> DO NOT REMOVE BELOW COMMENT
-        //Below is special case for auditing because before logging in we don't have security context of authenticated user
         auditLogService.log(
                 user,
                 AuditAction.LOGIN,
@@ -113,6 +131,37 @@ public class UserService {
                 savedAdmin,
                 AuditAction.USER_REGISTERED,
                 "Administrator account created"
+        );
+    }
+
+    @Transactional
+    public void resendVerificationEmail(
+            ResendVerificationRequest request) {
+
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No account found with this email address."
+                        ));
+
+        if (user.isEmailVerified()) {
+            throw new EmailVerificationException(
+                    "Your email address is already verified."
+            );
+        }
+
+        VerificationToken verificationToken =
+                verificationTokenService.createVerificationToken(user);
+
+        emailService.sendVerificationEmail(
+                user,
+                verificationToken.getToken()
+        );
+
+        auditLogService.log(
+                user,
+                AuditAction.VERIFICATION_EMAIL_RESENT,
+                "Verification email resent"
         );
     }
 

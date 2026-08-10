@@ -6,6 +6,12 @@ public enum AuditAction {
 
     USER_REGISTERED,
 
+    VERIFICATION_EMAIL_RESENT,
+
+    EMAIL_VERIFIED,
+
+    PROFILE_UPDATED,
+
     ACCOUNT_CREATED,
 
     ACCOUNT_ACTIVATED,
@@ -31,8 +37,6 @@ public enum AuditAction {
     LOAN_REJECTED,
 
     EMI_PAID,
-
-    PROFILE_UPDATED,
 
     CARD_ISSUED,
 

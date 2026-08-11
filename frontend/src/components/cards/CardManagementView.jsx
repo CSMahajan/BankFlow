@@ -108,31 +108,37 @@ const CardManagementView = ({
     });
 
     const getCardStatusStyle = (status) => {
-
         switch (status) {
-
             case "ACTIVE":
                 return {
+                    icon: "🟢",
                     background: "#dcfce7",
                     color: "#15803d",
+                    border: "1px solid #86efac",
                 };
 
             case "FROZEN":
                 return {
-                    background: "#fef3c7",
-                    color: "#92400e",
+                    icon: "❄️",
+                    background: "#fee2e2",
+                    color: "#b91c1c",
+                    border: "1px solid #fca5a5",
                 };
 
             case "BLOCKED":
                 return {
+                    icon: "🔒",
                     background: "#fee2e2",
                     color: "#b91c1c",
+                    border: "1px solid #fca5a5",
                 };
 
             default:
                 return {
+                    icon: "⚪",
                     background: "#f3f4f6",
                     color: "#6b7280",
+                    border: "1px solid #d1d5db",
                 };
         }
     };
@@ -307,8 +313,6 @@ const CardManagementView = ({
                                                     style={{
                                                         padding: "5px 10px",
                                                         borderRadius: "999px",
-                                                        background: "#fef3c7",
-                                                        color: "#92400e",
                                                         fontWeight: 600,
                                                         fontSize: "12px",
                                                         ...getCardStatusStyle(card.cardStatus),
@@ -365,26 +369,21 @@ const CardManagementView = ({
                                                             <div
                                                                 style={{
                                                                     ...styles.detailCard,
-                                                                    background: "#ecfdf5",
-                                                                    border: "1px solid #a7f3d0",
+                                                                    ...getCardStatusStyle(card.cardStatus),
                                                                 }}
                                                             >
                                                                 <div style={styles.detailLabel}>
-                                                                    🟢 Status
+                                                                    {getCardStatusStyle(card.cardStatus).icon} Status
                                                                 </div>
 
-                                                                <div style={styles.detailValue}>
-                                                                    <span
-                                                                        style={{
-                                                                            padding: "4px 10px",
-                                                                            borderRadius: "999px",
-                                                                            fontWeight: 600,
-                                                                            fontSize: "12px",
-                                                                            ...getCardStatusStyle(card.cardStatus),
-                                                                        }}
-                                                                    >
-                                                                        {card.cardStatus}
-                                                                    </span>
+                                                                <div
+                                                                    style={{
+                                                                        ...styles.detailValue,
+                                                                        color: getCardStatusStyle(card.cardStatus).color,
+                                                                        fontWeight: 700,
+                                                                    }}
+                                                                >
+                                                                    {card.cardStatus}
                                                                 </div>
                                                             </div>
                                                             <div style={styles.detailCard}>

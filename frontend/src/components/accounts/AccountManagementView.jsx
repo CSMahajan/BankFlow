@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { fetchAllAccounts, freezeAccount, unfreezeAccount } from '../../api/bankService';
+import { fetchAllAccounts, freezeAccount, unfreezeAccount, fetchAccountSummary } from '../../api/bankService';
 import { formatDate, formatCurrency } from '../../utils/formatUtils';
 import { getAccountStatusStyle } from '../../utils/accountStatusUtils';
 import modalStyles from "../../styles/modalStyles";
@@ -10,12 +10,15 @@ const AccountManagementView = ({
     refreshDashboard,
 }) => {
     const [accounts, setAccounts] = useState([]);
+    const [pageData, setPageData] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [accountStatusFilter, setAccountStatusFilter] = useState("ALL");
     const [expandedAccountId, setExpandedAccountId] = useState(null);
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState(null);
+    const [accountSummary, setAccountSummary] = useState(null);
 
     const handleToggleStatus = async () => {
 
@@ -26,47 +29,87 @@ const AccountManagementView = ({
                     ? await freezeAccount(selectedAccount.accountNumber)
                     : await unfreezeAccount(selectedAccount.accountNumber);
 
-            setAccounts((prev) =>
-                prev.map((account) =>
-                    account.accountNumber === updatedAccount.accountNumber
-                        ? updatedAccount
-                        : account
-                )
-            );
-            await refreshDashboard?.();
 
-            setSelectedAccount(updatedAccount);
+            await loadAccounts();
+            const summary = await fetchAccountSummary();
+            setAccountSummary(summary);
+            await refreshDashboard?.();
             setShowStatusModal(false);
+            setSelectedAccount(null);
+
             toast.success(
                 updatedAccount.accountStatus === "ACTIVE"
                     ? "Account unfrozen successfully."
                     : "Account frozen successfully."
             );
-
         } catch (err) {
             console.error(err);
             toast.error("Failed to update account status.");
         }
-
     };
+
     const handleStatusClick = (account) => {
         setSelectedAccount(account);
         setShowStatusModal(true);
     };
 
+    const loadAccounts = async () => {
+
+        try {
+
+            setLoading(true);
+
+            const response = await fetchAllAccounts({
+                page: currentPage,
+                size: 20,
+                search,
+                status: accountStatusFilter,
+            });
+
+            setAccounts(response.content);
+            setPageData(response);
+
+        } catch (err) {
+
+            console.error(err);
+            toast.error("Unable to load accounts.");
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    };
+
     useEffect(() => {
-        const loadAccounts = async () => {
-            try {
-                const accountList = await fetchAllAccounts();
-                setAccounts(accountList);
-            } catch (err) {
-                console.error(err);
-                toast.error("Unable to load accounts.");
-            } finally {
-                setLoading(false);
-            }
-        };
         loadAccounts();
+    }, [
+        currentPage,
+        search,
+        accountStatusFilter,
+    ]);
+
+    useEffect(() => {
+
+        const loadSummary = async () => {
+
+            try {
+
+                const summary = await fetchAccountSummary();
+
+                setAccountSummary(summary);
+
+            } catch (err) {
+
+                console.error(err);
+                toast.error("Unable to load account summary.");
+
+            }
+
+        };
+
+        loadSummary();
+
     }, []);
 
     if (loading) {
@@ -77,35 +120,13 @@ const AccountManagementView = ({
         );
     }
 
-    const activeCount = accounts.filter(
-        account => account.accountStatus === "ACTIVE"
-    ).length;
+    const activeCount = accountSummary?.activeAccounts ?? 0;
 
-    const frozenCount = accounts.filter(
-        account => account.accountStatus === "FROZEN"
-    ).length;
+    const frozenCount = accountSummary?.frozenAccounts ?? 0;
 
-    const savingsCount = accounts.filter(
-        account => account.accountType === "SAVINGS"
-    ).length;
+    const savingsCount = accountSummary?.savingsAccounts ?? 0;
 
-    const currentCount = accounts.filter(
-        account => account.accountType === "CURRENT"
-    ).length;
-
-    const filteredAccounts = accounts.filter((account) => {
-
-        const matchesSearch =
-            (account.customerName ?? "").toLowerCase().includes(search.toLowerCase()) ||
-            (account.accountNumber.toLowerCase().includes(search.toLowerCase()));
-
-        const matchesStatus =
-            accountStatusFilter === "ALL" ||
-            account.accountStatus === accountStatusFilter;
-
-        return matchesSearch && matchesStatus;
-
-    });
+    const currentCount = accountSummary?.currentAccounts ?? 0;
 
     const accountSummaryCards = [
         {
@@ -198,13 +219,19 @@ const AccountManagementView = ({
                         <input
                             placeholder="Search customer, account number..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => {
+                                setCurrentPage(0);
+                                setSearch(e.target.value);
+                            }}
                             style={styles.searchInput}
                         />
 
                         <select
                             value={accountStatusFilter}
-                            onChange={(e) => setAccountStatusFilter(e.target.value)}
+                            onChange={(e) => {
+                                setCurrentPage(0);
+                                setAccountStatusFilter(e.target.value);
+                            }}
                             style={styles.filterSelect}
                         >
                             <option value="ALL">All Status</option>
@@ -242,7 +269,7 @@ const AccountManagementView = ({
                             </thead>
 
                             <tbody>
-                                {filteredAccounts.map((account, index) => {
+                                {accounts.map((account, index) => {
                                     const statusStyle = getAccountStatusStyle(account.accountStatus);
 
                                     return (
@@ -562,7 +589,45 @@ const AccountManagementView = ({
                 </>
             )
             }
-        </PageCard >
+
+            {
+                pageData && pageData.totalPages > 1 && (
+
+                    <div style={styles.pagination}>
+
+                        <button
+                            disabled={pageData.first}
+                            onClick={() =>
+                                setCurrentPage(prev => prev - 1)
+                            }
+                            style={styles.pageButton}
+                        >
+                            ← Previous
+                        </button>
+
+
+                        <span>
+                            Page {pageData.number + 1}
+                            {" "}of{" "}
+                            {pageData.totalPages}
+                        </span>
+
+
+                        <button
+                            disabled={pageData.last}
+                            onClick={() =>
+                                setCurrentPage(prev => prev + 1)
+                            }
+                            style={styles.pageButton}
+                        >
+                            Next →
+                        </button>
+
+                    </div>
+
+                )
+            }
+        </PageCard>
     );
 };
 
@@ -959,6 +1024,23 @@ const styles = {
         background: "#ECFDF5",
         border: "1px solid #A7F3D0",
         color: "#15803d",
+    },
+
+    pagination: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "16px",
+        marginTop: "24px",
+    },
+
+    pageButton: {
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+        background: "#fff",
+        cursor: "pointer",
+        fontWeight: 600,
     },
 };
 

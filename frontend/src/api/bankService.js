@@ -209,8 +209,31 @@ export const fetchUserFixedDeposits = async (userId) => {
   return response.data;
 };
 
-export const fetchAllAccounts = async () => {
-  const response = await API.get("/admin/accounts");
+export const fetchAllAccounts = async ({
+  page = 0,
+  size = 20,
+  search = "",
+  status = "ALL",
+}) => {
+
+  const response = await API.get("/admin/accounts", {
+    params: {
+      page,
+      size,
+      ...(search && { search }),
+      ...(status !== "ALL" && { status }),
+    },
+  });
+
+  return response.data;
+};
+
+export const fetchAccountSummary = async () => {
+
+  const response = await API.get(
+    "/admin/accounts/summary"
+  );
+
   return response.data;
 };
 

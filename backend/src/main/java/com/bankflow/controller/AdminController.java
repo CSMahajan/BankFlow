@@ -1,11 +1,13 @@
 package com.bankflow.controller;
 
 import com.bankflow.dto.*;
+import com.bankflow.entity.Account;
 import com.bankflow.service.AccountService;
 import com.bankflow.service.CardService;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,10 +73,28 @@ public class AdminController {
 
     @GetMapping("/accounts")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AccountResponse>> getAllAccounts() {
+    public ResponseEntity<Page<AccountResponse>> getAllAccounts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Account.AccountStatus status) {
 
         return ResponseEntity.ok(
-                accountService.getAllAccountsForAdmin()
+                accountService.getAllAccountsForAdmin(
+                        page,
+                        size,
+                        search,
+                        status
+                )
+        );
+    }
+
+    @GetMapping("/accounts/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AccountSummaryResponse> getAccountSummary() {
+
+        return ResponseEntity.ok(
+                accountService.getAccountSummaryForAdmin()
         );
     }
 

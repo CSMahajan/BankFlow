@@ -18,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -262,12 +266,22 @@ class AccountServiceTest {
     @DisplayName("Get All Accounts For Admin Success")
     void getAllAccountsForAdmin_Success() {
         mockAuthenticatedUser(mockAdminUser);
-        when(accountRepository.findAll()).thenReturn(List.of(mockAccount));
 
-        List<AccountResponse> result = accountService.getAllAccountsForAdmin();
+        when(accountRepository.findAll(any(Specification.class), any(PageRequest.class)))
+                .thenReturn(new PageImpl<>(List.of(mockAccount)));
+
+        Page<AccountResponse> result =
+                accountService.getAllAccountsForAdmin(
+                        0,
+                        20,
+                        null,
+                        null
+                );
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(accountRepository, times(1)).findAll();
+        assertEquals(1, result.getTotalElements());
+
+        verify(accountRepository, times(1))
+                .findAll(any(Specification.class), any(PageRequest.class));
     }
 }

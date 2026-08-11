@@ -1,6 +1,7 @@
 package com.bankflow.service;
 
 import com.bankflow.dto.AccountResponse;
+import com.bankflow.dto.AccountSummaryResponse;
 import com.bankflow.dto.BalanceResponse;
 import com.bankflow.dto.CreateAccountRequest;
 import com.bankflow.entity.Account;
@@ -10,8 +11,13 @@ import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.TransactionRepository;
 import com.bankflow.repository.UserRepository;
+import com.bankflow.specification.AccountSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -184,20 +190,91 @@ public class AccountService {
         return mapToResponse(updatedAccount);
     }
 
+    @Transactional(readOnly = true)
+    public Page<AccountResponse> getAllAccountsForAdmin(
+            int page,
+            int size,
+            String search,
+            Account.AccountStatus status) {
 
+        User currentUser = getAuthenticatedUser();
+
+        if (size > 100) {
+            throw new IllegalArgumentException(
+                    "Maximum page size is 100"
+            );
+        }
+
+        log.info(
+                "ADMIN action: [{}] fetching accounts. page [{}], size [{}], search [{}], status [{}]",
+                currentUser.getEmail(),
+                page,
+                size,
+                search,
+                status
+        );
+
+        PageRequest pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Direction.DESC,
+                        "createdAt"
+                )
+        );
+
+        Specification<Account> specification =
+                Specification.where(
+                        AccountSpecification.search(search)
+                );
+
+        specification = specification.and(
+                AccountSpecification.status(status)
+        );
+
+        Page<AccountResponse> accounts =
+                accountRepository
+                        .findAll(specification, pageable)
+                        .map(this::mapToResponse);
+
+        log.info(
+                "ADMIN view retrieved [{}] accounts on page [{}] of [{}]",
+                accounts.getNumberOfElements(),
+                accounts.getNumber() + 1,
+                accounts.getTotalPages()
+        );
+
+        return accounts;
+    }
 
     @Transactional(readOnly = true)
-    public List<AccountResponse> getAllAccountsForAdmin() {
+    public AccountSummaryResponse getAccountSummaryForAdmin() {
+
         User currentUser = getAuthenticatedUser();
-        log.info("ADMIN action: [{}] fetching all accounts across system", currentUser.getEmail());
 
-        List<AccountResponse> allAccounts = accountRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        log.info(
+                "ADMIN action: [{}] fetching account summary",
+                currentUser.getEmail()
+        );
 
-        log.info("ADMIN view retrieved [{}] total accounts", allAccounts.size());
-        return allAccounts;
+        return new AccountSummaryResponse(
+
+                accountRepository.countByAccountStatus(
+                        Account.AccountStatus.ACTIVE
+                ),
+
+                accountRepository.countByAccountStatus(
+                        Account.AccountStatus.FROZEN
+                ),
+
+                accountRepository.countByAccountType(
+                        Account.AccountType.SAVINGS
+                ),
+
+                accountRepository.countByAccountType(
+                        Account.AccountType.CURRENT
+                )
+        );
     }
 
     @Transactional

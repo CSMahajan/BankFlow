@@ -1,6 +1,10 @@
 export const actionDisplayNames = {
     LOGIN: "🔐 Login",
     USER_REGISTERED: "👤 User Registered",
+    VERIFICATION_EMAIL_RESENT: "📧 Verification Email Resent",
+    PASSWORD_RESET: "🔑 Password Reset",
+    PASSWORD_CHANGED: "🔒 Password Changed",
+    EMAIL_VERIFIED: "✅ Email Verified",
 
     ACCOUNT_CREATED: "🏦 Account Created",
     ACCOUNT_ACTIVATED: "✅ Account Activated",
@@ -43,6 +47,10 @@ export const moduleActions = {
     LOGIN: [
         "LOGIN",
         "USER_REGISTERED",
+        "VERIFICATION_EMAIL_RESENT",
+        "PASSWORD_RESET",
+        "PASSWORD_CHANGED",
+        "EMAIL_VERIFIED",
     ],
 
     ACCOUNTS: [

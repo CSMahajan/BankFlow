@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import AccountsView from './accounts/AccountsView';
 import FdCalculatorCard from './fds/FdCalculatorCard';
 import FdManagementView from './fds/FdManagementView';
@@ -8,6 +9,7 @@ import CreateAccountModal from './accounts/CreateAccountModal';
 import PaymentsView from "./payments/PaymentsView";
 import LoansView from './loans/LoansView';
 import CardsView from "./cards/CardsView";
+import ProfileView from './ProfileView';
 import { fetchMyAccounts, fetchDashboardSummary, fetchMonthlyAnalytics } from "../api/bankService";
 
 const CustomerDashboard = ({ userRole, onLogout }) => {
@@ -25,11 +27,19 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
   const [analyticsError, setAnalyticsError] = useState(null);
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [summaryError, setSummaryError] = useState(null);
+  const [hoveredItem, setHoveredItem] = useState(null);
 
-  const customerName =
+  const [customerName, setCustomerName] = useState(
     localStorage.getItem('fullName') ||
     localStorage.getItem('name') ||
-    'Customer';
+    'Customer'
+  );
+
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  const handleProfileUpdated = (updatedName) => {
+    setCustomerName(updatedName);
+  };
 
   const loadDashboardSummary = async () => {
     setLoadingSummary(true);
@@ -107,7 +117,19 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
       {/* Sidebar Navigation */}
       <aside style={styles.sidebar}>
         <div style={styles.sidebarTop}>
-          <div style={styles.brand}>🏦 BankFlow</div>
+          <button
+            style={styles.brandButton}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = "0.8";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = "1";
+            }}
+            onClick={() => setActiveTab("dashboard")}
+            title="Go to Dashboard"
+          >
+            🏦 BankFlow
+          </button>
           <nav style={styles.nav}>
             <button
               style={{
@@ -270,36 +292,124 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
             </div>
           </nav>
         </div>
-
-        {/* User Footer */}
-        <div style={styles.sidebarFooter}>
-          <div style={styles.userProfile}>
-            <div style={styles.avatar}>{customerName.charAt(0).toUpperCase()}</div>
-            <div style={styles.userInfo}>
-              <strong style={styles.userName}>{customerName}</strong>
-              <span style={styles.roleBadge}>{roleDisplay}</span>
-            </div>
-          </div>
-          <button style={styles.logoutBtn} onClick={onLogout} title="Log Out">
-            🚪 Log Out
-          </button>
-        </div>
       </aside>
 
       {/* Main Content */}
       <main style={styles.mainContent}>
         <header style={styles.topHeader}>
           <div>
-            <h1 style={styles.headerTitle}>Customer Dashboard</h1>
+            <h1 style={styles.headerTitle}>Welcome back, {customerName}!</h1>
             <p style={styles.headerSubtitle}>
-              Welcome back, <strong>{customerName}</strong>! Manage your accounts & investments.
+              Manage your accounts & investments.
             </p>
           </div>
 
-          <button style={styles.headerAccountBtn} onClick={() => setIsAccountModalOpen(true)}>
-            + Open New Bank Account
-          </button>
+          <div style={styles.headerActions}>
+
+            <button
+              style={styles.headerAccountBtn}
+              onClick={() => setIsAccountModalOpen(true)}
+            >
+              + Open New Bank Account
+            </button>
+
+            <div style={styles.profileMenuWrapper}>
+
+              <button
+                style={styles.profileMenuButton}
+                onClick={() =>
+                  setIsProfileMenuOpen(!isProfileMenuOpen)
+                }
+              >
+                <div style={styles.headerAvatar}>
+                  {customerName.charAt(0).toUpperCase()}
+                </div>
+
+                <span style={styles.headerUserName}>
+                  {customerName}
+                </span>
+
+                <ChevronDownIcon
+                  style={{
+                    ...styles.dropdownArrow,
+                    transform: isProfileMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                />
+              </button>
+
+              {isProfileMenuOpen && (
+                <div style={styles.profileDropdown}>
+
+                  <button
+                    style={{
+                      ...styles.dropdownItem,
+                      backgroundColor:
+                        hoveredItem === "dashboard"
+                          ? "#f3f8f7"
+                          : "transparent",
+                    }}
+                    onMouseEnter={() => setHoveredItem("dashboard")}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={() => {
+                      setActiveTab("dashboard");
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    🏠 Dashboard
+                  </button>
+
+                  <button
+                    style={{
+                      ...styles.dropdownItem,
+                      backgroundColor:
+                        hoveredItem === "profile"
+                          ? "#f3f8f7"
+                          : "transparent",
+                    }}
+                    onMouseEnter={() => setHoveredItem("profile")}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={() => {
+                      setActiveTab("profile");
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    👤 My Profile
+                  </button>
+
+                  <div style={styles.dropdownDivider} />
+
+                  <button
+                    style={{
+                      ...styles.dropdownItem,
+                      backgroundColor:
+                        hoveredItem === "logout"
+                          ? "#fef2f2"
+                          : "transparent",
+                      color:
+                        hoveredItem === "logout"
+                          ? "#dc2626"
+                          : "#374151",
+                    }}
+                    onMouseEnter={() => setHoveredItem("logout")}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={onLogout}
+                  >
+                    🚪 Logout
+                  </button>
+
+                </div>
+              )}
+
+            </div>
+
+          </div>
         </header>
+
+        {activeTab === 'profile' && (
+          <ProfileView
+            onProfileUpdated={handleProfileUpdated}
+          />
+        )}
 
         {activeTab === 'dashboard' && (
           <DashboardOverview
@@ -385,18 +495,122 @@ const styles = {
   sidebarGroup: { display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' },
   groupHeader: { fontSize: '12px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', padding: '4px 12px' },
   subNavLink: { border: 'none', padding: '10px 16px 10px 24px', borderRadius: '6px', textAlign: 'left', fontWeight: '600', fontSize: '13px', cursor: 'pointer' },
-  sidebarFooter: { borderTop: '1px solid #eef0ec', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' },
-  userProfile: { display: 'flex', alignItems: 'center', gap: '10px' },
-  avatar: { width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#0d6360', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '15px' },
-  userInfo: { display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' },
-  userName: { fontSize: '14px', color: '#111827', fontWeight: '700', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  roleBadge: { fontSize: '11px', fontWeight: '700', color: '#0d6360', backgroundColor: '#e6f2f1', padding: '2px 6px', borderRadius: '4px', width: 'fit-content', textTransform: 'uppercase' },
-  logoutBtn: { border: '1px solid #fee2e2', padding: '10px', borderRadius: '8px', backgroundColor: '#fef2f2', cursor: 'pointer', fontWeight: '600', color: '#dc2626', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' },
   mainContent: { flex: 1, padding: '32px' },
   topHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', paddingBottom: '16px', borderBottom: '1px solid #eef0ec' },
   headerTitle: { margin: 0, fontSize: '24px', fontFamily: 'Georgia, serif', color: '#111827' },
   headerSubtitle: { margin: '4px 0 0 0', fontSize: '13px', color: '#6b7280' },
   headerAccountBtn: { backgroundColor: '#0d6360', color: '#ffffff', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: '700', fontSize: '14px', cursor: 'pointer' },
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "18px",
+  },
+
+  profileMenuWrapper: {
+    position: "relative",
+  },
+
+  profileMenuButton: {
+    display: "flex",
+    alignItems: "center",
+    gap: "7px",
+    border: "none",
+    background: "transparent",
+    padding: "5px 7px",
+    borderRadius: "9px",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
+  },
+
+  headerAvatar: {
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    backgroundColor: "#0d6360",
+    color: "#ffffff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: "700",
+    fontSize: "14px",
+    flexShrink: 0,
+  },
+
+  headerUserName: {
+    fontSize: "14px",
+    fontWeight: "700",
+    color: "#111827",
+    whiteSpace: "nowrap",
+  },
+
+  headerUserRole: {
+    fontSize: "10px",
+    fontWeight: "700",
+    color: "#0d6360",
+    letterSpacing: "0.5px",
+    textTransform: "uppercase",
+  },
+
+  dropdownArrow: {
+    width: "19px",
+    height: "19px",
+    color: "#4b5563",
+    marginLeft: "1px",
+    flexShrink: 0,
+    transition: "transform 0.2s ease",
+  },
+
+  profileIdentity: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "2px",
+  },
+
+  profileDropdown: {
+    position: "absolute",
+    top: "calc(100% + 8px)",
+    right: 0,
+    width: "170px",
+    backgroundColor: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+    padding: "6px",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
+    zIndex: 1000,
+  },
+
+  dropdownItem: {
+    width: "100%",
+    border: "none",
+    background: "transparent",
+    padding: "10px 11px",
+    borderRadius: "7px",
+    textAlign: "left",
+    fontSize: "13px",
+    fontWeight: "600",
+    color: "#374151",
+    cursor: "pointer",
+    transition: "background-color 0.15s ease, color 0.15s ease",
+  },
+
+  dropdownDivider: {
+    height: "1px",
+    backgroundColor: "#eef0ec",
+    margin: "4px 0",
+  },
+
+  brandButton: {
+    border: "none",
+    background: "transparent",
+    padding: 0,
+    fontSize: "20px",
+    fontWeight: "800",
+    fontFamily: "Georgia, serif",
+    color: "#0d6360",
+    cursor: "pointer",
+    textAlign: "left",
+  },
 };
 
 export default CustomerDashboard;

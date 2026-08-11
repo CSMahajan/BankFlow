@@ -252,6 +252,24 @@ export const fetchMonthlyAnalytics = async () => {
   return response.data;
 };
 
+export const exportTransactionsPdf = async (params) => {
+  const response = await API.get(
+    "/transactions/export/pdf", {
+    params, responseType: "blob",
+  });
+
+  return response.data;
+};
+
+export const exportTransactionsExcel = async (params) => {
+  const response = await API.get(
+    "/transactions/export/excel", {
+    params, responseType: "blob",
+  });
+  return response.data;
+};
+
+
 export const login = async (credentials) => {
   const response = await API.post("/auth/login", credentials);
   return response.data;
@@ -276,23 +294,6 @@ export const registerAdmin = async (request, token) => {
   return response.data;
 };
 
-export const exportTransactionsPdf = async (params) => {
-  const response = await API.get(
-    "/transactions/export/pdf", {
-    params, responseType: "blob",
-  });
-
-  return response.data;
-};
-
-export const exportTransactionsExcel = async (params) => {
-  const response = await API.get(
-    "/transactions/export/excel", {
-    params, responseType: "blob",
-  });
-  return response.data;
-};
-
 export const verifyEmail = async (token) => {
   const response = await API.get(
     `/auth/verify-email?token=${token}`
@@ -310,4 +311,17 @@ export const forgotPassword = async (request) => {
 
 export const resetPassword = async (request) => {
   await API.post("/auth/reset-password", request);
+};
+
+export const fetchCurrentUser = async () => {
+  const response = await API.get("/users/me");
+  return response.data;
+};
+
+export const updateProfile = async (request) => {
+  await API.put("/users/profile", request);
+};
+
+export const changePassword = async (request) => {
+  await API.patch("/users/change-password", request);
 };

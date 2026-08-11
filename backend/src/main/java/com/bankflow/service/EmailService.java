@@ -1,17 +1,25 @@
 package com.bankflow.service;
 
+import com.bankflow.dto.BrevoEmailRequest;
+import com.bankflow.dto.BrevoEmailResponse;
+import com.bankflow.dto.BrevoRecipient;
+import com.bankflow.dto.BrevoSender;
 import com.bankflow.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final RestClient brevoRestClient;
+
+    @Value("${app.brevo.api-key}")
+    private String brevoApiKey;
 
     @Value("${app.mail.from}")
     private String fromEmail;
@@ -19,16 +27,31 @@ public class EmailService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
-    private void sendEmail(String to, String subject, String body) {
+    private void sendEmail(
+            String to,
+            String recipientName,
+            String subject,
+            String body) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
+        BrevoEmailRequest request = new BrevoEmailRequest(
+                new BrevoSender(fromEmail, "BankFlow"),
+                List.of(new BrevoRecipient(to, recipientName)),
+                subject,
+                body
+        );
 
-        message.setFrom(fromEmail);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
+        BrevoEmailResponse response = brevoRestClient.post()
+                .uri("/v3/smtp/email")
+                .header("api-key", brevoApiKey)
+                .header("accept", "application/json")
+                .body(request)
+                .retrieve()
+                .body(BrevoEmailResponse.class);
 
-        mailSender.send(message);
+        if (response != null) {
+            // We will use this message ID later when we add
+            // email delivery tracking/webhooks.
+        }
     }
 
     public void sendVerificationEmail(User user, String token) {
@@ -56,7 +79,7 @@ public class EmailService {
                 BankFlow Team
                 """.formatted(user.getFullName(), verificationUrl);
 
-        sendEmail(user.getEmail(), subject, body);
+        sendEmail(user.getEmail(), user.getFullName(), subject, body);
     }
 
     public void sendPasswordResetEmail(User user, String token) {
@@ -65,24 +88,23 @@ public class EmailService {
 
         String subject = "Reset your BankFlow password";
 
-        String body =
-                """
-                        Hello %s,
-                        
-                        We received a request to reset your BankFlow password.
-                        
-                        Click the link below to create a new password:
-                        
-                        %s
-                        
-                        This link expires in 1 hour.
-                        
-                        If you didn't request this, please ignore this email.
-                        
-                        Regards,
-                        BankFlow Team
-                        """.formatted(user.getFullName(), resetLink);
+        String body = """
+                Hello %s,
+                
+                We received a request to reset your BankFlow password.
+                
+                Click the link below to create a new password:
+                
+                %s
+                
+                This link expires in 1 hour.
+                
+                If you didn't request this, please ignore this email.
+                
+                Regards,
+                BankFlow Team
+                """.formatted(user.getFullName(), resetLink);
 
-        sendEmail(user.getEmail(), subject, body);
+        sendEmail(user.getEmail(), user.getFullName(), subject, body);
     }
 }

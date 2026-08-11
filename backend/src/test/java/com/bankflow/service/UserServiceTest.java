@@ -2,6 +2,8 @@ package com.bankflow.service;
 
 import com.bankflow.dto.*;
 import com.bankflow.entity.User;
+import com.bankflow.entity.VerificationToken;
+import com.bankflow.exception.EmailVerificationException;
 import com.bankflow.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,12 @@ class UserServiceTest {
     private UserService userService;
 
     @Mock
+    private VerificationTokenService verificationTokenService;
+
+    @Mock
+    private EmailService emailService;
+
+    @Mock
     private AuditLogService auditLogService;
 
     @Mock
@@ -65,6 +73,7 @@ class UserServiceTest {
                 .email("john@example.com")
                 .password("encodedPassword123")
                 .role(User.Role.CUSTOMER)
+                .emailVerified(true)
                 .build();
 
         mockAdminUser = User.builder()
@@ -73,6 +82,7 @@ class UserServiceTest {
                 .email("admin@bankflow.com")
                 .password("encodedAdminPass123")
                 .role(User.Role.ADMIN)
+                .emailVerified(true)
                 .build();
     }
 
@@ -92,17 +102,60 @@ class UserServiceTest {
     @Test
     @DisplayName("Register Customer - Success")
     void registerCustomer_Success() {
-        RegisterRequest request = new RegisterRequest("John Doe", "john@example.com", "Secret@123");
+        RegisterRequest request =
+                new RegisterRequest("John Doe", "john@example.com", "Secret@123");
+
+        VerificationToken verificationToken = VerificationToken.builder()
+                .token("verification-token")
+                .user(mockUser)
+                .build();
 
         when(userRepository.existsByEmail("john@example.com")).thenReturn(false);
         when(passwordEncoder.encode("Secret@123")).thenReturn("encodedPassword123");
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
+        when(verificationTokenService.createVerificationToken(mockUser))
+                .thenReturn(verificationToken);
 
         assertDoesNotThrow(() -> userService.registerCustomer(request));
 
         verify(userRepository, times(1)).existsByEmail("john@example.com");
         verify(passwordEncoder, times(1)).encode("Secret@123");
         verify(userRepository, times(1)).save(any(User.class));
+        verify(verificationTokenService, times(1))
+                .createVerificationToken(mockUser);
+        verify(emailService, times(1))
+                .sendVerificationEmail(mockUser, "verification-token");
+    }
+
+    @Test
+    @DisplayName("Login - Unverified Email Throws EmailVerificationException")
+    void login_UnverifiedEmail_ThrowsEmailVerificationException() {
+        LoginRequest request =
+                new LoginRequest("john@example.com", "Secret@123");
+
+        mockUser.setEmailVerified(false);
+
+        when(userRepository.findByEmail("john@example.com"))
+                .thenReturn(Optional.of(mockUser));
+
+        when(passwordEncoder.matches(
+                "Secret@123",
+                "encodedPassword123"
+        )).thenReturn(true);
+
+        EmailVerificationException ex =
+                assertThrows(
+                        EmailVerificationException.class,
+                        () -> userService.login(request)
+                );
+
+        assertEquals(
+                "Please verify your email address before logging in.",
+                ex.getMessage()
+        );
+
+        verify(jwtService, never())
+                .generateToken(anyString(), anyString());
     }
 
     @Test

@@ -57,7 +57,6 @@ public class UserService {
         VerificationToken verificationToken = verificationTokenService.createVerificationToken(savedUser);
 
         emailService.sendVerificationEmail(savedUser, verificationToken.getToken());
-        emailService.sendVerificationEmail(savedUser, verificationToken.getToken());
 
         log.info("Customer registered successfully. User ID: [{}], Email: [{}]",
                 savedUser.getId(), savedUser.getEmail());

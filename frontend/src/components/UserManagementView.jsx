@@ -85,6 +85,7 @@ const UserManagementView = () => {
         setDrawerOpen(false);
         setSelectedUserId(null);
         setSelectedUser(null);
+        setActiveSection(null);
     };
 
     const filteredUsers = users.filter((user) => {

@@ -20,29 +20,31 @@ const UserDetailsDrawer = ({
 
     const [accounts, setAccounts] = useState([]);
     const [accountsLoading, setAccountsLoading] = useState(false);
-    const [showAccounts, setShowAccounts] = useState(false);
     const [cards, setCards] = useState([]);
     const [cardsLoading, setCardsLoading] = useState(false);
-    const [showCards, setShowCards] = useState(false);
     const [loans, setLoans] = useState([]);
     const [loansLoading, setLoansLoading] = useState(false);
-    const [showLoans, setShowLoans] = useState(false);
     const [fixedDeposits, setFixedDeposits] = useState([]);
     const [fixedDepositsLoading, setFixedDepositsLoading] = useState(false);
-    const [showFixedDeposits, setShowFixedDeposits] = useState(false);
+    const [activeSection, setActiveSection] = useState(null);
 
     if (!open) return null;
 
     const loadAccounts = async () => {
-        if (showAccounts) {
-            setShowAccounts(false);
+
+        if (activeSection === "accounts") {
+            setActiveSection(null);
             return;
         }
+
         try {
             setAccountsLoading(true);
+
             const accountList = await fetchUserAccounts(user.id);
+
             setAccounts(accountList);
-            setShowAccounts(true);
+            setActiveSection("accounts");
+
         } finally {
             setAccountsLoading(false);
         }
@@ -50,45 +52,61 @@ const UserDetailsDrawer = ({
 
 
     const loadCards = async () => {
-        if (showCards) {
-            setShowCards(false);
+
+        if (activeSection === "cards") {
+            setActiveSection(null);
             return;
         }
+
         try {
             setCardsLoading(true);
+
             const cardList = await fetchUserCards(user.id);
+
             setCards(cardList);
-            setShowCards(true);
+            setActiveSection("cards");
+
         } finally {
             setCardsLoading(false);
         }
     };
 
     const loadLoans = async () => {
-        if (showLoans) {
-            setShowLoans(false);
+
+        if (activeSection === "loans") {
+            setActiveSection(null);
             return;
         }
+
         try {
             setLoansLoading(true);
+
             const loanList = await fetchUserLoans(user.id);
+
             setLoans(loanList);
-            setShowLoans(true);
+            setActiveSection("loans");
+
         } finally {
             setLoansLoading(false);
         }
     };
 
     const loadFixedDeposits = async () => {
-        if (showFixedDeposits) {
-            setShowFixedDeposits(false);
+
+        if (activeSection === "fixedDeposits") {
+            setActiveSection(null);
             return;
         }
+
         try {
             setFixedDepositsLoading(true);
-            const fixedDepositList = await fetchUserFixedDeposits(user.id);
+
+            const fixedDepositList =
+                await fetchUserFixedDeposits(user.id);
+
             setFixedDeposits(fixedDepositList);
-            setShowFixedDeposits(true);
+            setActiveSection("fixedDeposits");
+
         } finally {
             setFixedDepositsLoading(false);
         }
@@ -129,37 +147,37 @@ const UserDetailsDrawer = ({
                             loadCards={loadCards}
                             loadLoans={loadLoans}
                             loadFixedDeposits={loadFixedDeposits}
-                            showAccounts={showAccounts}
-                            showCards={showCards}
-                            showLoans={showLoans}
-                            showFixedDeposits={showFixedDeposits}
+                            showAccounts={activeSection === "accounts"}
+                            showCards={activeSection === "cards"}
+                            showLoans={activeSection === "loans"}
+                            showFixedDeposits={activeSection === "fixedDeposits"}
                         />
 
                         <UserAccountsSection
                             accounts={accounts}
                             accountsLoading={accountsLoading}
-                            showAccounts={showAccounts}
+                            showAccounts={activeSection === "accounts"}
                             styles={styles}
                         />
 
                         <UserCardsSection
                             cards={cards}
                             cardsLoading={cardsLoading}
-                            showCards={showCards}
+                            showCards={activeSection === "cards"}
                             styles={styles}
                         />
 
                         <UserLoansSection
                             loans={loans}
                             loansLoading={loansLoading}
-                            showLoans={showLoans}
+                            showLoans={activeSection === "loans"}
                             styles={styles}
                         />
 
                         <UserFixedDepositsSection
                             fixedDeposits={fixedDeposits}
                             fixedDepositsLoading={fixedDepositsLoading}
-                            showFixedDeposits={showFixedDeposits}
+                            showFixedDeposits={activeSection === "fixedDeposits"}
                             styles={styles}
                         />
 

@@ -25,6 +25,23 @@ const UserSummaryCards = ({
     };
     return (
         <>
+            <div style={styles.financialCard}>
+                <div style={styles.financialLabel}>
+                    💰 Total Balance
+                </div>
+                <div style={styles.financialValue}>
+                    {formatCurrency(user.totalBalance)}
+                </div>
+            </div>
+
+            <div style={styles.loanCard}>
+                <div style={styles.financialLabel}>
+                    🏦 Outstanding Loan
+                </div>
+                <div style={styles.loanValue}>
+                    {formatCurrency(user.outstandingLoanAmount)}
+                </div>
+            </div>
             <div style={styles.statsGrid}>
                 <div
                     style={styles.statCard}
@@ -93,23 +110,6 @@ const UserSummaryCards = ({
                     <div style={styles.statFooter}>
                         {showFixedDeposits ? "Hide Fixed Deposits ↑" : "View Fixed Deposits →"}
                     </div>
-                </div>
-            </div>
-            <div style={styles.financialCard}>
-                <div style={styles.financialLabel}>
-                    💰 Total Balance
-                </div>
-                <div style={styles.financialValue}>
-                    {formatCurrency(user.totalBalance)}
-                </div>
-            </div>
-
-            <div style={styles.loanCard}>
-                <div style={styles.financialLabel}>
-                    🏦 Outstanding Loan
-                </div>
-                <div style={styles.loanValue}>
-                    {formatCurrency(user.outstandingLoanAmount)}
                 </div>
             </div>
         </>

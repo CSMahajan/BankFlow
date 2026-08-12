@@ -25,6 +25,11 @@ public interface TransactionRepository extends
     // Fetch transactions using account number string directly
     List<Transaction> findByAccountAccountNumberOrderByTransactionDateDesc(String accountNumber);
 
+    Page<Transaction> findByAccountAccountNumberOrderByTransactionDateDesc(
+            String accountNumber,
+            Pageable pageable
+    );
+
     // --- Single-Account ID Queries ---
 
     List<Transaction> findTop10ByAccountIdOrderByTransactionDateDesc(Long accountId);

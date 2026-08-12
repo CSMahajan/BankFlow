@@ -140,6 +140,37 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
+    public Page<TransactionResponse> getAccountTransactionsForAdmin(
+            String accountNumber,
+            Pageable pageable) {
+
+        User currentUser = getAuthenticatedUser();
+
+        log.info(
+                "ADMIN [{}] fetching transactions for account [{}]",
+                currentUser.getEmail(),
+                accountNumber
+        );
+
+        if (pageable.getPageSize() > 100) {
+            throw new IllegalArgumentException(
+                    "Maximum page size is 100"
+            );
+        }
+
+
+        Page<Transaction> transactions =
+                transactionRepository
+                        .findByAccountAccountNumberOrderByTransactionDateDesc(
+                                accountNumber,
+                                pageable
+                        );
+
+
+        return transactions.map(this::mapToResponse);
+    }
+
+    @Transactional(readOnly = true)
     public List<TransactionResponse> getAllTransactionsForAdmin(String accountNumber) {
         User currentUser = getAuthenticatedUser();
         log.info("ADMIN action: User [{}] requesting full transaction history for account [{}]", currentUser.getEmail(), accountNumber);

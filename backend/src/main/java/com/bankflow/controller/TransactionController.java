@@ -94,4 +94,25 @@ public class TransactionController {
             @PathVariable String accountNumber) {
         return ResponseEntity.ok(transactionService.getAllTransactionsForAdmin(accountNumber));
     }
+
+    @GetMapping("/admin/accounts/{accountNumber}/transactions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<TransactionResponse>> getAccountTransactionsForAdmin(
+            @PathVariable String accountNumber,
+
+            @PageableDefault(
+                    size = 10,
+                    sort = "transactionDate",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+    ) {
+
+        return ResponseEntity.ok(
+                transactionService.getAccountTransactionsForAdmin(
+                        accountNumber,
+                        pageable
+                )
+        );
+    }
 }

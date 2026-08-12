@@ -228,6 +228,24 @@ export const fetchAllAccounts = async ({
   return response.data;
 };
 
+export const fetchAccountTransactions = async (
+  accountNumber,
+  page = 0,
+  size = 10
+) => {
+  const response = await API.get(
+    `/transactions/admin/accounts/${accountNumber}/transactions`,
+    {
+      params: {
+        page,
+        size,
+      },
+    }
+  );
+
+  return response.data;
+};
+
 export const fetchAccountSummary = async () => {
 
   const response = await API.get(

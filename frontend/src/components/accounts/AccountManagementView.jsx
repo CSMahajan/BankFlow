@@ -1,6 +1,9 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { fetchAllAccounts, freezeAccount, unfreezeAccount, fetchAccountSummary } from '../../api/bankService';
-import { formatDate, formatCurrency } from '../../utils/formatUtils';
+import {
+    fetchAllAccounts, freezeAccount,
+    unfreezeAccount, fetchAccountSummary, fetchAccountTransactions
+} from '../../api/bankService';
+import { formatDate, formatCurrency, formatDateTime } from '../../utils/formatUtils';
 import { getAccountStatusStyle } from '../../utils/accountStatusUtils';
 import modalStyles from "../../styles/modalStyles";
 import toast from "react-hot-toast";
@@ -16,9 +19,14 @@ const AccountManagementView = ({
     const [search, setSearch] = useState("");
     const [accountStatusFilter, setAccountStatusFilter] = useState("ALL");
     const [expandedAccountId, setExpandedAccountId] = useState(null);
+
+    const [transactionAccountId, setTransactionAccountId] = useState(null);
+    const [accountTransactions, setAccountTransactions] = useState({});
+    const [transactionLoading, setTransactionLoading] = useState(false);
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState(null);
     const [accountSummary, setAccountSummary] = useState(null);
+    const [transactionPages, setTransactionPages] = useState({});
 
     const handleToggleStatus = async () => {
 
@@ -112,6 +120,43 @@ const AccountManagementView = ({
 
     }, []);
 
+    const loadAccountTransactions = async (
+        accountNumber,
+        page = 0
+    ) => {
+
+        try {
+
+            setTransactionLoading(true);
+
+            const response = await fetchAccountTransactions(
+                accountNumber,
+                page,
+                10
+            );
+
+            setAccountTransactions(prev => ({
+                ...prev,
+                [accountNumber]: response
+            }));
+
+            setTransactionPages(prev => ({
+                ...prev,
+                [accountNumber]: page
+            }));
+
+        } catch (err) {
+
+            console.error(err);
+            toast.error("Unable to load transactions.");
+
+        } finally {
+
+            setTransactionLoading(false);
+
+        }
+    };
+
     if (loading) {
         return (
             <PageCard title="🏦 Account Management">
@@ -168,9 +213,15 @@ const AccountManagementView = ({
     ];
 
     const handleRowClick = (accountId) => {
-        setExpandedAccountId(prev =>
-            prev === accountId ? null : accountId
-        );
+
+        setExpandedAccountId(prev => {
+
+            if (prev !== accountId) {
+                setTransactionAccountId(null);
+            }
+
+            return prev === accountId ? null : accountId;
+        });
     };
 
     return (
@@ -337,7 +388,7 @@ const AccountManagementView = ({
                                                             borderBottom: "1px solid #e5e7eb",
                                                         }}
                                                     >
-                                                        <div style={styles.loanDetailsContainer}>
+                                                        <div style={styles.accountDetailsContainer}>
                                                             <div style={styles.detailsHeader}>
                                                                 <div>
                                                                     <h3 style={styles.customerName}>
@@ -452,6 +503,34 @@ const AccountManagementView = ({
                                                                 </div>
                                                             </div>
                                                             <div style={styles.detailsActions}>
+
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+
+                                                                        if (transactionAccountId === account.id) {
+                                                                            setTransactionAccountId(null);
+                                                                            return;
+                                                                        }
+
+                                                                        setTransactionAccountId(account.id);
+
+                                                                        if (!accountTransactions[account.accountNumber]) {
+                                                                            loadAccountTransactions(
+                                                                                account.accountNumber,
+                                                                                0
+                                                                            )
+                                                                        }
+
+                                                                    }}
+                                                                    style={styles.transactionButton}
+                                                                >
+                                                                    {transactionAccountId === account.id
+                                                                        ? "Hide Transactions"
+                                                                        : "View Transactions"}
+                                                                </button>
+
+
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
@@ -468,6 +547,234 @@ const AccountManagementView = ({
                                                                         : "🔓 Unfreeze Account"}
                                                                 </button>
                                                             </div>
+                                                            {transactionAccountId === account.id && (
+                                                                <div style={styles.transactionsSection}>
+
+                                                                    <hr
+                                                                        style={{
+                                                                            border: "none",
+                                                                            borderTop: "1px solid #e5e7eb",
+                                                                            margin: "28px 0",
+                                                                        }}
+                                                                    />
+
+                                                                    <h4 style={styles.actionTitle}>
+                                                                        Transaction History (
+                                                                        {accountTransactions[account.accountNumber]?.totalElements ?? 0}{" "}
+                                                                        {
+                                                                            (accountTransactions[account.accountNumber]?.totalElements ?? 0) === 1
+                                                                                ? "transaction"
+                                                                                : "transactions"
+                                                                        }
+                                                                        )
+                                                                    </h4>
+
+                                                                    {
+                                                                        transactionLoading ? (
+                                                                            <p>Loading transactions...</p>
+                                                                        ) : (
+                                                                            <>
+                                                                                {
+                                                                                    accountTransactions[account.accountNumber]?.content?.length > 0 ? (
+
+                                                                                        <>
+                                                                                            <div
+                                                                                                style={{
+                                                                                                    overflowX: "auto",
+                                                                                                    border: "1px solid #e5e7eb",
+                                                                                                    borderRadius: "12px",
+                                                                                                    marginTop: "16px",
+                                                                                                }}
+                                                                                            >
+
+                                                                                                <table
+                                                                                                    style={{
+                                                                                                        width: "100%",
+                                                                                                        borderCollapse: "collapse",
+                                                                                                    }}
+                                                                                                >
+
+                                                                                                    <thead>
+                                                                                                        <tr>
+                                                                                                            <th style={styles.header}>
+                                                                                                                Transaction ID
+                                                                                                            </th>
+
+                                                                                                            <th style={styles.header}>
+                                                                                                                Date & Time
+                                                                                                            </th>
+
+                                                                                                            <th style={styles.header}>
+                                                                                                                Type
+                                                                                                            </th>
+
+                                                                                                            <th style={styles.header}>
+                                                                                                                Amount
+                                                                                                            </th>
+
+                                                                                                            <th style={styles.header}>
+                                                                                                                Balance After
+                                                                                                            </th>
+
+                                                                                                            <th style={styles.header}>
+                                                                                                                Description
+                                                                                                            </th>
+
+                                                                                                        </tr>
+                                                                                                    </thead>
+
+
+                                                                                                    <tbody>
+
+                                                                                                        {
+                                                                                                            accountTransactions[
+                                                                                                                account.accountNumber
+                                                                                                            ].content.map((transaction, index) => (
+
+                                                                                                                <tr
+                                                                                                                    key={transaction.transactionId}
+                                                                                                                    style={{
+                                                                                                                        background:
+                                                                                                                            index % 2 === 0 ? "#ffffff" : "#f8fafc",
+                                                                                                                    }}
+                                                                                                                >
+
+                                                                                                                    <td style={styles.cell}>
+                                                                                                                        <span
+                                                                                                                            style={{
+                                                                                                                                fontFamily: "monospace",
+                                                                                                                                fontWeight: 600,
+                                                                                                                            }}
+                                                                                                                        >
+                                                                                                                            {transaction.transactionId}
+                                                                                                                        </span>
+                                                                                                                    </td>
+
+
+                                                                                                                    <td style={styles.cell}>
+                                                                                                                        {formatDateTime(
+                                                                                                                            transaction.transactionDate
+                                                                                                                        )}
+                                                                                                                    </td>
+
+
+                                                                                                                    <td style={styles.cell}>
+                                                                                                                        <span
+                                                                                                                            style={{
+                                                                                                                                padding: "5px 10px",
+                                                                                                                                borderRadius: "999px",
+                                                                                                                                fontSize: "12px",
+                                                                                                                                fontWeight: 700,
+                                                                                                                                background:
+                                                                                                                                    transaction.transactionType === "CREDIT"
+                                                                                                                                        ? "#DCFCE7"
+                                                                                                                                        : "#FEE2E2",
+                                                                                                                                color:
+                                                                                                                                    transaction.transactionType === "CREDIT"
+                                                                                                                                        ? "#166534"
+                                                                                                                                        : "#991B1B",
+                                                                                                                            }}
+                                                                                                                        >
+                                                                                                                            {transaction.transactionType}
+                                                                                                                        </span>
+                                                                                                                    </td>
+
+
+                                                                                                                    <td style={styles.cell}>
+                                                                                                                        {formatCurrency(
+                                                                                                                            transaction.amount
+                                                                                                                        )}
+                                                                                                                    </td>
+
+
+                                                                                                                    <td style={styles.cell}>
+                                                                                                                        {formatCurrency(
+                                                                                                                            transaction.availableBalance
+                                                                                                                        )}
+                                                                                                                    </td>
+
+
+                                                                                                                    <td style={styles.cell}>
+                                                                                                                        {transaction.description}
+                                                                                                                    </td>
+
+                                                                                                                </tr>
+
+                                                                                                            ))
+                                                                                                        }
+
+                                                                                                    </tbody>
+
+                                                                                                </table>
+
+                                                                                            </div>
+
+
+                                                                                            {
+                                                                                                accountTransactions[account.accountNumber]?.totalPages > 1 && (
+
+                                                                                                    <div style={styles.transactionPagination}>
+
+                                                                                                        <button
+                                                                                                            disabled={
+                                                                                                                accountTransactions[account.accountNumber]?.first
+                                                                                                            }
+                                                                                                            onClick={() =>
+                                                                                                                loadAccountTransactions(
+                                                                                                                    account.accountNumber,
+                                                                                                                    accountTransactions[account.accountNumber]?.number - 1
+                                                                                                                )
+                                                                                                            }
+                                                                                                            style={styles.transactionPageButton}
+                                                                                                        >
+                                                                                                            ← Previous Tx
+                                                                                                        </button>
+
+
+                                                                                                        <span style={styles.transactionPageInfo}>
+                                                                                                            Transactions Page {
+                                                                                                                accountTransactions[account.accountNumber]?.number + 1
+                                                                                                            }
+                                                                                                            {" "}of{" "}
+                                                                                                            {
+                                                                                                                accountTransactions[account.accountNumber]?.totalPages
+                                                                                                            }
+                                                                                                        </span>
+
+
+                                                                                                        <button
+                                                                                                            disabled={
+                                                                                                                accountTransactions[account.accountNumber]?.last
+                                                                                                            }
+                                                                                                            onClick={() =>
+                                                                                                                loadAccountTransactions(
+                                                                                                                    account.accountNumber,
+                                                                                                                    accountTransactions[account.accountNumber]?.number + 1
+                                                                                                                )
+                                                                                                            }
+                                                                                                            style={styles.transactionPageButton}
+                                                                                                        >
+                                                                                                            Next Tx →
+                                                                                                        </button>
+
+                                                                                                    </div>
+
+                                                                                                )
+                                                                                            }
+
+                                                                                        </>
+
+                                                                                    ) : (
+
+                                                                                        <p>No transactions found.</p>
+
+                                                                                    )
+                                                                                }
+                                                                            </>
+                                                                        )
+                                                                    }
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr >
@@ -732,8 +1039,8 @@ const styles = {
         fontSize: "14px",
     },
 
-    loanDetailsContainer: {
-        background: "#ffffff",
+    accountDetailsContainer: {
+        background: "#fafafa",
         border: "1px solid #e5e7eb",
         borderRadius: "14px",
         padding: "14px",
@@ -1041,6 +1348,53 @@ const styles = {
         background: "#fff",
         cursor: "pointer",
         fontWeight: 600,
+    },
+
+    transactionButton: {
+        background: "#2563eb",
+        color: "#fff",
+        border: "none",
+        padding: "10px 18px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        fontWeight: 600,
+        minWidth: "180px",
+    },
+
+    transactionsSection: {
+        marginTop: "20px",
+    },
+
+    transactionPagination: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "12px",
+        marginTop: "18px",
+        padding: "12px",
+        background: "#f8fafc",
+        borderRadius: "10px",
+        border: "1px solid #e2e8f0",
+    },
+
+    transactionPageButton: {
+        padding: "6px 14px",
+        borderRadius: "20px",
+        border: "1px solid #93c5fd",
+        background: "#eff6ff",
+        color: "#1d4ed8",
+        cursor: "pointer",
+        fontWeight: 600,
+        fontSize: "13px",
+    },
+
+    transactionPageInfo: {
+        padding: "6px 14px",
+        borderRadius: "20px",
+        background: "#dbeafe",
+        color: "#1e40af",
+        fontWeight: 700,
+        fontSize: "13px",
     },
 };
 

@@ -291,8 +291,31 @@ export const unfreezeAccount = async (accountNumber) => {
   return response.data;
 };
 
-export const fetchAllCards = async () => {
-  const response = await API.get("/admin/cards");
+export const fetchAllCards = async ({
+  page = 0,
+  size = 20,
+  search = "",
+  status = "ALL",
+}) => {
+
+  const response = await API.get("/admin/cards", {
+    params: {
+      page,
+      size,
+      ...(search && { search }),
+      ...(status !== "ALL" && { status }),
+    },
+  });
+
+  return response.data;
+};
+
+export const fetchCardSummary = async () => {
+
+  const response = await API.get(
+    "/admin/cards/summary"
+  );
+
   return response.data;
 };
 

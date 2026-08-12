@@ -2,6 +2,7 @@ package com.bankflow.service;
 
 import com.bankflow.dto.AdminCardResponse;
 import com.bankflow.dto.CardResponse;
+import com.bankflow.dto.CardSummaryResponse;
 import com.bankflow.dto.IssueCardRequest;
 import com.bankflow.entity.Account;
 import com.bankflow.entity.AuditAction;
@@ -11,8 +12,14 @@ import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.CardRepository;
 import com.bankflow.repository.UserRepository;
+import com.bankflow.specification.CardSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -172,23 +179,69 @@ public class CardService {
     }
 
     @Transactional(readOnly = true)
-    public List<AdminCardResponse> getAllCardsForAdmin() {
-        log.info("ADMIN action: Fetching all cards");
-        return cardRepository.findAll()
-                .stream()
-                .map(card -> new AdminCardResponse(
+    public Page<AdminCardResponse> getAllCardsForAdmin(
+            int page,
+            int size,
+            String search,
+            CardStatus status
+    ) {
 
-                        card.getId(),
-                        card.getAccount().getUser().getFullName(),
-                        card.getAccount().getAccountNumber(),
-                        maskCardNumber(card.getCardNumber()),
-                        card.getCardType(),
-                        card.getCardStatus(),
-                        card.getDailyLimit(),
-                        card.getExpiryDate()
+        log.info("ADMIN action: Fetching cards with pagination");
 
-                ))
-                .toList();
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("id").descending()
+                );
+
+
+        return cardRepository.findAll(
+                Specification
+                        .where(CardSpecification.search(search))
+                        .and(CardSpecification.status(status)),
+                pageable
+        ).map(card -> new AdminCardResponse(
+
+                card.getId(),
+                card.getAccount()
+                        .getUser()
+                        .getFullName(),
+
+                card.getAccount()
+                        .getAccountNumber(),
+
+                maskCardNumber(
+                        card.getCardNumber()
+                ),
+
+                card.getCardType(),
+
+                card.getCardStatus(),
+
+                card.getDailyLimit(),
+
+                card.getExpiryDate()
+
+        ));
+    }
+
+    @Transactional(readOnly = true)
+    public CardSummaryResponse getCardSummaryForAdmin() {
+
+        log.info("ADMIN action: Fetching card summary");
+
+        return new CardSummaryResponse(
+
+                cardRepository.count(),
+
+                cardRepository.countByCardStatus(CardStatus.ACTIVE),
+
+                cardRepository.countByCardStatus(CardStatus.BLOCKED),
+
+                cardRepository.countByCardStatus(CardStatus.FROZEN)
+
+        );
     }
 
     @Transactional

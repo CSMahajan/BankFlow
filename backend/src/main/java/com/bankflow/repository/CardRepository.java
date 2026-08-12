@@ -7,8 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 @Repository
-public interface CardRepository extends JpaRepository<Card, Long> {
+public interface CardRepository extends
+        JpaRepository<Card, Long>,
+        JpaSpecificationExecutor<Card> {
 
     Optional<Card> findByCardNumber(String cardNumber);
 
@@ -19,4 +23,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     boolean existsByAccountIdAndCardType(Long accountId, Card.CardType cardType);
 
     long countByAccountUserId(Long userId);
+
+    long countByCardStatus(Card.CardStatus cardStatus);
 }

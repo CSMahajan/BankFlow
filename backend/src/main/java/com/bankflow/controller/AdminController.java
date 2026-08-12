@@ -2,6 +2,7 @@ package com.bankflow.controller;
 
 import com.bankflow.dto.*;
 import com.bankflow.entity.Account;
+import com.bankflow.entity.Card;
 import com.bankflow.service.AccountService;
 import com.bankflow.service.CardService;
 import com.bankflow.service.LoanService;
@@ -91,22 +92,6 @@ public class AdminController {
         );
     }
 
-    @GetMapping("/accounts/summary")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AccountSummaryResponse> getAccountSummary() {
-
-        return ResponseEntity.ok(
-                accountService.getAccountSummaryForAdmin()
-        );
-    }
-
-    @GetMapping("/loans/summary")
-    public LoanSummaryResponse getLoanSummary(){
-
-        return loanService.getLoanSummary();
-
-    }
-
     @PatchMapping("/accounts/{accountNumber}/freeze")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponse> freezeAccount(
@@ -129,10 +114,20 @@ public class AdminController {
 
     @GetMapping("/cards")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AdminCardResponse>> getAllCards() {
+    public ResponseEntity<Page<AdminCardResponse>> getAllCards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Card.CardStatus status
+    ) {
 
         return ResponseEntity.ok(
-                cardService.getAllCardsForAdmin()
+                cardService.getAllCardsForAdmin(
+                        page,
+                        size,
+                        search,
+                        status
+                )
         );
     }
 
@@ -153,6 +148,31 @@ public class AdminController {
 
         return ResponseEntity.ok(
                 cardService.unblockCardByAdmin(cardId)
+        );
+    }
+
+    @GetMapping("/accounts/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AccountSummaryResponse> getAccountSummary() {
+
+        return ResponseEntity.ok(
+                accountService.getAccountSummaryForAdmin()
+        );
+    }
+
+    @GetMapping("/loans/summary")
+    public LoanSummaryResponse getLoanSummary(){
+
+        return loanService.getLoanSummary();
+
+    }
+
+    @GetMapping("/cards/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CardSummaryResponse> getCardSummary(){
+
+        return ResponseEntity.ok(
+                cardService.getCardSummaryForAdmin()
         );
     }
 }

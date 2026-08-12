@@ -41,8 +41,30 @@ export const payEmi = async (paymentData) => {
   return response.data;
 };
 
-export const fetchPendingLoans = async () => {
-  const response = await API.get('/loans/pending');
+export const fetchPendingLoans = async ({
+  page = 0,
+  size = 10,
+  search = "",
+  loanType = "ALL",
+}) => {
+
+  const response = await API.get("/loans/pending", {
+    params: {
+      page,
+      size,
+      ...(search && { search }),
+      ...(loanType !== "ALL" && { loanType }),
+    },
+  });
+
+  return response.data;
+};
+
+export const fetchLoanSummary = async () => {
+  const response = await API.get(
+    "/admin/loans/summary"
+  );
+
   return response.data;
 };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchPendingLoans, approveLoan, rejectLoan } from '../../api/bankService';
+import { fetchPendingLoans, approveLoan, rejectLoan, fetchLoanSummary } from '../../api/bankService';
 import { formatDate, formatCurrency } from '../../utils/formatUtils';
 import modalStyles from "../../styles/modalStyles";
 import toast from "react-hot-toast";
@@ -10,7 +10,10 @@ const LoanApprovalsView = ({
     refreshDashboard,
 }) => {
     const [pendingLoans, setPendingLoans] = useState([]);
+    const [pageData, setPageData] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(true);
     const [error, setError] = useState('');
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedLoanId, setSelectedLoanId] = useState(null);
@@ -19,14 +22,56 @@ const LoanApprovalsView = ({
     const [search, setSearch] = useState("");
     const [loanTypeFilter, setLoanTypeFilter] = useState("ALL");
     const [expandedLoanId, setExpandedLoanId] = useState(null);
+    const [loanSummary, setLoanSummary] = useState(null);
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    useEffect(() => {
+
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
+
+
+        return () => clearTimeout(timer);
+
+    }, [search]);
+
+    const loadLoanSummary = async () => {
+
+        try {
+            const response = await fetchLoanSummary();
+
+            setLoanSummary(response);
+        }
+
+        catch (err) {
+
+            console.error("Loan summary failed", err);
+
+        }
+    };
+
+    useEffect(() => {
+        loadLoanSummary();
+    }, []);
 
     const loadPendingLoans = async () => {
         try {
-            setLoading(true);
+            if (initialLoading) {
+                setLoading(true);
+            }
             setError("");
 
-            const loans = await fetchPendingLoans();
-            setPendingLoans(loans);
+            const response = await fetchPendingLoans({
+                page: currentPage,
+                size: 10,
+                search: debouncedSearch,
+                loanType: loanTypeFilter,
+            });
+
+            setPendingLoans(response.content);
+            setPageData(response);
+
         } catch (err) {
             console.error(err);
             setError("Unable to load pending loan applications.");
@@ -37,9 +82,13 @@ const LoanApprovalsView = ({
 
     useEffect(() => {
         loadPendingLoans();
-    }, []);
+    }, [
+        currentPage,
+        debouncedSearch,
+        loanTypeFilter,
+    ]);
 
-    if (loading) {
+    if (loading && initialLoading) {
         return <p>Loading pending loan applications...</p>;
     }
 
@@ -51,9 +100,14 @@ const LoanApprovalsView = ({
         try {
             await approveLoan(loanId);
 
-            setPendingLoans(prev =>
-                prev.filter(loan => loan.id !== loanId)
-            );
+            if (pendingLoans.length === 1 && currentPage > 0) {
+                setCurrentPage(prev => prev - 1);
+            }
+            else {
+                await loadPendingLoans();
+            }
+
+            await loadLoanSummary();
 
             await refreshDashboard?.();
 
@@ -80,9 +134,14 @@ const LoanApprovalsView = ({
         try {
             await rejectLoan(selectedLoanId, rejectionRemarks.trim());
 
-            setPendingLoans(prev =>
-                prev.filter(loan => loan.id !== selectedLoanId)
-            );
+            if (pendingLoans.length === 1 && currentPage > 0) {
+                setCurrentPage(prev => prev - 1);
+            }
+            else {
+                await loadPendingLoans();
+            }
+
+            await loadLoanSummary();
 
             await refreshDashboard?.();
 
@@ -105,34 +164,14 @@ const LoanApprovalsView = ({
         }
     };
 
-    const personalCount = pendingLoans.filter(
-        loan => loan.loanType === "PERSONAL"
-    ).length;
+    const personalCount =
+        loanSummary?.personalLoans ?? 0;
 
-    const homeCount = pendingLoans.filter(
-        loan => loan.loanType === "HOME"
-    ).length;
+    const homeCount =
+        loanSummary?.homeLoans ?? 0;
 
-    const vehicleCount = pendingLoans.filter(
-        loan => loan.loanType === "VEHICLE"
-    ).length;
-
-    const filteredLoans = pendingLoans.filter((loan) => {
-
-        const matchesSearch =
-            loan.loanNumber.toLowerCase().includes(search.toLowerCase()) ||
-            loan.customerName.toLowerCase().includes(search.toLowerCase()) ||
-            loan.accountNumber.toLowerCase().includes(search.toLowerCase());
-
-        const matchesType =
-            loanTypeFilter === "ALL" ||
-            loan.loanType === loanTypeFilter;
-
-        return matchesSearch && matchesType;
-
-    });
-
-
+    const vehicleCount =
+        loanSummary?.vehicleLoans ?? 0;
 
     const formatLoanType = (loanType) => {
         switch (loanType) {
@@ -189,7 +228,7 @@ const LoanApprovalsView = ({
                 </div>
 
                 <div style={styles.pendingBadge}>
-                    {pendingLoans.length} Pending
+                    {pageData?.totalElements ?? 0} Pending
                 </div>
 
             </div>
@@ -218,7 +257,16 @@ const LoanApprovalsView = ({
             </div>
 
             {pendingLoans.length === 0 ? (
-                <p>No pending loan applications.</p>
+
+                <div style={styles.emptyState}>
+
+                    {search || loanTypeFilter !== "ALL"
+                        ? "No loans found matching your criteria."
+                        : "No pending loan applications."
+                    }
+
+                </div>
+
             ) : (
                 <>
                     <div style={styles.toolbar}>
@@ -226,13 +274,19 @@ const LoanApprovalsView = ({
                         <input
                             placeholder="Search loan, customer or account..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => {
+                                setCurrentPage(0);
+                                setSearch(e.target.value);
+                            }}
                             style={styles.searchInput}
                         />
 
                         <select
                             value={loanTypeFilter}
-                            onChange={(e) => setLoanTypeFilter(e.target.value)}
+                            onChange={(e) => {
+                                setCurrentPage(0);
+                                setLoanTypeFilter(e.target.value);
+                            }}
                             style={styles.filterSelect}
                         >
                             <option value="ALL">All Types</option>
@@ -270,7 +324,7 @@ const LoanApprovalsView = ({
                             </thead>
 
                             <tbody>
-                                {filteredLoans.map((loan, index) => (
+                                {pendingLoans.map((loan, index) => (
                                     <React.Fragment key={loan.id}>
                                         <tr
                                             key={loan.id}
@@ -465,6 +519,43 @@ const LoanApprovalsView = ({
                             </tbody>
                         </table>
                     </div >
+                    {
+                        pageData && pageData.totalPages > 1 && (
+
+                            <div style={styles.pagination}>
+
+                                <button
+                                    disabled={pageData.first}
+                                    onClick={() =>
+                                        setCurrentPage(prev => prev - 1)
+                                    }
+                                    style={styles.pageButton}
+                                >
+                                    ← Previous
+                                </button>
+
+
+                                <span>
+                                    Page {pageData.number + 1}
+                                    {" "}of{" "}
+                                    {pageData.totalPages}
+                                </span>
+
+
+                                <button
+                                    disabled={pageData.last}
+                                    onClick={() =>
+                                        setCurrentPage(prev => prev + 1)
+                                    }
+                                    style={styles.pageButton}
+                                >
+                                    Next →
+                                </button>
+
+                            </div>
+
+                        )
+                    }
                 </>
             )}
 
@@ -917,6 +1008,30 @@ const styles = {
         fontWeight: 600,
         cursor: "pointer",
     },
+
+    pagination: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "16px",
+        marginTop: "24px",
+    },
+
+    pageButton: {
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+        background: "#fff",
+        cursor: "pointer",
+        fontWeight: 600,
+    },
+
+    emptyState: {
+        textAlign: "center",
+        padding: "40px",
+        color: "#64748b",
+        fontSize: "15px",
+    }
 };
 
 export default LoanApprovalsView;

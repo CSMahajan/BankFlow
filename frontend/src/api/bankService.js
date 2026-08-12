@@ -86,8 +86,22 @@ export const fetchAdminDashboardSummary = async () => {
   return response.data;
 };
 
-export const fetchUsers = async () => {
-  const response = await API.get("/users");
+export const fetchUsers = async ({
+  page = 0,
+  size = 10,
+  search = "",
+  role = "ALL",
+}) => {
+
+  const response = await API.get("/users", {
+    params: {
+      page,
+      size,
+      ...(search && { search }),
+      ...(role !== "ALL" && { role }),
+    },
+  });
+
   return response.data;
 };
 

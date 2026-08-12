@@ -5,10 +5,15 @@ import PageCard from "./PageCard";
 import UserDetailsDrawer from "./UserDetailsDrawer";
 import { getUserRoleStyle } from "../utils/userRoleUtils";
 import { formatDate } from "../utils/formatUtils";
+import styles from '../styles/userManagementStyles';
 
 const UserManagementView = () => {
     const [users, setUsers] = useState([]);
+    const [pageData, setPageData] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [searchInput, setSearchInput] = useState("");
     const [loading, setLoading] = useState(true);
+    const [tableLoading, setTableLoading] = useState(false);
     const [error, setError] = useState("");
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("ALL");
@@ -16,26 +21,73 @@ const UserManagementView = () => {
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [detailsLoading, setDetailsLoading] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
 
     useEffect(() => {
         loadUsers();
-    }, []);
+    }, [
+        currentPage,
+        search,
+        roleFilter
+    ]);
+
+    useEffect(() => {
+
+        const value = searchInput.trim();
+
+        if (value === search) {
+            return;
+        }
+
+        setSearchLoading(true);
+
+        const timer = setTimeout(() => {
+
+            setCurrentPage(0);
+            setSearch(value);
+
+        }, 400);
+
+
+        return () => clearTimeout(timer);
+
+    }, [searchInput]);
 
     const loadUsers = async () => {
+
         try {
-            setLoading(true);
+
+            if (!pageData) {
+                setLoading(true);
+            } else {
+                setTableLoading(true);
+            }
+
             setError("");
 
-            const response = await fetchUsers();
-            setUsers(response);
-        } catch (err) {
-            console.error(err);
-            console.log(err.response);
-            console.log(err.response?.data);
+            const response = await fetchUsers({
+                page: currentPage,
+                size: 10,
+                search,
+                role: roleFilter,
+            });
 
+
+            setUsers(response.content);
+            setPageData(response);
+
+
+        } catch (err) {
+
+            console.error(err);
             setError("Failed to load users.");
+
         } finally {
+
             setLoading(false);
+            setTableLoading(false);
+            setSearchLoading(false);
+
         }
     };
 
@@ -75,90 +127,97 @@ const UserManagementView = () => {
         return <p>{error}</p>;
     }
 
-    const USER_ROLE_FILTERS = [
-        "ALL",
-        "CUSTOMER",
-        "ADMIN",
-    ];
-
     const closeDrawer = () => {
         setDrawerOpen(false);
         setSelectedUserId(null);
         setSelectedUser(null);
-        setActiveSection(null);
     };
-
-    const filteredUsers = users.filter((user) => {
-        const matchesSearch =
-            user.fullName.toLowerCase().includes(search.toLowerCase()) ||
-            user.email.toLowerCase().includes(search.toLowerCase());
-
-        const matchesRole =
-            roleFilter === "ALL" || user.role === roleFilter;
-
-        return matchesSearch && matchesRole;
-    });
 
     return (
         <div>
             <PageCard title="👥 User Management">
-                <div
-                    style={{
-                        overflowX: "auto",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "10px",
-                    }}
-                >
 
-                    <div style={{ marginBottom: "20px" }}>
+
+                <div style={styles.toolbar}>
+
+                    <div style={styles.searchWrapper}>
+
                         <input
                             type="text"
-                            placeholder="Search by name or email..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            style={{
-                                width: "320px",
-                                padding: "10px 14px",
-                                border: "1px solid #cbd5e1",
-                                borderRadius: "8px",
-                                fontSize: "14px",
-                                outline: "none",
+                            placeholder="Search customer name or email..."
+                            value={searchInput}
+                            onChange={(e) => {
+                                setSearchInput(e.target.value);
                             }}
+                            style={styles.searchInput}
                         />
-                    </div>
 
-                    <div
-                        style={{
-                            display: "flex",
-                            gap: "10px",
-                            marginBottom: "20px",
-                        }}
-                    >
-                        {USER_ROLE_FILTERS.map((role) => (
+
+                        {searchLoading && (
+                            <span style={styles.searchStatus}>
+                                Searching...
+                            </span>
+                        )}
+
+
+                        {searchInput && (
                             <button
-                                key={role}
-                                onClick={() => setRoleFilter(role)}
-                                style={{
-                                    padding: "8px 16px",
-                                    borderRadius: "20px",
-                                    border: "1px solid #cbd5e1",
-                                    cursor: "pointer",
-                                    backgroundColor:
-                                        roleFilter === role ? "#1e293b" : "#ffffff",
-                                    color:
-                                        roleFilter === role ? "#ffffff" : "#334155",
-                                    fontWeight: "600",
+                                style={styles.clearButton}
+                                onClick={() => {
+                                    setSearchInput("");
+                                    setSearch("");
+                                    setCurrentPage(0);
                                 }}
                             >
-                                {role === "ALL"
-                                    ? "All"
-                                    : role === "CUSTOMER"
-                                        ? "Customers"
-                                        : "Admins"}
+                                ✕
                             </button>
-                        ))}
+                        )}
                     </div>
+                    <select
+                        value={roleFilter}
+                        onChange={(e) => {
+                            setCurrentPage(0);
+                            setRoleFilter(e.target.value);
+                        }}
+                        style={styles.filterSelect}
+                    >
+                        <option value="ALL">
+                            All Roles
+                        </option>
+                        <option value="CUSTOMER">
+                            Customers
+                        </option>
+                        <option value="ADMIN">
+                            Admins
+                        </option>
+                    </select>
+                </div>
+                <div style={styles.resultRow}>
+                    <div style={styles.resultInfo}>
+                        Showing {pageData?.totalElements ?? 0} users
+                        {search && ` matching "${search}"`}
+                    </div>
+                    {tableLoading && (
+                        <span style={styles.loadingText}>
+                            Updating...
+                        </span>
+                    )}
+                </div>
+                <hr
+                    style={{
+                        border: "none",
+                        borderTop: "1px solid #e5e7eb",
+                        margin: "28px 0",
+                    }}
+                />
 
+                <div
+                    style={{
+                        ...styles.tableContainer,
+                        opacity: tableLoading ? 0.6 : 1,
+                        transition: "opacity .2s ease",
+                    }}
+                >
                     <table
                         style={{
                             width: "100%",
@@ -179,7 +238,7 @@ const UserManagementView = () => {
                         </thead>
 
                         <tbody>
-                            {filteredUsers.map((user) => (
+                            {users.map((user) => (
                                 <tr
                                     key={user.id}
                                     onClick={() => openUserDetails(user.id)}
@@ -230,6 +289,48 @@ const UserManagementView = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {
+                    pageData && pageData.totalPages > 1 && (
+
+                        <div style={styles.pagination}>
+
+                            <button
+                                disabled={pageData.first}
+                                onClick={() =>
+                                    setCurrentPage(prev => prev - 1)
+                                }
+                                style={{
+                                    ...styles.pageButton,
+                                    ...(pageData.first && styles.disabledPageButton)
+                                }}
+                            >
+                                ← Previous
+                            </button>
+
+
+                            <span style={styles.pageInfo}>
+                                Page {pageData.number + 1} of {pageData.totalPages}
+                            </span>
+
+
+                            <button
+                                disabled={pageData.last}
+                                onClick={() =>
+                                    setCurrentPage(prev => prev + 1)
+                                }
+                                style={{
+                                    ...styles.pageButton,
+                                    ...(pageData.last && styles.disabledPageButton)
+                                }}
+                            >
+                                Next →
+                            </button>
+
+                        </div>
+
+                    )
+                }
             </PageCard>
             <UserDetailsDrawer
                 open={drawerOpen}

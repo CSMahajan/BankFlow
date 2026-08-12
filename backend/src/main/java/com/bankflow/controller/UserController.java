@@ -4,6 +4,7 @@ import com.bankflow.dto.*;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,10 +42,27 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserSummaryResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
+    public ResponseEntity<Page<UserSummaryResponse>> getAllUsers(
 
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "10") int size,
+
+            @RequestParam(required = false) String search,
+
+            @RequestParam(defaultValue = "ALL") String role
+
+    ) {
+
+        return ResponseEntity.ok(
+                userService.getAllUsers(
+                        page,
+                        size,
+                        search,
+                        role
+                )
+        );
+    }
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDetailsResponse> getUserDetails(

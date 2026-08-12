@@ -7,8 +7,14 @@ import com.bankflow.entity.VerificationToken;
 import com.bankflow.exception.EmailVerificationException;
 import com.bankflow.exception.ResourceNotFoundException;
 import com.bankflow.repository.*;
+import com.bankflow.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -250,20 +256,59 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserSummaryResponse> getAllUsers() {
-        log.info("Fetching all users for admin");
+    public Page<UserSummaryResponse> getAllUsers(
+            int page,
+            int size,
+            String search,
+            String role
+    ) {
 
-        return userRepository.findAll()
-                .stream()
-                .map(user -> new UserSummaryResponse(
-                        user.getId(),
-                        user.getFullName(),
-                        user.getEmail(),
-                        user.getRole().name(),
-                        user.getCreatedAt(),
-                        accountRepository.countByUserId(user.getId())
-                ))
-                .toList();
+        log.info(
+                "Fetching users. page={}, size={}, search={}, role={}",
+                page,
+                size,
+                search,
+                role
+        );
+
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by("createdAt")
+                                .descending()
+                );
+
+
+        User.Role userRole = null;
+
+        if(role != null && !role.equals("ALL")) {
+            userRole = User.Role.valueOf(role);
+        }
+
+
+        Specification<User> specification =
+                Specification
+                        .where(UserSpecification.search(search))
+                        .and(UserSpecification.role(userRole));
+
+
+        return userRepository
+                .findAll(
+                        specification,
+                        pageable
+                )
+                .map(user ->
+                        new UserSummaryResponse(
+                                user.getId(),
+                                user.getFullName(),
+                                user.getEmail(),
+                                user.getRole().name(),
+                                user.getCreatedAt(),
+                                accountRepository.countByUserId(user.getId())
+                        )
+                );
     }
 
     @Transactional

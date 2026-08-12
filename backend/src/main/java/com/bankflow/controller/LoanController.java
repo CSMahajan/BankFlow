@@ -1,9 +1,15 @@
 package com.bankflow.controller;
 
 import com.bankflow.dto.*;
+import com.bankflow.entity.Loan;
 import com.bankflow.service.LoanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,9 +51,28 @@ public class LoanController {
     // ADMIN Endpoint: View Pending Loan Applications
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<LoanResponse>> getPendingLoans() {
-        List<LoanResponse> loans = loanService.getPendingLoans();
-        return ResponseEntity.ok(loans);
+    public ResponseEntity<Page<LoanResponse>> getPendingLoans(
+
+            @RequestParam(required = false) String search,
+
+            @RequestParam(required = false) Loan.LoanType loanType,
+
+            @PageableDefault(
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+
+    ) {
+
+        return ResponseEntity.ok(
+                loanService.getPendingLoans(
+                        search,
+                        loanType,
+                        pageable
+                )
+        );
     }
 
     // ADMIN Endpoint: Approve & Disburse Loan

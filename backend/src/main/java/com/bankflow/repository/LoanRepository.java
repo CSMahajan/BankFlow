@@ -1,7 +1,12 @@
 package com.bankflow.repository;
 
 import com.bankflow.entity.Loan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface LoanRepository extends JpaRepository<Loan, Long> {
+public interface LoanRepository extends
+        JpaRepository<Loan, Long>,
+        JpaSpecificationExecutor<Loan> {
 
     List<Loan> findByUserId(Long userId);
 
@@ -31,4 +38,19 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
               AND l.status = com.bankflow.entity.Loan.LoanStatus.ACTIVE
             """)
     BigDecimal getOutstandingLoanAmount(Long userId);
+
+
+        @EntityGraph(attributePaths = {
+                "disbursementAccount",
+                "user"
+        })
+        Page<Loan> findAll(
+                Specification<Loan> specification,
+                Pageable pageable
+        );
+
+    long countByStatusAndLoanType(
+            Loan.LoanStatus status,
+            Loan.LoanType loanType
+    );
 }

@@ -4,6 +4,7 @@ import com.bankflow.dto.*;
 import com.bankflow.entity.Account;
 import com.bankflow.service.AccountService;
 import com.bankflow.service.CardService;
+import com.bankflow.service.LoanService;
 import com.bankflow.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class AdminController {
     private final UserService userService;
     private final AccountService accountService;
     private final CardService cardService;
+    private final LoanService loanService;
 
     @PostMapping("/users/create-admin")
     @PreAuthorize("hasRole('ADMIN')") // Blocks non-admins (HTTP 403 Forbidden)
@@ -96,6 +98,13 @@ public class AdminController {
         return ResponseEntity.ok(
                 accountService.getAccountSummaryForAdmin()
         );
+    }
+
+    @GetMapping("/loans/summary")
+    public LoanSummaryResponse getLoanSummary(){
+
+        return loanService.getLoanSummary();
+
     }
 
     @PatchMapping("/accounts/{accountNumber}/freeze")

@@ -6,8 +6,12 @@ import com.bankflow.entity.Loan.LoanStatus;
 import com.bankflow.entity.Loan.LoanType;
 import com.bankflow.entity.Transaction.TransactionType;
 import com.bankflow.repository.*;
+import com.bankflow.specification.LoanSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -268,11 +272,68 @@ public class LoanService {
     }
 
     @Transactional(readOnly = true)
-    public List<LoanResponse> getPendingLoans() {
-        return loanRepository.findByStatus(LoanStatus.PENDING)
-                .stream()
-                .map(this::mapToLoanResponse)
-                .toList();
+    public Page<LoanResponse> getPendingLoans(
+            String search,
+            LoanType loanType,
+            Pageable pageable) {
+
+
+        Specification<Loan> specification =
+                Specification.where(
+                        LoanSpecification.status(LoanStatus.PENDING)
+                );
+
+
+        specification =
+                specification.and(
+                        LoanSpecification.search(search)
+                );
+
+
+        specification =
+                specification.and(
+                        LoanSpecification.loanType(loanType)
+                );
+
+
+        return loanRepository
+                .findAll(specification, pageable)
+                .map(this::mapToLoanResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public LoanSummaryResponse getLoanSummary() {
+
+        long totalPending =
+                loanRepository.countByStatus(
+                        LoanStatus.PENDING
+                );
+
+        long personal =
+                loanRepository.countByStatusAndLoanType(
+                        LoanStatus.PENDING,
+                        LoanType.PERSONAL
+                );
+
+        long home =
+                loanRepository.countByStatusAndLoanType(
+                        LoanStatus.PENDING,
+                        LoanType.HOME
+                );
+
+        long vehicle =
+                loanRepository.countByStatusAndLoanType(
+                        LoanStatus.PENDING,
+                        LoanType.VEHICLE
+                );
+
+
+        return new LoanSummaryResponse(
+                totalPending,
+                personal,
+                home,
+                vehicle
+        );
     }
 
     @Transactional(readOnly = true)

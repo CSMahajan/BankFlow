@@ -294,7 +294,7 @@ public class UserService {
                         .and(UserSpecification.role(userRole));
 
 
-        return userRepository
+        return userRepository   
                 .findAll(
                         specification,
                         pageable

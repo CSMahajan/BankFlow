@@ -38,11 +38,25 @@ public class KycService {
     public KycDocument uploadDocument(MultipartFile file, KycDocument.DocumentType documentType) {
         User user = currentUserService.getCurrentUser();
         validateFile(file);
-        kycDocumentRepository.findByUserIdAndDocumentType(
-                        user.getId(), documentType)
-                .ifPresent(existing -> {
-                    throw new IllegalArgumentException("Document already uploaded for this type");
-                });
+        List<KycDocument> existingDocuments =
+                kycDocumentRepository
+                        .findByUserIdAndDocumentTypeOrderByUploadedAtDesc(
+                                user.getId(),
+                                documentType
+                        );
+
+        if(!existingDocuments.isEmpty()) {
+
+            KycDocument latest = existingDocuments.get(0);
+
+            if(latest.getKycVerificationStatus()
+                    != KycDocument.KycVerificationStatus.REJECTED) {
+
+                throw new IllegalArgumentException(
+                        "Document already uploaded and cannot be replaced"
+                );
+            }
+        }
         String storagePath = fileStorageService.store(file, user.getId());
         try {
             KycDocument document = KycDocument.builder()
@@ -70,7 +84,6 @@ public class KycService {
             throw e;
         }
     }
-
 
     @Transactional(readOnly = true)
     public List<KycDocumentResponse> getMyDocuments() {

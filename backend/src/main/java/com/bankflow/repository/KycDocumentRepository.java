@@ -16,7 +16,7 @@ public interface KycDocumentRepository
 
     List<KycDocument> findByUserIdOrderByUploadedAtDesc(Long userId);
 
-    Optional<KycDocument> findByUserIdAndDocumentType(
+    List<KycDocument> findByUserIdAndDocumentTypeOrderByUploadedAtDesc(
             Long userId,
             KycDocument.DocumentType documentType
     );

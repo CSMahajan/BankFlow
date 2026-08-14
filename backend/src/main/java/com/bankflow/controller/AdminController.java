@@ -3,14 +3,15 @@ package com.bankflow.controller;
 import com.bankflow.dto.*;
 import com.bankflow.entity.Account;
 import com.bankflow.entity.Card;
-import com.bankflow.service.AccountService;
-import com.bankflow.service.CardService;
-import com.bankflow.service.LoanService;
-import com.bankflow.service.UserService;
+import com.bankflow.entity.KycDocument;
+import com.bankflow.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class AdminController {
     private final AccountService accountService;
     private final CardService cardService;
     private final LoanService loanService;
+    private final KycService kycService;
 
     @PostMapping("/users/create-admin")
     @PreAuthorize("hasRole('ADMIN')") // Blocks non-admins (HTTP 403 Forbidden)
@@ -174,5 +176,85 @@ public class AdminController {
         return ResponseEntity.ok(
                 cardService.getCardSummaryForAdmin()
         );
+    }
+
+    @GetMapping("/kyc/documents")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<AdminKycDocumentResponse>> getAllKycDocuments(
+
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "20") int size,
+
+            @RequestParam(required = false) String search,
+
+            @RequestParam(required = false)
+            KycDocument.KycVerificationStatus status
+
+    ) {
+
+        return ResponseEntity.ok(
+                kycService.getAllDocuments(
+                        page,
+                        size,
+                        search,
+                        status
+                )
+        );
+    }
+
+    @GetMapping("/kyc/documents/{documentId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Resource> viewKycDocument(
+            @PathVariable Long documentId) {
+
+        KycDocument document =
+                kycService.getAdminDocumentDetails(documentId);
+
+        Resource resource =
+                kycService.getAdminDocumentResource(documentId);
+
+        return ResponseEntity.ok()
+                .contentType(
+                        MediaType.parseMediaType(
+                                document.getContentType()
+                        )
+                )
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" +
+                                document.getOriginalFileName()
+                                + "\""
+                )
+                .body(resource);
+    }
+
+    @PatchMapping("/kyc/documents/{documentId}/verify")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void verifyKycDocument(
+            @PathVariable Long documentId) {
+
+        kycService.verifyDocument(documentId);
+    }
+
+    @PatchMapping("/kyc/documents/{documentId}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void rejectKycDocument(
+            @PathVariable Long documentId,
+            @Valid @RequestBody KycRejectRequest request) {
+
+        kycService.rejectDocument(
+                documentId,
+                request.reason()
+        );
+    }
+
+    @GetMapping("/kyc/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<KycSummaryResponse> getKycSummary(){
+
+        return ResponseEntity.ok(kycService.getKycSummary());
     }
 }

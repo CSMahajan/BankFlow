@@ -57,6 +57,9 @@ app:
     api-key: ${BREVO_API_KEY}
     base-url: https://api.brevo.com
 
+  storage:
+    location: ${STORAGE_LOCATION:uploads/kyc}
+
 management:
   endpoints:
     web:

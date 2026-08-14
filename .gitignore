@@ -20,6 +20,8 @@ backend/.classpath
 backend/.project
 backend/.settings/
 
+uploads/
+
 # Maven
 backend/.mvn/
 backend/mvnw

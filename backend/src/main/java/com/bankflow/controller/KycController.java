@@ -34,7 +34,8 @@ public class KycController {
                         document.getDocumentType().name(),
                         document.getOriginalFileName(),
                         document.getKycVerificationStatus().name(),
-                        document.getUploadedAt()
+                        document.getUploadedAt(),
+                        document.getRejectionReason()
                 )
         );
     }

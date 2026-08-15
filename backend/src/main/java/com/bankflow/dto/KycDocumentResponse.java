@@ -8,6 +8,7 @@ public record KycDocumentResponse(
         String documentType,
         String originalFileName,
         String status,
-        LocalDateTime uploadedAt
+        LocalDateTime uploadedAt,
+        String rejectionReason
 ) {
 }

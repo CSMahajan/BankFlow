@@ -99,7 +99,8 @@ public class KycService {
                                 document.getDocumentType().name(),
                                 document.getOriginalFileName(),
                                 document.getKycVerificationStatus().name(),
-                                document.getUploadedAt()
+                                document.getUploadedAt(),
+                                document.getRejectionReason()
                         )
                 )
                 .toList();

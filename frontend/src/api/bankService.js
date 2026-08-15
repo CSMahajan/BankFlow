@@ -474,7 +474,7 @@ export const viewMyKycDocument = async (documentId) => {
   return response.data;
 };
 
-export const getAdminKycSummary = async () => {
+export const fetchAdminKycSummary = async () => {
 
   const response = await API.get(
     "/admin/kyc/summary"
@@ -484,12 +484,12 @@ export const getAdminKycSummary = async () => {
 };
 
 
-export const getAdminKycDocuments = async (
-  page,
-  size,
-  search,
-  status
-) => {
+export const fetchAdminKycDocuments = async ({
+  page = 0,
+  size = 10,
+  search = "",
+  status = "ALL",
+}) => {
 
   const response = await API.get(
     "/admin/kyc/documents",
@@ -497,8 +497,8 @@ export const getAdminKycDocuments = async (
       params: {
         page,
         size,
-        search,
-        status
+        ...(search && { search }),
+        ...(status !== "ALL" && { status })
       }
     }
   );
@@ -545,4 +545,5 @@ export const viewAdminKycDocument = async (
   );
 
   return response.data;
+
 };

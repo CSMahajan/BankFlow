@@ -6,6 +6,7 @@ import AdminDashboardOverview from './AdminDashboardOverview';
 import UserManagementView from "./UserManagementView";
 import AccountManagementView from './accounts/AccountManagementView';
 import CardManagementView from './cards/CardManagementView';
+import KycManagementView from './kyc/KycManagementView';
 import AuditLogsView from "./audit/AuditLogsView";
 import { fetchAdminDashboardSummary } from '../api/bankService';
 
@@ -107,6 +108,16 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
               onClick={() => setActiveTab('cardManage')}
             >
               💳 Card Management
+            </button>
+            <button
+              style={{
+                ...styles.navBtn,
+                backgroundColor: activeTab === 'kyc' ? '#1e293b' : 'transparent',
+                color: activeTab === 'kyc' ? '#ffffff' : '#374151',
+              }}
+              onClick={() => setActiveTab('kyc')}
+            >
+              🪪 KYC Verification
             </button>
             <button
               style={{
@@ -268,6 +279,12 @@ const AdminDashboard = ({ userRole, userName, onLogout }) => {
 
         {activeTab === 'cardManage' && (
           <CardManagementView
+            refreshDashboard={refreshDashboard}
+          />
+        )}
+
+        {activeTab === 'kyc' && (
+          <KycManagementView
             refreshDashboard={refreshDashboard}
           />
         )}

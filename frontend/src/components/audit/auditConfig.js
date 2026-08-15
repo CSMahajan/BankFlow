@@ -6,6 +6,10 @@ export const actionDisplayNames = {
     PASSWORD_CHANGED: "🔒 Password Changed",
     EMAIL_VERIFIED: "✅ Email Verified",
 
+    KYC_DOCUMENT_UPLOADED: "📄 KYC Document Uploaded",
+    KYC_DOCUMENT_VERIFIED: "🟢 KYC Document Verified",
+    KYC_DOCUMENT_REJECTED: "🔴 KYC Document Rejected",
+
     ACCOUNT_CREATED: "🏦 Account Created",
     ACCOUNT_ACTIVATED: "✅ Account Activated",
     ACCOUNT_FROZEN: "❄️ Account Frozen",
@@ -35,12 +39,13 @@ export const actionDisplayNames = {
 
 export const moduleDisplayNames = {
     LOGIN: "🔐 Authentication",
+    KYC: "🪪 KYC Verification",
+    PROFILE: "👤 Profile",
     ACCOUNTS: "🏦 Accounts",
     TRANSFERS: "💸 Transfers",
     FIXED_DEPOSITS: "💰 Fixed Deposits",
     LOANS: "📄 Loans",
     CARDS: "💳 Cards",
-    PROFILE: "👤 Profile",
 };
 
 export const moduleActions = {
@@ -89,5 +94,11 @@ export const moduleActions = {
 
     PROFILE: [
         "PROFILE_UPDATED",
+    ],
+
+    KYC: [
+        "KYC_DOCUMENT_UPLOADED",
+        "KYC_DOCUMENT_VERIFIED",
+        "KYC_DOCUMENT_REJECTED",
     ],
 };

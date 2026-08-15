@@ -47,7 +47,7 @@ public class KycService {
 
         if(!existingDocuments.isEmpty()) {
 
-            KycDocument latest = existingDocuments.get(0);
+            KycDocument latest = existingDocuments.getFirst();
 
             if(latest.getKycVerificationStatus()
                     != KycDocument.KycVerificationStatus.REJECTED) {

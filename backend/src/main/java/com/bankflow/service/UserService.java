@@ -10,6 +10,7 @@ import com.bankflow.repository.*;
 import com.bankflow.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,9 @@ public class UserService {
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.email-verification.enabled:false}")
+    private boolean emailVerificationEnabled;
+
     @Transactional
     public void registerCustomer(RegisterRequest request) {
         log.info("Attempting customer registration for email [{}]", request.email());
@@ -59,10 +63,14 @@ public class UserService {
                 .build();
 
         User savedUser = userRepository.save(user);
-
-        VerificationToken verificationToken = verificationTokenService.createVerificationToken(savedUser);
-
-        emailService.sendVerificationEmail(savedUser, verificationToken.getToken());
+        if (emailVerificationEnabled) {
+            VerificationToken verificationToken =
+                    verificationTokenService.createVerificationToken(savedUser);
+            emailService.sendVerificationEmail(savedUser, verificationToken.getToken());
+        } else {
+            savedUser.setEmailVerified(true);
+            userRepository.save(savedUser);
+        }
 
         log.info("Customer registered successfully. User ID: [{}], Email: [{}]",
                 savedUser.getId(), savedUser.getEmail());
@@ -89,7 +97,7 @@ public class UserService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
-        if (!user.isEmailVerified()) {
+        if (emailVerificationEnabled && !user.isEmailVerified()) {
             log.warn("Authentication failed for email [{}]: Email not verified",
                     request.email());
 
@@ -156,7 +164,8 @@ public class UserService {
                 .fullName(request.fullName())
                 .email(request.email())
                 .password(encodedPassword)
-                .role(User.Role.ADMIN) // Explicitly assign ADMIN role
+                .role(User.Role.ADMIN)
+                .emailVerified(true)
                 .build();
 
         User savedAdmin = userRepository.save(adminUser);
@@ -178,6 +187,10 @@ public class UserService {
                                 "No account found with this email address."
                         ));
 
+        if (!emailVerificationEnabled) {
+            return;
+        }
+
         if (user.isEmailVerified()) {
             throw new EmailVerificationException(
                     "Your email address is already verified."
@@ -187,10 +200,7 @@ public class UserService {
         VerificationToken verificationToken =
                 verificationTokenService.createVerificationToken(user);
 
-        emailService.sendVerificationEmail(
-                user,
-                verificationToken.getToken()
-        );
+        emailService.sendVerificationEmail(user, verificationToken.getToken());
 
         auditLogService.log(
                 user,
@@ -283,7 +293,7 @@ public class UserService {
 
         User.Role userRole = null;
 
-        if(role != null && !role.equals("ALL")) {
+        if (role != null && !role.equals("ALL")) {
             userRole = User.Role.valueOf(role);
         }
 

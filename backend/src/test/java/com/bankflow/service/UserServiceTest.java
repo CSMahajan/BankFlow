@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -67,6 +68,13 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+
+        ReflectionTestUtils.setField(
+                userService,
+                "emailVerificationEnabled",
+                true
+        );
+
         mockUser = User.builder()
                 .id(1L)
                 .fullName("John Doe")
@@ -100,7 +108,7 @@ class UserServiceTest {
     // ==========================================
 
     @Test
-    @DisplayName("Register Customer - Success")
+    @DisplayName("Register Customer When Email Verification Disabled - Success")
     void registerCustomer_Success() {
         RegisterRequest request =
                 new RegisterRequest("John Doe", "john@example.com", "Secret@123");

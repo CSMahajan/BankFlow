@@ -60,6 +60,9 @@ app:
   storage:
     location: ${STORAGE_LOCATION:uploads/kyc}
 
+  email-verification:
+    enabled: ${EMAIL_VERIFICATION_ENABLED:false}
+
   kyc:
     notification-enabled: ${KYC_NOTIFICATION_ENABLED:false}
 

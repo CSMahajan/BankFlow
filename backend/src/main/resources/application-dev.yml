@@ -9,3 +9,10 @@ spring:
   sql:
     init:
       mode: always
+
+app:
+  email-verification:
+    enabled: false
+
+  kyc:
+    notification-enabled: false

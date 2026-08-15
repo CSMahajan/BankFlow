@@ -62,7 +62,9 @@ public class LocalFileStorageService implements FileStorageService {
     public Resource load(String filePath) {
         try {
 
-            Path file = Paths.get(filePath).toAbsolutePath().normalize();
+            Path file = rootLocation
+                    .resolve(filePath)
+                    .normalize();
 
             if (!file.startsWith(rootLocation)) {
                 throw new RuntimeException("Invalid file path");

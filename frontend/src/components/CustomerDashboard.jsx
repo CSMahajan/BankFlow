@@ -10,6 +10,7 @@ import PaymentsView from "./payments/PaymentsView";
 import LoansView from './loans/LoansView';
 import CardsView from "./cards/CardsView";
 import ProfileView from './ProfileView';
+import KycView from './kyc/KycView';
 import { fetchMyAccounts, fetchDashboardSummary, fetchMonthlyAnalytics } from "../api/bankService";
 
 const CustomerDashboard = ({ userRole, onLogout }) => {
@@ -376,6 +377,24 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
                     👤 My Profile
                   </button>
 
+                  <button
+                    style={{
+                      ...styles.dropdownItem,
+                      backgroundColor:
+                        hoveredItem === "kyc"
+                          ? "#f3f8f7"
+                          : "transparent",
+                    }}
+                    onMouseEnter={() => setHoveredItem("kyc")}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={() => {
+                      setActiveTab("kyc");
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    🪪 KYC Verification
+                  </button>
+
                   <div style={styles.dropdownDivider} />
 
                   <button
@@ -409,6 +428,10 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
           <ProfileView
             onProfileUpdated={handleProfileUpdated}
           />
+        )}
+
+        {activeTab === 'kyc' && (
+          <KycView />
         )}
 
         {activeTab === 'dashboard' && (

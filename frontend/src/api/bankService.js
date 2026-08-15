@@ -425,3 +425,124 @@ export const updateProfile = async (request) => {
 export const changePassword = async (request) => {
   await API.patch("/users/change-password", request);
 };
+
+export const fetchMyKycStatus = async () => {
+  const response = await API.get(
+    "/kyc/status"
+  );
+
+  return response.data;
+};
+
+
+export const fetchMyKycDocuments = async () => {
+  const response = await API.get(
+    "/kyc/my-documents"
+  );
+
+  return response.data;
+};
+
+
+export const uploadKycDocument = async (
+  file,
+  documentType
+) => {
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+  formData.append("documentType", documentType);
+
+  const response = await API.post(
+    "/kyc/upload",
+    formData
+  );
+
+  return response.data;
+};
+
+export const viewMyKycDocument = async (documentId) => {
+
+  const response = await API.get(
+    `/kyc/documents/${documentId}`,
+    {
+      responseType: "blob"
+    }
+  );
+
+  return response.data;
+};
+
+export const getAdminKycSummary = async () => {
+
+  const response = await API.get(
+    "/admin/kyc/summary"
+  );
+
+  return response.data;
+};
+
+
+export const getAdminKycDocuments = async (
+  page,
+  size,
+  search,
+  status
+) => {
+
+  const response = await API.get(
+    "/admin/kyc/documents",
+    {
+      params: {
+        page,
+        size,
+        search,
+        status
+      }
+    }
+  );
+
+  return response.data;
+};
+
+
+export const verifyKycDocument = async (
+  documentId
+) => {
+
+  await API.patch(
+    `/admin/kyc/documents/${documentId}/verify`
+  );
+
+};
+
+
+export const rejectKycDocument = async (
+  documentId,
+  reason
+) => {
+
+  await API.patch(
+    `/admin/kyc/documents/${documentId}/reject`,
+    {
+      reason
+    }
+  );
+
+};
+
+
+export const viewAdminKycDocument = async (
+  documentId
+) => {
+
+  const response = await API.get(
+    `/admin/kyc/documents/${documentId}`,
+    {
+      responseType: "blob"
+    }
+  );
+
+  return response.data;
+};

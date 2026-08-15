@@ -8,5 +8,6 @@ public record AdminDashboardSummaryResponse(
         long activeLoans,
         long pendingLoans,
         long activeFixedDeposits,
-        BigDecimal totalDeposits
+        BigDecimal totalDeposits,
+        long pendingKycDocuments
 ) {}

@@ -4,17 +4,9 @@ import com.bankflow.dto.AdminDashboardSummaryResponse;
 import com.bankflow.dto.DashboardSummaryResponse;
 import com.bankflow.dto.MonthlyAnalyticsResponse;
 import com.bankflow.dto.TransactionResponse;
-import com.bankflow.entity.Account;
-import com.bankflow.entity.FixedDeposit;
-import com.bankflow.entity.Loan;
-import com.bankflow.entity.Transaction;
+import com.bankflow.entity.*;
 import com.bankflow.entity.Transaction.TransactionType;
-import com.bankflow.entity.User;
-import com.bankflow.repository.AccountRepository;
-import com.bankflow.repository.FixedDepositRepository;
-import com.bankflow.repository.LoanRepository;
-import com.bankflow.repository.TransactionRepository;
-import com.bankflow.repository.UserRepository;
+import com.bankflow.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,6 +35,7 @@ public class DashboardService {
     private final LoanRepository loanRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final KycDocumentRepository kycDocumentRepository;
 
     @Transactional(readOnly = true)
     public DashboardSummaryResponse getDashboardSummary() {
@@ -149,7 +142,10 @@ public class DashboardService {
                 loanRepository.countByStatus(Loan.LoanStatus.ACTIVE),
                 loanRepository.countByStatus(Loan.LoanStatus.PENDING),
                 fdRepository.countByStatus(FixedDeposit.FdStatus.ACTIVE),
-                accountRepository.getTotalDeposits()
+                accountRepository.getTotalDeposits(),
+                kycDocumentRepository.countByKycVerificationStatus(
+                        KycDocument.KycVerificationStatus.PENDING
+                )
         );
     }
 

@@ -60,16 +60,19 @@ public class UserService {
                 .email(request.email())
                 .password(encodedPassword)
                 .role(User.Role.CUSTOMER)
+                .emailVerified(!emailVerificationEnabled)
                 .build();
 
         User savedUser = userRepository.save(user);
+
         if (emailVerificationEnabled) {
             VerificationToken verificationToken =
                     verificationTokenService.createVerificationToken(savedUser);
-            emailService.sendVerificationEmail(savedUser, verificationToken.getToken());
-        } else {
-            savedUser.setEmailVerified(true);
-            userRepository.save(savedUser);
+
+            emailService.sendVerificationEmail(
+                    savedUser,
+                    verificationToken.getToken()
+            );
         }
 
         log.info("Customer registered successfully. User ID: [{}], Email: [{}]",
@@ -188,7 +191,7 @@ public class UserService {
                         ));
 
         if (!emailVerificationEnabled) {
-            return;
+            throw new IllegalStateException("Email verification is disabled");
         }
 
         if (user.isEmailVerified()) {

@@ -50,6 +50,13 @@ const AdminDashboardOverview = ({
             />
 
             <SummaryCard
+                icon="🪪"
+                title="Pending KYC"
+                value={summary.pendingKycDocuments}
+                subtitle="Documents Awaiting Review"
+            />
+
+            <SummaryCard
                 icon="💰"
                 title="Fixed Deposits"
                 value={summary.activeFixedDeposits}

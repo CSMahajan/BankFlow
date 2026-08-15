@@ -12,7 +12,9 @@ import KycPagination from "./KycPagination";
 import toast from "react-hot-toast";
 
 
-const KycManagementView = () => {
+const KycManagementView = ({
+    refreshDashboard
+}) => {
 
     const [documents, setDocuments] = useState([]);
     const [summary, setSummary] = useState(null);
@@ -96,6 +98,9 @@ const KycManagementView = () => {
             await verifyKycDocument(documentId);
             toast.success("Document verified successfully");
             await loadData();
+            if (refreshDashboard) {
+                await refreshDashboard();
+            }
         } catch (err) {
             console.error(err);
             toast.error(
@@ -126,6 +131,9 @@ const KycManagementView = () => {
             setRejectDocumentId(null);
             setRejectionReason("");
             await loadData();
+            if (refreshDashboard) {
+                await refreshDashboard();
+            }
         } catch (err) {
             console.error(err);
             toast.error(

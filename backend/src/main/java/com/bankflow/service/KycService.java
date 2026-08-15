@@ -12,6 +12,7 @@ import com.bankflow.repository.KycDocumentRepository;
 import com.bankflow.specification.KycDocumentSpecification;
 import com.bankflow.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,11 +46,11 @@ public class KycService {
                                 documentType
                         );
 
-        if(!existingDocuments.isEmpty()) {
+        if (!existingDocuments.isEmpty()) {
 
             KycDocument latest = existingDocuments.getFirst();
 
-            if(latest.getKycVerificationStatus()
+            if (latest.getKycVerificationStatus()
                     != KycDocument.KycVerificationStatus.REJECTED) {
 
                 throw new IllegalArgumentException(
@@ -133,24 +134,43 @@ public class KycService {
 
         KycStatusResponse.DocumentStatus aadhaar = mapDocumentStatus(aadhaarDocument);
 
-        String overallStatus;
-
-        if (panDocument == null && aadhaarDocument == null) {
-            overallStatus = "NOT_SUBMITTED";
-        } else if (
-                panDocument != null &&
-                        aadhaarDocument != null &&
-                        panDocument.getKycVerificationStatus()
-                                == KycDocument.KycVerificationStatus.VERIFIED &&
-                        aadhaarDocument.getKycVerificationStatus()
-                                == KycDocument.KycVerificationStatus.VERIFIED) {
-
-            overallStatus = "VERIFIED";
-        } else {
-            overallStatus = "PENDING";
-        }
+        String overallStatus = getOverallStatus(panDocument, aadhaarDocument);
 
         return new KycStatusResponse(overallStatus, pan, aadhaar);
+    }
+
+    private static @NonNull String getOverallStatus(
+            KycDocument panDocument,
+            KycDocument aadhaarDocument
+    ) {
+        // User has not uploaded anything
+        if (panDocument == null && aadhaarDocument == null) {
+            return "NOT_SUBMITTED";
+        }
+        // Any mandatory document missing
+        if (panDocument == null || aadhaarDocument == null) {
+            return "INCOMPLETE";
+        }
+        // Any document rejected
+        if (
+                panDocument.getKycVerificationStatus()
+                        == KycDocument.KycVerificationStatus.REJECTED
+                        ||
+                        aadhaarDocument.getKycVerificationStatus()
+                                == KycDocument.KycVerificationStatus.REJECTED
+        ) {
+            return "REJECTED";
+        }
+        // Both documents verified
+        if (
+                panDocument.getKycVerificationStatus() == KycDocument.KycVerificationStatus.VERIFIED
+                        &&
+                        aadhaarDocument.getKycVerificationStatus() == KycDocument.KycVerificationStatus.VERIFIED
+        ) {
+            return "VERIFIED";
+        }
+        // Both uploaded but admin verification pending
+        return "UNDER_REVIEW";
     }
 
     @Transactional(readOnly = true)

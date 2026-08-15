@@ -171,6 +171,15 @@ const KycManagementView = () => {
 
     useEffect(() => {
 
+        setSelectedDocument(null);
+
+        if (previewDocument?.url) {
+            window.URL.revokeObjectURL(previewDocument.url);
+        }
+
+        setPreviewDocument(null);
+
+
         const timer = setTimeout(() => {
             loadData();
         }, 500);
@@ -312,15 +321,34 @@ const KycManagementView = () => {
                     <KycSummaryCards summary={summary} />
                 )
             }
-            <KycSearchToolbar
-                search={search}
-                setSearch={setSearch}
-                status={status}
-                setStatus={setStatus}
-                setPage={setPage}
-            />
+            <div style={styles.toolbarWrapper}>
 
-            <div style={styles.card}>
+                <KycSearchToolbar
+                    search={search}
+                    setSearch={setSearch}
+                    status={status}
+                    setStatus={setStatus}
+                    setPage={setPage}
+                />
+
+
+                {
+                    loading && (
+                        <span style={styles.loadingText}>
+                            Loading...
+                        </span>
+                    )
+                }
+
+            </div>
+
+            <div
+                style={{
+                    ...styles.card,
+                    opacity: loading ? 0.6 : 1,
+                    transition: "opacity 0.2s ease"
+                }}
+            >
 
 
                 <table style={styles.table}>
@@ -443,13 +471,48 @@ const KycManagementView = () => {
 
                                                     <div style={styles.detailsContainer}>
 
-                                                        <h3 style={{ margin: "0 0 5px 0" }}>
-                                                            👤 {doc.customerName}
-                                                        </h3>
+                                                        <div style={styles.expandedHeader}>
 
-                                                        <p style={styles.subtitle}>
-                                                            Review submitted KYC document and verify customer identity.
-                                                        </p>
+                                                            <div>
+                                                                <h3 style={{ margin: "0 0 5px 0" }}>
+                                                                    👤 {doc.customerName}
+                                                                </h3>
+
+                                                                <p style={styles.subtitle}>
+                                                                    Review submitted KYC document and verify customer identity.
+                                                                </p>
+
+                                                                {
+                                                                    doc.status === "REJECTED" && doc.rejectionReason && (
+
+                                                                        <div style={styles.rejectionInfo}>
+                                                                            <strong>
+                                                                                Rejection Reason:
+                                                                            </strong>
+
+                                                                            <span>
+                                                                                {doc.rejectionReason}
+                                                                            </span>
+                                                                        </div>
+
+                                                                    )
+                                                                }
+                                                            </div>
+
+
+                                                            <span
+                                                                style={{
+                                                                    ...styles.expandedStatusBadge,
+                                                                    backgroundColor:
+                                                                        getStatusColor(doc.status).background,
+                                                                    color:
+                                                                        getStatusColor(doc.status).color
+                                                                }}
+                                                            >
+                                                                {doc.status}
+                                                            </span>
+
+                                                        </div>
 
 
                                                         <div style={styles.reviewLayout}>
@@ -595,57 +658,47 @@ const KycManagementView = () => {
                                                                             </div>
                                                                         )
                                                                 }
+                                                                {
+                                                                    doc.status === "PENDING" && (
+
+                                                                        <div style={styles.documentActionPanel}>
+
+                                                                            <p style={styles.actionText}>
+                                                                                Review document and verify customer identity.
+                                                                            </p>
+
+
+                                                                            <div style={styles.detailActions}>
+
+                                                                                <button
+                                                                                    style={styles.rejectButton}
+                                                                                    disabled={processing}
+                                                                                    onClick={() =>
+                                                                                        setRejectDocumentId(doc.id)
+                                                                                    }
+                                                                                >
+                                                                                    Reject
+                                                                                </button>
+
+
+                                                                                <button
+                                                                                    style={styles.verifyButton}
+                                                                                    disabled={processing}
+                                                                                    onClick={() =>
+                                                                                        handleVerify(doc.id)
+                                                                                    }
+                                                                                >
+                                                                                    Verify
+                                                                                </button>
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                    )
+                                                                }
                                                             </div>
                                                         </div>
-                                                        {
-                                                            doc.status === "PENDING" && (
-
-                                                                <div style={styles.reviewActionPanel}>
-
-                                                                    <div>
-
-                                                                        <h4 style={styles.actionTitle}>
-                                                                            Review Action
-                                                                        </h4>
-
-                                                                        <p style={styles.actionText}>
-                                                                            Review the submitted KYC document and verify customer identity.
-                                                                        </p>
-
-                                                                    </div>
-
-
-                                                                    <div style={styles.detailActions}>
-
-                                                                        <button
-                                                                            style={styles.rejectButton}
-                                                                            disabled={processing}
-                                                                            onClick={() =>
-                                                                                setRejectDocumentId(doc.id)
-                                                                            }
-                                                                        >
-                                                                            ❌ Reject
-                                                                        </button>
-
-
-                                                                        <button
-                                                                            style={styles.verifyButton}
-                                                                            disabled={processing}
-                                                                            onClick={() =>
-                                                                                handleVerify(doc.id)
-                                                                            }
-                                                                        >
-                                                                            ✅ Verify
-                                                                        </button>
-
-                                                                    </div>
-
-                                                                </div>
-
-                                                            )
-                                                        }
-
-
                                                     </div>
 
                                                 </td>
@@ -867,23 +920,27 @@ const styles = {
     },
 
     verifyButton: {
-        padding: "9px 18px",
+        padding: "10px 22px",
         borderRadius: "8px",
         border: "none",
-        background: "#15803d",
+        background: "#16a34a",
         color: "#ffffff",
         cursor: "pointer",
-        fontWeight: "700"
+        fontWeight: "700",
+        fontSize: "14px",
+        boxShadow: "0 2px 5px rgba(22,163,74,0.25)"
     },
 
     rejectButton: {
-        padding: "9px 18px",
+        padding: "10px 22px",
         borderRadius: "8px",
         border: "none",
-        background: "#b91c1c",
+        background: "#dc2626",
         color: "#ffffff",
         cursor: "pointer",
-        fontWeight: "700"
+        fontWeight: "700",
+        fontSize: "14px",
+        boxShadow: "0 2px 5px rgba(220,38,38,0.25)"
     },
 
     modalOverlay: {
@@ -951,7 +1008,8 @@ const styles = {
     detailActions: {
         display: "flex",
         justifyContent: "flex-end",
-        gap: "10px"
+        gap: "12px",
+        marginTop: "12px"
     },
 
     subtitle: {
@@ -1044,15 +1102,10 @@ const styles = {
         fontSize: "12px"
     },
 
-    reviewActionPanel: {
-        marginTop: "20px",
-        padding: "14px 18px",
-        background: "#f8fafc",
-        borderRadius: "10px",
-        border: "1px solid #e2e8f0",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
+    documentActionPanel: {
+        marginTop: "14px",
+        paddingTop: "12px",
+        borderTop: "1px solid #e2e8f0",
     },
 
     actionTitle: {
@@ -1062,14 +1115,56 @@ const styles = {
     },
 
     actionText: {
-        margin: "5px 0 0",
+        margin: "0",
         fontSize: "13px",
-        color: "#64748b"
+        color: "#64748b",
+        lineHeight: "1.5"
     },
 
     customerName: {
         fontSize: "14px",
         color: "#0f172a"
+    },
+
+    toolbarWrapper: {
+        position: "relative",
+    },
+
+    loadingText: {
+        position: "absolute",
+        right: "0",
+        top: "-18px",
+        fontSize: "12px",
+        color: "#64748b",
+        fontWeight: "600"
+    },
+
+    expandedHeader: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        marginBottom: "14px"
+    },
+
+    expandedStatusBadge: {
+        padding: "8px 16px",
+        borderRadius: "20px",
+        fontSize: "13px",
+        fontWeight: "700",
+        textTransform: "uppercase"
+    },
+
+    rejectionInfo: {
+        marginTop: "8px",
+        padding: "10px 12px",
+        background: "#FEF2F2",
+        border: "1px solid #FECACA",
+        borderRadius: "8px",
+        color: "#991B1B",
+        fontSize: "13px",
+        display: "flex",
+        gap: "8px",
+        alignItems: "center"
     },
 };
 

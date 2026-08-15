@@ -11,15 +11,33 @@ const KycSearchToolbar = ({
     return (
         <div style={styles.toolbar}>
 
-            <input
-                placeholder="Search customer, email..."
-                value={search}
-                onChange={(e) => {
-                    setPage(0);
-                    setSearch(e.target.value);
-                }}
-                style={styles.searchInput}
-            />
+            <div style={styles.searchWrapper}>
+
+                <input
+                    placeholder="Search customer, email..."
+                    value={search}
+                    onChange={(e) => {
+                        setPage(0);
+                        setSearch(e.target.value);
+                    }}
+                    style={styles.searchInput}
+                />
+
+                {
+                    search && (
+                        <button
+                            style={styles.clearButton}
+                            onClick={() => {
+                                setPage(0);
+                                setSearch("");
+                            }}
+                        >
+                            ✕
+                        </button>
+                    )
+                }
+
+            </div>
 
 
             <select
@@ -65,7 +83,7 @@ const styles = {
 
     searchInput: {
         flex: 1,
-        padding: "12px 14px",
+        padding: "12px 40px 12px 14px",
         borderRadius: "10px",
         border: "1px solid #d1d5db",
         fontSize: "14px",
@@ -77,7 +95,24 @@ const styles = {
         borderRadius: "10px",
         border: "1px solid #d1d5db",
         fontSize: "14px",
-    }
+    },
+
+    searchWrapper: {
+        flex: 1,
+        position: "relative",
+        display: "flex",
+        alignItems: "center"
+    },
+
+    clearButton: {
+        position: "absolute",
+        right: "12px",
+        border: "none",
+        background: "transparent",
+        cursor: "pointer",
+        fontSize: "16px",
+        color: "#64748b"
+    },
 
 };
 

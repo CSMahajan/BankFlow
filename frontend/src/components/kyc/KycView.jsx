@@ -482,8 +482,9 @@ const DocumentCard = ({
                         <strong>
                             ❌ Document Rejected
                         </strong>
-                        <p>
-                            {document.rejectionReason}
+
+                        <p style={{ margin: "6px 0 0" }}>
+                            Reason: {document.rejectionReason}
                         </p>
                     </div>
                 )

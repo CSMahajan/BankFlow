@@ -60,6 +60,9 @@ app:
   storage:
     location: ${STORAGE_LOCATION:uploads/kyc}
 
+  kyc:
+    notification-enabled: ${KYC_NOTIFICATION_ENABLED:false}
+
 management:
   endpoints:
     web:

@@ -107,4 +107,49 @@ public class EmailService {
 
         sendEmail(user.getEmail(), user.getFullName(), subject, body);
     }
+
+    public void sendKycApprovedEmail(User user, String documentType) {
+
+        String subject = "BankFlow KYC Document Approved";
+
+        String body = """
+                Dear %s,
+                
+                Good news!
+                
+                Your %s document has been verified successfully.
+                
+                Your KYC verification process is progressing.
+                
+                Regards,
+                BankFlow Team
+                """.formatted(user.getFullName(), documentType);
+
+        sendEmail(user.getEmail(), user.getFullName(), subject, body);
+    }
+
+    public void sendKycRejectedEmail(
+            User user,
+            String documentType,
+            String reason
+    ) {
+
+        String subject = "BankFlow KYC Document Rejected";
+
+        String body = """
+                Dear %s,
+                
+                Your %s document could not be verified.
+                
+                Reason:
+                %s
+                
+                Please upload a new document from your BankFlow account.
+                
+                Regards,
+                BankFlow Team
+                """.formatted(user.getFullName(), documentType, reason);
+
+        sendEmail(user.getEmail(), user.getFullName(), subject, body);
+    }
 }

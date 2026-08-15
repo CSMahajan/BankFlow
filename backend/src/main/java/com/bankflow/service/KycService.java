@@ -13,6 +13,7 @@ import com.bankflow.specification.KycDocumentSpecification;
 import com.bankflow.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,10 @@ public class KycService {
     private final FileStorageService fileStorageService;
     private final CurrentUserService currentUserService;
     private final AuditLogService auditLogService;
+    private final EmailService emailService;
+
+    @Value("${app.kyc.notification-enabled:false}")
+    private boolean kycNotificationEnabled;
 
     @Transactional
     public KycDocument uploadDocument(MultipartFile file, KycDocument.DocumentType documentType) {
@@ -254,6 +259,11 @@ public class KycService {
 
         kycDocumentRepository.save(document);
 
+        if (kycNotificationEnabled) {
+            emailService.sendKycApprovedEmail(
+                    document.getUser(), document.getDocumentType().name());
+        }
+
         auditLogService.log(
                 AuditAction.KYC_DOCUMENT_VERIFIED,
                 "KYC document verified: "
@@ -289,6 +299,11 @@ public class KycService {
         document.setRejectionReason(reason.trim());
 
         kycDocumentRepository.save(document);
+
+        if (kycNotificationEnabled) {
+            emailService.sendKycRejectedEmail(
+                    document.getUser(), document.getDocumentType().name(), reason.trim());
+        }
 
         auditLogService.log(
                 AuditAction.KYC_DOCUMENT_REJECTED,

@@ -66,6 +66,10 @@ app:
   kyc:
     notification-enabled: ${KYC_NOTIFICATION_ENABLED:false}
 
+  aws:
+    region: ${AWS_REGION:ap-south-1}
+    bucket: ${AWS_S3_BUCKET}
+
 management:
   endpoints:
     web:

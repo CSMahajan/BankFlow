@@ -16,3 +16,6 @@ app:
 
   kyc:
     notification-enabled: false
+
+  storage:
+    type: local

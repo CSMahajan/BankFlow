@@ -7,3 +7,5 @@ springdoc:
 
 app:
   jwt-secret: ${JWT_SECRET}
+  storage:
+    type: s3

@@ -79,6 +79,7 @@ public class KycService {
                     .s3Bucket(metadata.bucket())
                     .s3ObjectKey(metadata.objectKey())
                     .encryptionType(metadata.encryptionType())
+                    .checksum(metadata.checksum())
                     .contentType(file.getContentType())
                     .fileSize(file.getSize())
                     .build();

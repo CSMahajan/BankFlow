@@ -5,6 +5,7 @@ public record StoredFileMetadata(
         String storageType,
         String bucket,
         String objectKey,
-        String encryptionType
+        String encryptionType,
+        String checksum
 ) {
 }

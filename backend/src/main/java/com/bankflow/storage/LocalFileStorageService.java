@@ -49,10 +49,11 @@ public class LocalFileStorageService implements FileStorageService {
             Path destination = userDirectory.resolve(storedFileName);
             Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
             log.info("File stored successfully: {}", destination);
-            // return relative path only
+
             return new StoredFileMetadata(
                     userFolder + "/" + storedFileName,
                     "LOCAL",
+                    null,
                     null,
                     null,
                     null

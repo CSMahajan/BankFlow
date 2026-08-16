@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
@@ -54,14 +55,14 @@ public class S3FileStorageService implements FileStorageService {
                     .build();
 
 
-            s3Client.putObject(
-                    request,
-                    software.amazon.awssdk.core.sync.RequestBody
-                            .fromInputStream(
+            PutObjectResponse response =
+                    s3Client.putObject(
+                            request,
+                            RequestBody.fromInputStream(
                                     file.getInputStream(),
                                     file.getSize()
                             )
-            );
+                    );
 
 
             log.info(
@@ -75,7 +76,8 @@ public class S3FileStorageService implements FileStorageService {
                     "S3",
                     bucketName,
                     key,
-                    "AES256"
+                    "AES256",
+                    response.eTag()
             );
 
         } catch (IOException e) {

@@ -1,5 +1,6 @@
 package com.bankflow.storage;
 
+import com.bankflow.dto.StoredFileMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,7 +40,7 @@ public class LocalFileStorageService implements FileStorageService {
     }
 
     @Override
-    public String store(MultipartFile file, Long userId) {
+    public StoredFileMetadata store(MultipartFile file, Long userId) {
         try {
             String userFolder = "user-" + userId;
             Path userDirectory = rootLocation.resolve(userFolder);
@@ -49,7 +50,13 @@ public class LocalFileStorageService implements FileStorageService {
             Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
             log.info("File stored successfully: {}", destination);
             // return relative path only
-            return userFolder + "/" + storedFileName;
+            return new StoredFileMetadata(
+                    userFolder + "/" + storedFileName,
+                    "LOCAL",
+                    null,
+                    null,
+                    null
+            );
         } catch (IOException e) {
             throw new RuntimeException("File storage failed", e);
         }

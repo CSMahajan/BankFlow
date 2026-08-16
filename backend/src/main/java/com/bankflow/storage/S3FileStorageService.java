@@ -1,5 +1,6 @@
 package com.bankflow.storage;
 
+import com.bankflow.dto.StoredFileMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class S3FileStorageService implements FileStorageService {
 
 
     @Override
-    public String store(MultipartFile file, Long userId) {
+    public StoredFileMetadata store(MultipartFile file, Long userId) {
 
         try {
 
@@ -47,6 +48,9 @@ public class S3FileStorageService implements FileStorageService {
                     .key(key)
                     .contentType(file.getContentType())
                     .contentLength(file.getSize())
+                    .serverSideEncryption(
+                            ServerSideEncryption.AES256
+                    )
                     .build();
 
 
@@ -60,11 +64,22 @@ public class S3FileStorageService implements FileStorageService {
             );
 
 
-            log.info("File uploaded to S3 successfully: {}", key);
+            log.info(
+                    "File uploaded to S3 successfully: {}",
+                    key
+            );
 
-            return key;
+
+            return new StoredFileMetadata(
+                    key,
+                    "S3",
+                    bucketName,
+                    key,
+                    "AES256"
+            );
 
         } catch (IOException e) {
+
             throw new RuntimeException(
                     "S3 file upload failed",
                     e

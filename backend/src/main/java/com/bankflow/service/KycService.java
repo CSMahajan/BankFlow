@@ -1,9 +1,6 @@
 package com.bankflow.service;
 
-import com.bankflow.dto.AdminKycDocumentResponse;
-import com.bankflow.dto.KycDocumentResponse;
-import com.bankflow.dto.KycStatusResponse;
-import com.bankflow.dto.KycSummaryResponse;
+import com.bankflow.dto.*;
 import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.KycDocument;
 import com.bankflow.entity.User;
@@ -63,15 +60,28 @@ public class KycService {
                 );
             }
         }
-        String storagePath = fileStorageService.store(file, user.getId());
+        StoredFileMetadata metadata =
+                fileStorageService.store(file, user.getId());
+
         try {
+
             KycDocument document = KycDocument.builder()
                     .user(user)
                     .documentType(documentType)
                     .originalFileName(file.getOriginalFilename())
-                    .storedFileName(Paths.get(storagePath).getFileName().toString())
-                    .storagePath(storagePath).contentType(file.getContentType())
-                    .fileSize(file.getSize()).build();
+                    .storedFileName(
+                            Paths.get(metadata.path())
+                                    .getFileName()
+                                    .toString()
+                    )
+                    .storagePath(metadata.path())
+                    .storageType(metadata.storageType())
+                    .s3Bucket(metadata.bucket())
+                    .s3ObjectKey(metadata.objectKey())
+                    .encryptionType(metadata.encryptionType())
+                    .contentType(file.getContentType())
+                    .fileSize(file.getSize())
+                    .build();
 
             KycDocument saved =
                     kycDocumentRepository.save(document);
@@ -85,8 +95,10 @@ public class KycService {
             );
 
             return saved;
+
         } catch (Exception e) {
-            fileStorageService.delete(storagePath);
+
+            fileStorageService.delete(metadata.path());
             throw e;
         }
     }

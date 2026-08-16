@@ -9,3 +9,8 @@ app:
   jwt-secret: ${JWT_SECRET}
   storage:
     type: s3
+
+logging:
+  level:
+    root: INFO
+    com.bankflow.filter.JwtAuthenticationFilter: INFO

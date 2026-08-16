@@ -58,6 +58,21 @@ public class KycDocument {
     @Column(length = 500)
     private String rejectionReason;
 
+    @Column(name = "storage_type", nullable = false)
+    private String storageType;
+
+    @Column(name = "s3_bucket")
+    private String s3Bucket;
+
+    @Column(name = "s3_object_key")
+    private String s3ObjectKey;
+
+    @Column(name = "encryption_type")
+    private String encryptionType;
+
+    @Column(name = "checksum")
+    private String checksum;
+
     @PrePersist
     protected void onCreate() {
         uploadedAt = LocalDateTime.now();

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>KYC Approved</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background:#f6f8fb; padding:20px;">
+
+<div style="
+        max-width:600px;
+        margin:auto;
+        background:white;
+        padding:30px;
+        border:1px solid #ddd;
+        border-radius:8px;
+">
+
+    <h2>KYC Verification Successful ✅</h2>
+
+    <p>
+        Hello <span th:text="${name}"></span>,
+    </p>
+
+    <p>
+        Your submitted
+        <b th:text="${documentType}"></b>
+        document has been verified successfully.
+    </p>
+
+    <p>
+        Your KYC verification status has been updated in BankFlow.
+    </p>
+
+    <br>
+
+    <a th:href="${dashboardUrl}"
+       style="
+       display:inline-block;
+       background:#2563eb;
+       color:white;
+       padding:12px 20px;
+       text-decoration:none;
+       border-radius:5px;
+       ">
+        Open BankFlow
+    </a>
+
+    <br><br>
+
+    <p>
+        Thank you for using BankFlow.
+    </p>
+
+    <p>
+        Regards,<br>
+        <b>BankFlow Team</b>
+    </p>
+
+</div>
+
+</body>
+
+</html>

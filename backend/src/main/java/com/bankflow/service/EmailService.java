@@ -11,12 +11,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
     private final RestClient brevoRestClient;
+
+    private final EmailTemplateService emailTemplateService;
 
     @Value("${app.brevo.api-key}")
     private String brevoApiKey;
@@ -31,13 +34,13 @@ public class EmailService {
             String to,
             String recipientName,
             String subject,
-            String body) {
+            String htmlBody) {
 
         BrevoEmailRequest request = new BrevoEmailRequest(
                 new BrevoSender(fromEmail, "BankFlow"),
                 List.of(new BrevoRecipient(to, recipientName)),
                 subject,
-                body
+                htmlBody
         );
 
         BrevoEmailResponse response = brevoRestClient.post()
@@ -54,78 +57,97 @@ public class EmailService {
         }
     }
 
-    public void sendVerificationEmail(User user, String token) {
+    public void sendVerificationEmail(
+            User user,
+            String token
+    ) {
 
-        String verificationUrl = frontendUrl + "/verify-email?token=" + token;
+        String verificationUrl =
+                frontendUrl
+                        + "/verify-email?token="
+                        + token;
 
-        String subject = "Verify your BankFlow Account";
 
-        String body = """
-                Dear %s,
-                
-                Welcome to BankFlow!
-                
-                Thank you for creating your account.
-                
-                To activate your account, please verify your email address by clicking the link below:
-                
-                %s
-                
-                This verification link is valid for 24 hours.
-                
-                If you did not create a BankFlow account, please ignore this email.
-                
-                Regards,
-                BankFlow Team
-                """.formatted(user.getFullName(), verificationUrl);
+        String htmlBody =
+                emailTemplateService.render(
+                        "verify-email",
+                        Map.of(
+                                "name",
+                                user.getFullName(),
 
-        sendEmail(user.getEmail(), user.getFullName(), subject, body);
+                                "verificationUrl",
+                                verificationUrl
+                        )
+                );
+
+
+        sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                "Verify your BankFlow Account",
+                htmlBody
+        );
     }
 
     public void sendPasswordResetEmail(User user, String token) {
 
-        String resetLink = frontendUrl + "/reset-password?token=" + token;
+        String resetLink =
+                frontendUrl
+                        + "/reset-password?token="
+                        + token;
 
-        String subject = "Reset your BankFlow password";
 
-        String body = """
-                Hello %s,
-                
-                We received a request to reset your BankFlow password.
-                
-                Click the link below to create a new password:
-                
-                %s
-                
-                This link expires in 1 hour.
-                
-                If you didn't request this, please ignore this email.
-                
-                Regards,
-                BankFlow Team
-                """.formatted(user.getFullName(), resetLink);
+        String htmlBody =
+                emailTemplateService.render(
+                        "password-reset",
+                        Map.of(
+                                "name",
+                                user.getFullName(),
 
-        sendEmail(user.getEmail(), user.getFullName(), subject, body);
+                                "resetUrl",
+                                resetLink
+                        )
+                );
+
+
+        sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                "Reset your BankFlow password",
+                htmlBody
+        );
     }
 
-    public void sendKycApprovedEmail(User user, String documentType) {
+    public void sendKycApprovedEmail(
+            User user,
+            String documentType
+    ) {
 
-        String subject = "BankFlow KYC Document Approved";
+        String dashboardUrl =
+                frontendUrl + "?open=dashboard";
 
-        String body = """
-                Dear %s,
-                
-                Good news!
-                
-                Your %s document has been verified successfully.
-                
-                Your KYC verification process is progressing.
-                
-                Regards,
-                BankFlow Team
-                """.formatted(user.getFullName(), documentType);
+        String htmlBody =
+                emailTemplateService.render(
+                        "kyc-approved",
+                        Map.of(
+                                "name",
+                                user.getFullName(),
 
-        sendEmail(user.getEmail(), user.getFullName(), subject, body);
+                                "documentType",
+                                documentType,
+
+                                "dashboardUrl",
+                                dashboardUrl
+                        )
+                );
+
+
+        sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                "BankFlow KYC Document Approved",
+                htmlBody
+        );
     }
 
     public void sendKycRejectedEmail(
@@ -134,22 +156,33 @@ public class EmailService {
             String reason
     ) {
 
-        String subject = "BankFlow KYC Document Rejected";
+        String uploadUrl =
+                frontendUrl + "?open=kyc";
 
-        String body = """
-                Dear %s,
-                
-                Your %s document could not be verified.
-                
-                Reason:
-                %s
-                
-                Please upload a new document from your BankFlow account.
-                
-                Regards,
-                BankFlow Team
-                """.formatted(user.getFullName(), documentType, reason);
+        String htmlBody =
+                emailTemplateService.render(
+                        "kyc-rejected",
+                        Map.of(
+                                "name",
+                                user.getFullName(),
 
-        sendEmail(user.getEmail(), user.getFullName(), subject, body);
+                                "documentType",
+                                documentType,
+
+                                "reason",
+                                reason,
+
+                                "uploadUrl",
+                                uploadUrl
+                        )
+                );
+
+
+        sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                "BankFlow KYC Document Rejected",
+                htmlBody
+        );
     }
 }

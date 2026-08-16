@@ -6,6 +6,6 @@ public record BrevoEmailRequest(
         BrevoSender sender,
         List<BrevoRecipient> to,
         String subject,
-        String textContent
+        String htmlContent
 ) {
 }

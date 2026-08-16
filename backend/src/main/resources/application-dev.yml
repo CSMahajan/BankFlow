@@ -6,9 +6,9 @@ springdoc:
     enabled: true
 
 spring:
-  sql:
-    init:
-      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 app:
   email-verification:

@@ -54,6 +54,10 @@ services:
 
       SUPER_ADMIN_PASSWORD: AdminSecretPass123!
 
+      BREVO_API_KEY: your_actual_brevo_api_key
+      MAIL_FROM: your_email@example.com
+      AWS_S3_BUCKET: your_bucket_name
+
       VIRUS_SCAN_ENABLED: true
       CLAMAV_HOST: clamav
       CLAMAV_PORT: 3310

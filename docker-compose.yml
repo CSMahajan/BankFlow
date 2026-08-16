@@ -41,6 +41,10 @@ services:
       DB_USER: bankflow
       DB_PASSWORD: bankflow
 
+      VIRUS_SCAN_ENABLED: true
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: 3310
+
     healthcheck:
       test:
         [
@@ -56,6 +60,16 @@ services:
 
     ports:
       - "8080:8080"
+
+    restart: unless-stopped
+
+  clamav:
+    image: clamav/clamav:latest
+    platform: linux/amd64
+    container_name: bankflow-clamav
+
+    ports:
+      - "3310:3310"
 
     restart: unless-stopped
 

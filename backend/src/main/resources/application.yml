@@ -78,6 +78,12 @@ app:
     region: ${AWS_REGION:ap-south-1}
     bucket: ${AWS_S3_BUCKET}
 
+  security:
+    virus-scan-enabled: ${VIRUS_SCAN_ENABLED:false}
+    clamav:
+      host: ${CLAMAV_HOST:localhost}
+      port: ${CLAMAV_PORT:3310}
+
 management:
   endpoints:
     web:

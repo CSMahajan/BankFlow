@@ -24,6 +24,16 @@ services:
 
     restart: unless-stopped
 
+  clamav:
+    image: clamav/clamav:latest
+    platform: linux/amd64
+    container_name: bankflow-clamav
+
+    ports:
+      - "3310:3310"
+
+    restart: unless-stopped
+
   backend:
     image: csmahajan/bankflow-backend:latest
     container_name: bankflow-backend
@@ -32,12 +42,21 @@ services:
       postgres:
         condition: service_healthy
 
+      clamav:
+        condition: service_started
+
     environment:
       SPRING_PROFILES_ACTIVE: dev
+
       DB_URL: jdbc:postgresql://postgres:5432/banking?currentSchema=retail_banking
       DB_USER: bankflow
       DB_PASSWORD: bankflow
+
       SUPER_ADMIN_PASSWORD: AdminSecretPass123!
+
+      VIRUS_SCAN_ENABLED: true
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: 3310
 
     ports:
       - "8080:8080"

@@ -6,9 +6,12 @@ import com.bankflow.entity.KycDocument;
 import com.bankflow.entity.User;
 import com.bankflow.exception.ResourceNotFoundException;
 import com.bankflow.repository.KycDocumentRepository;
+import com.bankflow.security.VirusScanResult;
+import com.bankflow.security.VirusScanService;
 import com.bankflow.specification.KycDocumentSpecification;
 import com.bankflow.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -26,6 +29,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KycService {
 
     private final KycDocumentRepository kycDocumentRepository;
@@ -33,6 +37,7 @@ public class KycService {
     private final CurrentUserService currentUserService;
     private final AuditLogService auditLogService;
     private final EmailService emailService;
+    private final VirusScanService virusScanService;
 
     @Value("${app.kyc.notification-enabled:false}")
     private boolean kycNotificationEnabled;
@@ -41,6 +46,15 @@ public class KycService {
     public KycDocument uploadDocument(MultipartFile file, KycDocument.DocumentType documentType) {
         User user = currentUserService.getCurrentUser();
         validateFile(file);
+        VirusScanResult scanResult =
+                virusScanService.scan(file);
+
+
+        if (!scanResult.clean()) {
+            log.error("File scan found issue in security verification: {}", scanResult.message());
+            throw new IllegalArgumentException("File failed security scan: ");
+        }
+
         List<KycDocument> existingDocuments =
                 kycDocumentRepository
                         .findByUserIdAndDocumentTypeOrderByUploadedAtDesc(

@@ -38,6 +38,8 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+
+
   const handleProfileUpdated = (updatedName) => {
     setCustomerName(updatedName);
   };
@@ -76,6 +78,30 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
     loadAccounts();
     loadDashboardSummary();
     loadAnalytics();
+  }, []);
+
+  useEffect(() => {
+
+    const params = new URLSearchParams(window.location.search);
+
+    const openTab = params.get("open");
+
+    if (openTab === "kyc") {
+      setActiveTab("kyc");
+    }
+
+    if (openTab === "dashboard") {
+      setActiveTab("dashboard");
+    }
+
+    if (openTab) {
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+    }
+
   }, []);
 
   const roleDisplay = userRole || localStorage.getItem('userRole') || 'CUSTOMER';

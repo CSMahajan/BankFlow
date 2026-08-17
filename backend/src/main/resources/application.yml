@@ -80,9 +80,6 @@ app:
 
   security:
     virus-scan-enabled: ${VIRUS_SCAN_ENABLED:false}
-    clamav:
-      host: ${CLAMAV_HOST:localhost}
-      port: ${CLAMAV_PORT:3310}
 
 management:
   endpoints:

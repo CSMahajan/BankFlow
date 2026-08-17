@@ -1,15 +1,28 @@
 #!/bin/bash
 set -e
 
+echo "Updating ClamAV database..."
+
+freshclam || echo "Freshclam failed, continuing..."
+
+echo "Configuring ClamAV TCP..."
+
+sed -i 's/^LocalSocket/#LocalSocket/' /etc/clamav/clamd.conf
+
+echo "TCPSocket 3310" >> /etc/clamav/clamd.conf
+echo "TCPAddr 127.0.0.1" >> /etc/clamav/clamd.conf
+
+
 echo "Starting ClamAV..."
 
 clamd &
+
 
 echo "Waiting for ClamAV..."
 
 for i in {1..30}
 do
-    if clamdscan --ping 1 >/dev/null 2>&1
+    if nc -z localhost 3310
     then
         echo "ClamAV is ready"
         break

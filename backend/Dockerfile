@@ -3,28 +3,23 @@ FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
-# Copy Maven Wrapper
 COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
 
-# Download dependencies (improves build caching)
 RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 
-# Copy source code
 COPY src src
 
-# Build application
 RUN ./mvnw clean package -DskipTests
 
 
 # ---------- Runtime Stage ----------
-# ---------- Runtime Stage ----------
 FROM eclipse-temurin:21-jre
 
 RUN apt-get update && \
-    apt-get install -y clamav clamav-daemon && \
+    apt-get install -y clamav clamav-daemon netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

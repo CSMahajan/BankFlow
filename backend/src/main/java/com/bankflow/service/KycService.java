@@ -263,6 +263,10 @@ public class KycService {
                 documentId,
                 extractedData.getExtractionStatus().name(),
                 extractedData.getExtractedText(),
+                extractedData.getPanNumber(),
+                extractedData.getFullName(),
+                extractedData.getFatherName(),
+                extractedData.getDateOfBirth(),
                 extractedData.getFailureReason(),
                 extractedData.getCreatedAt(),
                 extractedData.getUpdatedAt()

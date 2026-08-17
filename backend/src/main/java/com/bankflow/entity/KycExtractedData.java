@@ -3,6 +3,7 @@ package com.bankflow.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,6 +45,17 @@ public class KycExtractedData {
 
     private LocalDateTime updatedAt;
 
+    @Column(name = "pan_number")
+    private String panNumber;
+
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "father_name")
+    private String fatherName;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
 
     public enum ExtractionStatus {
         PENDING,

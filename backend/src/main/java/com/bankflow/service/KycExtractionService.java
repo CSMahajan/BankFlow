@@ -1,5 +1,6 @@
 package com.bankflow.service;
 
+import com.bankflow.dto.PanExtractedData;
 import com.bankflow.entity.KycDocument;
 import com.bankflow.entity.KycExtractedData;
 import com.bankflow.repository.KycDocumentRepository;
@@ -24,6 +25,7 @@ public class KycExtractionService {
     private final TextractClient textractClient;
     private final KycExtractedDataRepository extractedDataRepository;
     private final KycDocumentRepository kycDocumentRepository;
+    private final PanTextExtractorService panTextExtractorService;
 
     @Async
     @TransactionalEventListener(
@@ -64,25 +66,27 @@ public class KycExtractionService {
                             .build();
 
 
-            DetectDocumentTextResponse response =
-                    textractClient.detectDocumentText(request);
-
+            DetectDocumentTextResponse response = textractClient.detectDocumentText(request);
 
             String extractedText =
                     response.blocks()
                             .stream()
-                            .filter(block ->
-                                    block.blockType()
-                                            == BlockType.LINE
-                            )
+                            .filter(block -> block.blockType() == BlockType.LINE)
                             .map(Block::text)
                             .collect(Collectors.joining("\n"));
 
-
-            extractedData.setExtractedText(extractedText);
-            extractedData.setExtractionStatus(
-                    KycExtractedData.ExtractionStatus.SUCCESS
+            PanExtractedData panData = panTextExtractorService.extract(extractedText);
+            log.info(
+                    "PAN extraction completed for document id {} : {}",
+                    document.getId(),
+                    panData
             );
+            extractedData.setPanNumber(panData.panNumber());
+            extractedData.setFullName(panData.fullName());
+            extractedData.setFatherName(panData.fatherName());
+            extractedData.setDateOfBirth(panData.dateOfBirth());
+            extractedData.setExtractedText(extractedText);
+            extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.SUCCESS);
             extractedData.setUpdatedAt(LocalDateTime.now());
 
             log.info(

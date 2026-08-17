@@ -3,9 +3,11 @@ package com.bankflow.service;
 import com.bankflow.dto.*;
 import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.KycDocument;
+import com.bankflow.entity.KycExtractedData;
 import com.bankflow.entity.User;
 import com.bankflow.exception.ResourceNotFoundException;
 import com.bankflow.repository.KycDocumentRepository;
+import com.bankflow.repository.KycExtractedDataRepository;
 import com.bankflow.security.VirusScanResult;
 import com.bankflow.security.VirusScanService;
 import com.bankflow.specification.KycDocumentSpecification;
@@ -38,6 +40,8 @@ public class KycService {
     private final AuditLogService auditLogService;
     private final EmailService emailService;
     private final VirusScanService virusScanService;
+    private final KycExtractionEventPublisher kycExtractionEventPublisher;
+    private final KycExtractedDataRepository kycExtractedDataRepository;
 
     @Value("${app.kyc.notification-enabled:false}")
     private boolean kycNotificationEnabled;
@@ -100,6 +104,8 @@ public class KycService {
 
             KycDocument saved =
                     kycDocumentRepository.save(document);
+
+            kycExtractionEventPublisher.publish(saved.getId());
 
             auditLogService.log(
                     AuditAction.KYC_DOCUMENT_UPLOADED,
@@ -220,6 +226,47 @@ public class KycService {
         }
 
         return fileStorageService.load(document.getStoragePath());
+    }
+
+    @Transactional(readOnly = true)
+    public KycExtractionResponse getExtractionResult(Long documentId) {
+
+        User user = currentUserService.getCurrentUser();
+
+        KycDocument document =
+                kycDocumentRepository.findById(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Document not found"
+                                )
+                        );
+
+
+        if (!document.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(
+                    "You are not allowed to access this document"
+            );
+        }
+
+
+        KycExtractedData extractedData =
+                kycExtractedDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Extraction data not found"
+                                )
+                        );
+
+
+        return new KycExtractionResponse(
+                documentId,
+                extractedData.getExtractionStatus().name(),
+                extractedData.getExtractedText(),
+                extractedData.getFailureReason(),
+                extractedData.getCreatedAt(),
+                extractedData.getUpdatedAt()
+        );
     }
 
     @Transactional(readOnly = true)

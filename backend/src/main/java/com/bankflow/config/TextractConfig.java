@@ -3,20 +3,19 @@ package com.bankflow.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.textract.TextractClient;
 
 @Configuration
-public class S3Config {
+public class TextractConfig {
 
     @Value("${app.aws.region}")
     private String region;
 
     @Bean
-    public S3Client s3Client() {
+    public TextractClient textractClient() {
 
-        return S3Client.builder()
+        return TextractClient.builder()
                 .region(Region.of(region))
                 .build();
     }

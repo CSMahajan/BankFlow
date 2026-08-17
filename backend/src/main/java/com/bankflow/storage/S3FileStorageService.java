@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -51,6 +52,12 @@ public class S3FileStorageService implements FileStorageService {
                     .contentLength(file.getSize())
                     .serverSideEncryption(
                             ServerSideEncryption.AES256
+                    )
+                    .metadata(
+                            Map.of(
+                                    "uploaded-by",
+                                    "bankflow"
+                            )
                     )
                     .build();
 

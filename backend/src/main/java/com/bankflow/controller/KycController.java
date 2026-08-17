@@ -1,6 +1,7 @@
 package com.bankflow.controller;
 
 import com.bankflow.dto.KycDocumentResponse;
+import com.bankflow.dto.KycExtractionResponse;
 import com.bankflow.dto.KycStatusResponse;
 import com.bankflow.entity.KycDocument;
 import com.bankflow.service.KycService;
@@ -64,6 +65,15 @@ public class KycController {
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"" + document.getOriginalFileName() + "\"")
                 .body(resource);
+    }
+
+    @GetMapping("/documents/{documentId}/extraction")
+    public ResponseEntity<KycExtractionResponse> getExtraction(
+            @PathVariable Long documentId) {
+
+        return ResponseEntity.ok(
+                kycService.getExtractionResult(documentId)
+        );
     }
 
 }

@@ -20,17 +20,22 @@ RUN ./mvnw clean package -DskipTests
 
 
 # ---------- Runtime Stage ----------
+# ---------- Runtime Stage ----------
 FROM eclipse-temurin:21-jre
+
+RUN apt-get update && \
+    apt-get install -y clamav clamav-daemon && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar
 
-EXPOSE 8080
+COPY docker/start.sh start.sh
 
-ENTRYPOINT ["java", \
-"-XX:+UseContainerSupport", \
-"-XX:MaxRAMPercentage=75.0", \
-"-Djava.security.egd=file:/dev/./urandom", \
-"-jar", \
-"app.jar"]
+RUN chmod +x start.sh
+
+EXPOSE 8080
+EXPOSE 3310
+
+ENTRYPOINT ["./start.sh"]

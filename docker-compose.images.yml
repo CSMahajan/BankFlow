@@ -52,11 +52,11 @@ services:
       DB_USER: bankflow
       DB_PASSWORD: bankflow
 
-      SUPER_ADMIN_PASSWORD: AdminSecretPass123!
+      SUPER_ADMIN_PASSWORD: replace_with_super_admin_password
 
-      BREVO_API_KEY: your_actual_brevo_api_key
-      MAIL_FROM: your_email@example.com
-      AWS_S3_BUCKET: your_bucket_name
+      BREVO_API_KEY: replace_with_brevo_api_key
+      MAIL_FROM: replace_with_email@example.com
+      AWS_S3_BUCKET: replace_with_bucket_name
 
       VIRUS_SCAN_ENABLED: true
       CLAMAV_HOST: clamav

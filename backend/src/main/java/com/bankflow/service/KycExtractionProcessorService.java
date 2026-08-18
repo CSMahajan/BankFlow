@@ -53,12 +53,19 @@ public class KycExtractionProcessorService {
 
         try {
 
-            DetectDocumentTextRequest request = DetectDocumentTextRequest.builder().document(Document.builder().s3Object(S3Object.builder().bucket(document.getS3Bucket()).name(document.getS3ObjectKey()).build()).build()).build();
+            DetectDocumentTextRequest request = DetectDocumentTextRequest.builder()
+                    .document(Document.builder()
+                            .s3Object(S3Object.builder()
+                                    .bucket(document.getS3Bucket())
+                                    .name(document.getS3ObjectKey()).build())
+                            .build()).build();
 
 
             DetectDocumentTextResponse response = textractClient.detectDocumentText(request);
 
-            String extractedText = response.blocks().stream().filter(block -> block.blockType() == BlockType.LINE).map(Block::text).collect(Collectors.joining("\n"));
+            String extractedText = response.blocks().stream()
+                    .filter(block -> block.blockType() == BlockType.LINE)
+                    .map(Block::text).collect(Collectors.joining("\n"));
 
             if (document.getDocumentType() == KycDocument.DocumentType.PAN) {
 
@@ -115,7 +122,15 @@ public class KycExtractionProcessorService {
 
         aadhaarExtractionValidator.validate(aadhaarData);
 
-        KycAadhaarData aadhaarEntity = KycAadhaarData.builder().kycDocument(document).aadhaarNumber(aadhaarData.aadhaarNumber()).fullName(aadhaarData.fullName()).dateOfBirth(aadhaarData.dateOfBirth()).gender(aadhaarData.gender()).address(aadhaarData.address()).mobileNumber(aadhaarData.mobileNumber()).createdAt(LocalDateTime.now()).build();
+        KycAadhaarData aadhaarEntity = KycAadhaarData.builder()
+                .kycDocument(document)
+                .aadhaarNumber(aadhaarData.aadhaarNumber())
+                .fullName(aadhaarData.fullName())
+                .dateOfBirth(aadhaarData.dateOfBirth())
+                .gender(aadhaarData.gender())
+                .address(aadhaarData.address())
+                .mobileNumber(aadhaarData.mobileNumber())
+                .createdAt(LocalDateTime.now()).build();
 
 
         kycAadhaarDataRepository.save(aadhaarEntity);

@@ -297,24 +297,37 @@ public class KycService {
                         );
 
 
+
+
         return kycDocumentRepository
                 .findAll(
                         specification,
                         pageable
                 )
-                .map(document ->
-                        new AdminKycDocumentResponse(
-                                document.getId(),
-                                document.getUser().getId(),
-                                document.getUser().getFullName(),
-                                document.getUser().getEmail(),
-                                document.getDocumentType().name(),
-                                document.getOriginalFileName(),
-                                document.getKycVerificationStatus().name(),
-                                document.getRejectionReason(),
-                                document.getUploadedAt()
-                        )
-                );
+                .map(document -> {
+
+                    String extractionStatus =
+                            kycExtractedDataRepository
+                                    .findByKycDocumentId(document.getId())
+                                    .map(data ->
+                                            data.getExtractionStatus().name()
+                                    )
+                                    .orElse("PENDING");
+
+
+                    return new AdminKycDocumentResponse(
+                            document.getId(),
+                            document.getUser().getId(),
+                            document.getUser().getFullName(),
+                            document.getUser().getEmail(),
+                            document.getDocumentType().name(),
+                            document.getOriginalFileName(),
+                            document.getKycVerificationStatus().name(),
+                            extractionStatus,
+                            document.getRejectionReason(),
+                            document.getUploadedAt()
+                    );
+                });
     }
 
     @Transactional

@@ -11,6 +11,7 @@ public record AdminKycDocumentResponse(
         String documentType,
         String originalFileName,
         String status,
+        String extractionStatus,
         String rejectionReason,
         LocalDateTime uploadedAt
 ) {}

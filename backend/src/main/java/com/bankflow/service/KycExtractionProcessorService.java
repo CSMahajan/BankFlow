@@ -6,6 +6,7 @@ import com.bankflow.entity.KycAadhaarData;
 import com.bankflow.entity.KycDocument;
 import com.bankflow.entity.KycExtractedData;
 import com.bankflow.entity.KycPanData;
+import com.bankflow.exception.ResourceNotFoundException;
 import com.bankflow.repository.KycAadhaarDataRepository;
 import com.bankflow.repository.KycDocumentRepository;
 import com.bankflow.repository.KycExtractedDataRepository;
@@ -39,7 +40,13 @@ public class KycExtractionProcessorService {
     @Transactional(noRollbackFor = Exception.class)
     public void process(Long documentId) {
 
-        KycDocument document = kycDocumentRepository.findById(documentId).orElseThrow();
+        KycDocument document =
+                kycDocumentRepository.findById(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "KYC document not found"
+                                )
+                        );
 
         KycExtractedData extractedData = KycExtractedData
                 .builder()
@@ -90,8 +97,8 @@ public class KycExtractionProcessorService {
                             : "Unknown extraction failure"
             );
             extractedData.setUpdatedAt(LocalDateTime.now());
-            extractedDataRepository.save(extractedData);
         }
+        extractedDataRepository.save(extractedData);
     }
 
 
@@ -113,7 +120,7 @@ public class KycExtractionProcessorService {
         kycPanDataRepository.save(panEntity);
 
 
-        log.info("PAN extraction completed for document id {} : {}", document.getId(), panData);
+        log.info("PAN extraction completed for document id {}", document.getId());
     }
 
     private void saveAadhaarData(KycDocument document, String extractedText) {
@@ -136,6 +143,6 @@ public class KycExtractionProcessorService {
         kycAadhaarDataRepository.save(aadhaarEntity);
 
 
-        log.info("Aadhaar extraction completed for document id {} : {}", document.getId(), aadhaarData);
+        log.info("Aadhaar extraction completed for document id {}", document.getId());
     }
 }

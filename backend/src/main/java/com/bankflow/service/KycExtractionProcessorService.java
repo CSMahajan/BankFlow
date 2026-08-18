@@ -16,7 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.textract.TextractClient;
-import software.amazon.awssdk.services.textract.model.*;
+import software.amazon.awssdk.services.textract.model.Block;
+import software.amazon.awssdk.services.textract.model.BlockType;
+import software.amazon.awssdk.services.textract.model.DetectDocumentTextRequest;
+import software.amazon.awssdk.services.textract.model.DetectDocumentTextResponse;
+import software.amazon.awssdk.services.textract.model.Document;
+import software.amazon.awssdk.services.textract.model.S3Object;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;

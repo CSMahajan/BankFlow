@@ -1,6 +1,5 @@
 package com.bankflow.service;
 
-import com.bankflow.entity.KycDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;

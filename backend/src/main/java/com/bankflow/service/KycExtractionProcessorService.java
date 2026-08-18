@@ -100,9 +100,13 @@ public class KycExtractionProcessorService {
             log.error("OCR extraction failed for document id {}", document.getId(), e);
             extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.FAILED);
             extractedData.setFailureReason(
-                    e.getMessage() != null
-                            ? e.getMessage()
-                            : "Unknown extraction failure"
+                    e.getClass().getSimpleName()
+                            + ": "
+                            + (
+                            e.getMessage() != null
+                                    ? e.getMessage()
+                                    : "Unknown extraction failure"
+                    )
             );
             extractedData.setUpdatedAt(LocalDateTime.now());
         }
@@ -116,13 +120,22 @@ public class KycExtractionProcessorService {
 
         panExtractionValidator.validate(panData);
 
-        KycPanData panEntity = KycPanData.builder()
-                .kycDocument(document)
-                .panNumber(panData.panNumber())
-                .fullName(panData.fullName())
-                .fatherName(panData.fatherName())
-                .dateOfBirth(panData.dateOfBirth())
-                .createdAt(LocalDateTime.now()).build();
+        KycPanData panEntity =
+                kycPanDataRepository
+                        .findByKycDocumentId(document.getId())
+                        .orElse(
+                                KycPanData.builder()
+                                        .kycDocument(document)
+                                        .createdAt(LocalDateTime.now())
+                                        .build()
+                        );
+
+
+        panEntity.setPanNumber(panData.panNumber());
+        panEntity.setFullName(panData.fullName());
+        panEntity.setFatherName(panData.fatherName());
+        panEntity.setDateOfBirth(panData.dateOfBirth());
+        panEntity.setUpdatedAt(LocalDateTime.now());
 
 
         kycPanDataRepository.save(panEntity);
@@ -137,15 +150,24 @@ public class KycExtractionProcessorService {
 
         aadhaarExtractionValidator.validate(aadhaarData);
 
-        KycAadhaarData aadhaarEntity = KycAadhaarData.builder()
-                .kycDocument(document)
-                .aadhaarNumber(aadhaarData.aadhaarNumber())
-                .fullName(aadhaarData.fullName())
-                .dateOfBirth(aadhaarData.dateOfBirth())
-                .gender(aadhaarData.gender())
-                .address(aadhaarData.address())
-                .mobileNumber(aadhaarData.mobileNumber())
-                .createdAt(LocalDateTime.now()).build();
+        KycAadhaarData aadhaarEntity =
+                kycAadhaarDataRepository
+                        .findByKycDocumentId(document.getId())
+                        .orElse(
+                                KycAadhaarData.builder()
+                                        .kycDocument(document)
+                                        .createdAt(LocalDateTime.now())
+                                        .build()
+                        );
+
+
+        aadhaarEntity.setAadhaarNumber(aadhaarData.aadhaarNumber());
+        aadhaarEntity.setFullName(aadhaarData.fullName());
+        aadhaarEntity.setDateOfBirth(aadhaarData.dateOfBirth());
+        aadhaarEntity.setGender(aadhaarData.gender());
+        aadhaarEntity.setAddress(aadhaarData.address());
+        aadhaarEntity.setMobileNumber(aadhaarData.mobileNumber());
+        aadhaarEntity.setUpdatedAt(LocalDateTime.now());
 
 
         kycAadhaarDataRepository.save(aadhaarEntity);

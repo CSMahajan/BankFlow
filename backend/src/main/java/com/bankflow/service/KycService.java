@@ -552,6 +552,97 @@ public class KycService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public PanDataResponse getAdminPanData(Long documentId) {
+
+
+        KycDocument document =
+                kycDocumentRepository.findById(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Document not found"
+                                )
+                        );
+
+
+        KycPanData panData =
+                kycPanDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "PAN data not found"
+                                )
+                        );
+
+
+        return new PanDataResponse(
+                documentId,
+                panData.getPanNumber(),
+                panData.getFullName(),
+                panData.getFatherName(),
+                panData.getDateOfBirth(),
+                panData.getCreatedAt()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public AadhaarDataResponse getAdminAadhaarData(Long documentId) {
+
+
+        KycDocument document =
+                kycDocumentRepository.findById(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Document not found"
+                                )
+                        );
+
+
+        KycAadhaarData aadhaarData =
+                kycAadhaarDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Aadhaar data not found"
+                                )
+                        );
+
+
+        return new AadhaarDataResponse(
+                documentId,
+                aadhaarData.getAadhaarNumber(),
+                aadhaarData.getFullName(),
+                aadhaarData.getDateOfBirth(),
+                aadhaarData.getGender(),
+                aadhaarData.getAddress(),
+                aadhaarData.getMobileNumber(),
+                aadhaarData.getCreatedAt()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public AdminKycExtractionResponse getAdminExtractionStatus(Long documentId) {
+
+
+        KycExtractedData extractedData =
+                kycExtractedDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Extraction data not found"
+                                ));
+
+
+        return new AdminKycExtractionResponse(
+                documentId,
+                extractedData.getKycDocument().getDocumentType().name(),
+                extractedData.getExtractionStatus().name(),
+                extractedData.getFailureReason(),
+                extractedData.getCreatedAt(),
+                extractedData.getUpdatedAt()
+        );
+    }
+
     private KycStatusResponse.DocumentStatus mapDocumentStatus(KycDocument document) {
         if (document == null) {
             return new KycStatusResponse.DocumentStatus(

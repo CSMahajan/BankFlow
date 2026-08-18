@@ -257,4 +257,35 @@ public class AdminController {
 
         return ResponseEntity.ok(kycService.getKycSummary());
     }
+
+    @GetMapping("/kyc/documents/{documentId}/extraction")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdminKycExtractionResponse> getExtractionStatus(
+            @PathVariable Long documentId) {
+
+
+        return ResponseEntity.ok(
+                kycService.getAdminExtractionStatus(documentId)
+        );
+    }
+
+    @GetMapping("/kyc/documents/{documentId}/pan-data")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PanDataResponse> getPanData(
+            @PathVariable Long documentId) {
+
+        return ResponseEntity.ok(
+                kycService.getAdminPanData(documentId)
+        );
+    }
+
+    @GetMapping("/kyc/documents/{documentId}/aadhaar-data")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AadhaarDataResponse> getAadhaarData(
+            @PathVariable Long documentId) {
+
+        return ResponseEntity.ok(
+                kycService.getAdminAadhaarData(documentId)
+        );
+    }
 }

@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -295,8 +296,6 @@ public class KycService {
                         .and(
                                 KycDocumentSpecification.status(status)
                         );
-
-
 
 
         return kycDocumentRepository
@@ -654,6 +653,33 @@ public class KycService {
                 extractedData.getCreatedAt(),
                 extractedData.getUpdatedAt()
         );
+    }
+
+    @Transactional
+    public void retryExtraction(Long documentId) {
+
+        KycExtractedData extractedData =
+                kycExtractedDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Extraction data not found"
+                                )
+                        );
+
+
+        if (extractedData.getExtractionStatus() != KycExtractedData.ExtractionStatus.FAILED) {
+            throw new IllegalStateException("Only failed extractions can be retried");
+        }
+
+        extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.PENDING);
+
+        extractedData.setFailureReason(null);
+        extractedData.setUpdatedAt(LocalDateTime.now());
+
+        kycExtractedDataRepository.save(extractedData);
+
+        kycExtractionEventPublisher.publish(documentId);
     }
 
     private KycStatusResponse.DocumentStatus mapDocumentStatus(KycDocument document) {

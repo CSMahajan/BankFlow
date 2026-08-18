@@ -16,12 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.textract.TextractClient;
-import software.amazon.awssdk.services.textract.model.Block;
-import software.amazon.awssdk.services.textract.model.BlockType;
-import software.amazon.awssdk.services.textract.model.DetectDocumentTextRequest;
-import software.amazon.awssdk.services.textract.model.DetectDocumentTextResponse;
-import software.amazon.awssdk.services.textract.model.Document;
-import software.amazon.awssdk.services.textract.model.S3Object;
+import software.amazon.awssdk.services.textract.model.*;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -53,12 +48,20 @@ public class KycExtractionProcessorService {
                                 )
                         );
 
-        KycExtractedData extractedData = KycExtractedData
-                .builder()
-                .kycDocument(document)
-                .extractionStatus(KycExtractedData.ExtractionStatus.PROCESSING)
-                .createdAt(LocalDateTime.now())
-                .build();
+        KycExtractedData extractedData =
+                extractedDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseGet(() ->
+                                KycExtractedData.builder()
+                                        .kycDocument(document)
+                                        .createdAt(LocalDateTime.now())
+                                        .build()
+                        );
+
+
+        extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.PROCESSING);
+
+        extractedData.setUpdatedAt(LocalDateTime.now());
 
         extractedDataRepository.save(extractedData);
 

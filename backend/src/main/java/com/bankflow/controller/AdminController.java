@@ -269,6 +269,15 @@ public class AdminController {
         );
     }
 
+    @PostMapping("/kyc/documents/{documentId}/extraction/retry")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void retryKycExtraction(
+            @PathVariable Long documentId) {
+
+        kycService.retryExtraction(documentId);
+    }
+
     @GetMapping("/kyc/documents/{documentId}/pan-data")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PanDataResponse> getPanData(

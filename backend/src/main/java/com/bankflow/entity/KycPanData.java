@@ -3,11 +3,12 @@ package com.bankflow.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "kyc_extracted_data",
+        name = "kyc_pan_data",
         schema = "retail_banking"
 )
 @Getter
@@ -15,11 +16,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KycExtractedData {
+public class KycPanData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -29,25 +31,26 @@ public class KycExtractedData {
     )
     private KycDocument kycDocument;
 
-    @Column(columnDefinition = "TEXT")
-    private String extractedText;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ExtractionStatus extractionStatus;
+    @Column(name = "pan_number")
+    private String panNumber;
 
-    @Column(length = 500)
-    private String failureReason;
+
+    @Column(name = "full_name")
+    private String fullName;
+
+
+    @Column(name = "father_name")
+    private String fatherName;
+
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt;
 
-    public enum ExtractionStatus {
-        PENDING,
-        PROCESSING,
-        SUCCESS,
-        FAILED
-    }
+    private LocalDateTime updatedAt;
 }

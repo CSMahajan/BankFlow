@@ -1,8 +1,6 @@
 package com.bankflow.controller;
 
-import com.bankflow.dto.KycDocumentResponse;
-import com.bankflow.dto.KycExtractionResponse;
-import com.bankflow.dto.KycStatusResponse;
+import com.bankflow.dto.*;
 import com.bankflow.entity.KycDocument;
 import com.bankflow.service.KycService;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +71,24 @@ public class KycController {
 
         return ResponseEntity.ok(
                 kycService.getExtractionResult(documentId)
+        );
+    }
+
+    @GetMapping("/documents/{documentId}/pan-data")
+    public ResponseEntity<PanDataResponse> getPanData(
+            @PathVariable Long documentId) {
+
+        return ResponseEntity.ok(
+                kycService.getPanData(documentId)
+        );
+    }
+
+    @GetMapping("/documents/{documentId}/aadhaar-data")
+    public ResponseEntity<AadhaarDataResponse> getAadhaarData(
+            @PathVariable Long documentId) {
+
+        return ResponseEntity.ok(
+                kycService.getAadhaarData(documentId)
         );
     }
 

@@ -1,13 +1,12 @@
 package com.bankflow.service;
 
 import com.bankflow.dto.*;
-import com.bankflow.entity.AuditAction;
-import com.bankflow.entity.KycDocument;
-import com.bankflow.entity.KycExtractedData;
-import com.bankflow.entity.User;
+import com.bankflow.entity.*;
 import com.bankflow.exception.ResourceNotFoundException;
+import com.bankflow.repository.KycAadhaarDataRepository;
 import com.bankflow.repository.KycDocumentRepository;
 import com.bankflow.repository.KycExtractedDataRepository;
+import com.bankflow.repository.KycPanDataRepository;
 import com.bankflow.security.VirusScanResult;
 import com.bankflow.security.VirusScanService;
 import com.bankflow.specification.KycDocumentSpecification;
@@ -42,6 +41,8 @@ public class KycService {
     private final VirusScanService virusScanService;
     private final KycExtractionEventPublisher kycExtractionEventPublisher;
     private final KycExtractedDataRepository kycExtractedDataRepository;
+    private final KycPanDataRepository kycPanDataRepository;
+    private final KycAadhaarDataRepository kycAadhaarDataRepository;
 
     @Value("${app.kyc.notification-enabled:false}")
     private boolean kycNotificationEnabled;
@@ -263,10 +264,6 @@ public class KycService {
                 documentId,
                 extractedData.getExtractionStatus().name(),
                 extractedData.getExtractedText(),
-                extractedData.getPanNumber(),
-                extractedData.getFullName(),
-                extractedData.getFatherName(),
-                extractedData.getDateOfBirth(),
                 extractedData.getFailureReason(),
                 extractedData.getCreatedAt(),
                 extractedData.getUpdatedAt()
@@ -471,6 +468,87 @@ public class KycService {
                 verified,
                 rejected,
                 pendingCustomers
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PanDataResponse getPanData(Long documentId) {
+
+        User user = currentUserService.getCurrentUser();
+
+        KycDocument document =
+                kycDocumentRepository.findById(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Document not found"
+                                )
+                        );
+
+        if (!document.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(
+                    "You are not allowed to access this document"
+            );
+        }
+
+        KycPanData panData =
+                kycPanDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "PAN data not found"
+                                )
+                        );
+
+        return new PanDataResponse(
+                documentId,
+                panData.getPanNumber(),
+                panData.getFullName(),
+                panData.getFatherName(),
+                panData.getDateOfBirth(),
+                panData.getCreatedAt()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public AadhaarDataResponse getAadhaarData(Long documentId) {
+
+        User user = currentUserService.getCurrentUser();
+
+        KycDocument document =
+                kycDocumentRepository.findById(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Document not found"
+                                )
+                        );
+
+
+        if (!document.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(
+                    "You are not allowed to access this document"
+            );
+        }
+
+
+        KycAadhaarData aadhaarData =
+                kycAadhaarDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Aadhaar data not found"
+                                )
+                        );
+
+
+        return new AadhaarDataResponse(
+                documentId,
+                aadhaarData.getAadhaarNumber(),
+                aadhaarData.getFullName(),
+                aadhaarData.getDateOfBirth(),
+                aadhaarData.getGender(),
+                aadhaarData.getAddress(),
+                aadhaarData.getMobileNumber(),
+                aadhaarData.getCreatedAt()
         );
     }
 

@@ -1,10 +1,15 @@
 package com.bankflow.service;
 
+import com.bankflow.dto.AadhaarExtractedData;
 import com.bankflow.dto.PanExtractedData;
+import com.bankflow.entity.KycAadhaarData;
 import com.bankflow.entity.KycDocument;
 import com.bankflow.entity.KycExtractedData;
+import com.bankflow.entity.KycPanData;
+import com.bankflow.repository.KycAadhaarDataRepository;
 import com.bankflow.repository.KycDocumentRepository;
 import com.bankflow.repository.KycExtractedDataRepository;
+import com.bankflow.repository.KycPanDataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -26,6 +31,9 @@ public class KycExtractionService {
     private final KycExtractedDataRepository extractedDataRepository;
     private final KycDocumentRepository kycDocumentRepository;
     private final PanTextExtractorService panTextExtractorService;
+    private final KycPanDataRepository kycPanDataRepository;
+    private final AadhaarTextExtractorService aadhaarTextExtractorService;
+    private final KycAadhaarDataRepository kycAadhaarDataRepository;
 
     @Async
     @TransactionalEventListener(
@@ -75,16 +83,16 @@ public class KycExtractionService {
                             .map(Block::text)
                             .collect(Collectors.joining("\n"));
 
-            PanExtractedData panData = panTextExtractorService.extract(extractedText);
-            log.info(
-                    "PAN extraction completed for document id {} : {}",
-                    document.getId(),
-                    panData
-            );
-            extractedData.setPanNumber(panData.panNumber());
-            extractedData.setFullName(panData.fullName());
-            extractedData.setFatherName(panData.fatherName());
-            extractedData.setDateOfBirth(panData.dateOfBirth());
+            if (document.getDocumentType()
+                    == KycDocument.DocumentType.PAN) {
+
+                savePanData(document, extractedText);
+
+            } else if (document.getDocumentType()
+                    == KycDocument.DocumentType.AADHAAR) {
+
+                saveAadhaarData(document, extractedText);
+            }
             extractedData.setExtractedText(extractedText);
             extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.SUCCESS);
             extractedData.setUpdatedAt(LocalDateTime.now());
@@ -115,5 +123,67 @@ public class KycExtractionService {
 
 
         extractedDataRepository.save(extractedData);
+    }
+
+    private void savePanData(
+            KycDocument document,
+            String extractedText
+    ) {
+
+        PanExtractedData panData =
+                panTextExtractorService.extract(extractedText);
+
+
+        KycPanData panEntity =
+                KycPanData.builder()
+                        .kycDocument(document)
+                        .panNumber(panData.panNumber())
+                        .fullName(panData.fullName())
+                        .fatherName(panData.fatherName())
+                        .dateOfBirth(panData.dateOfBirth())
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+
+        kycPanDataRepository.save(panEntity);
+
+
+        log.info(
+                "PAN extraction completed for document id {} : {}",
+                document.getId(),
+                panData
+        );
+    }
+
+    private void saveAadhaarData(
+            KycDocument document,
+            String extractedText
+    ) {
+
+        AadhaarExtractedData aadhaarData =
+                aadhaarTextExtractorService.extract(extractedText);
+
+
+        KycAadhaarData aadhaarEntity =
+                KycAadhaarData.builder()
+                        .kycDocument(document)
+                        .aadhaarNumber(aadhaarData.aadhaarNumber())
+                        .fullName(aadhaarData.fullName())
+                        .dateOfBirth(aadhaarData.dateOfBirth())
+                        .gender(aadhaarData.gender())
+                        .address(aadhaarData.address())
+                        .mobileNumber(aadhaarData.mobileNumber())
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+
+        kycAadhaarDataRepository.save(aadhaarEntity);
+
+
+        log.info(
+                "Aadhaar extraction completed for document id {} : {}",
+                document.getId(),
+                aadhaarData
+        );
     }
 }

@@ -1,6 +1,7 @@
 package com.bankflow.service;
 
 import com.bankflow.dto.AadhaarExtractedData;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Slf4j
 public class AadhaarTextExtractorService {
 
 
@@ -35,12 +37,22 @@ public class AadhaarTextExtractorService {
 
     private String extractAadhaarNumber(String text) {
 
-        Matcher matcher =
-                AADHAAR_PATTERN.matcher(text);
+        String[] lines = text.split("\\r?\\n");
 
-        if (matcher.find()) {
-            return matcher.group()
-                    .replace(" ", "");
+        Pattern pattern =
+                Pattern.compile(
+                        "^\\s*(\\d{4}\\s+\\d{4}\\s+\\d{4})\\s*$"
+                );
+
+        for(String line : lines) {
+
+            Matcher matcher = pattern.matcher(line);
+
+            if(matcher.matches()) {
+
+                return matcher.group(1)
+                        .replaceAll("\\s", "");
+            }
         }
 
         return null;
@@ -49,18 +61,57 @@ public class AadhaarTextExtractorService {
 
     private String extractName(String text) {
 
-        String[] lines = text.split("\\n");
+        String[] lines = text.split("\\r?\\n");
 
-        for (String line : lines) {
 
-            if (line.contains("Chaitanya")
-                    || line.contains("MAHAJAN")) {
+        // Approach 1: Name before S/O, D/O, W/O
+        for (int i = 1; i < lines.length; i++) {
 
-                return line.trim();
+            String currentLine = lines[i].trim();
+
+            if (currentLine.matches(
+                    "(?i).*(S/O|D/O|W/O).*"
+            )) {
+
+                String candidate = lines[i - 1].trim();
+
+                if (isValidName(candidate)) {
+                    return candidate;
+                }
+            }
+        }
+
+
+        // Approach 2: Name immediately before DOB
+        for (int i = 0; i < lines.length; i++) {
+
+            String currentLine = lines[i].trim();
+
+            if (currentLine.matches(
+                    "(?i).*(DOB|D.O.B|Date of Birth).*"
+            )) {
+
+                for (int j = i - 1; j >= 0; j--) {
+
+                    String candidate = lines[j].trim();
+
+                    if (isValidName(candidate)) {
+                        return candidate;
+                    }
+                }
             }
         }
 
         return null;
+    }
+
+    private boolean isValidName(String line) {
+
+        if(line.matches(".*\\d+.*")) {
+            return false;
+        }
+
+        return line.matches("[A-Za-z ]{3,50}");
     }
 
 

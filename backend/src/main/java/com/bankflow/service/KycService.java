@@ -516,6 +516,14 @@ public class KycService {
             );
         }
 
+        if(document.getKycVerificationStatus()
+                != KycDocument.KycVerificationStatus.VERIFIED){
+
+            throw new IllegalStateException(
+                    "PAN data available only after KYC verification"
+            );
+        }
+
         KycPanData panData =
                 kycPanDataRepository
                         .findByKycDocumentId(documentId)
@@ -555,6 +563,13 @@ public class KycService {
             );
         }
 
+        if(document.getKycVerificationStatus()
+                != KycDocument.KycVerificationStatus.VERIFIED){
+
+            throw new IllegalStateException(
+                    "Aadhaar data available only after KYC verification"
+            );
+        }
 
         KycAadhaarData aadhaarData =
                 kycAadhaarDataRepository

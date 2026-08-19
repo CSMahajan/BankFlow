@@ -547,3 +547,38 @@ export const viewAdminKycDocument = async (
   return response.data;
 
 };
+
+export const fetchAdminKycExtraction = async (documentId) => {
+
+  const response = await API.get(
+    `/admin/kyc/documents/${documentId}/extraction`
+  );
+
+  return response.data;
+};
+
+export const retryAdminKycExtraction = async (documentId) => {
+
+  await API.post(
+    `/admin/kyc/documents/${documentId}/extraction/retry`
+  );
+
+};
+
+export const fetchAdminPanData = async (documentId) => {
+
+  const response = await API.get(
+    `/admin/kyc/documents/${documentId}/pan-data`
+  );
+
+  return response.data;
+};
+
+export const fetchAdminAadhaarData = async (documentId) => {
+
+  const response = await API.get(
+    `/admin/kyc/documents/${documentId}/aadhaar-data`
+  );
+
+  return response.data;
+};

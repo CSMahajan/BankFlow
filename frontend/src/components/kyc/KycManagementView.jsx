@@ -4,7 +4,11 @@ import {
     fetchAdminKycSummary,
     viewAdminKycDocument,
     verifyKycDocument,
-    rejectKycDocument
+    rejectKycDocument,
+    fetchAdminKycExtraction,
+    fetchAdminPanData,
+    fetchAdminAadhaarData,
+    retryAdminKycExtraction
 } from "../../api/bankService";
 import { formatDateTime } from "../../utils/formatUtils";
 import KycSearchToolbar from "./KycSearchToolbar";
@@ -29,6 +33,9 @@ const KycManagementView = ({
     const [rejectionReason, setRejectionReason] = useState("");
     const [processing, setProcessing] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
+    const [extractionData, setExtractionData] = useState(null);
+    const [panData, setPanData] = useState(null);
+    const [aadhaarData, setAadhaarData] = useState(null);
 
     const loadData = async () => {
 
@@ -91,6 +98,8 @@ const KycManagementView = ({
 
         setPreviewDocument(null);
     };
+
+
 
     const handleVerify = async (documentId) => {
         try {
@@ -196,6 +205,137 @@ const KycManagementView = ({
         return () => clearTimeout(timer);
 
     }, [page, status, search]);
+
+    const loadKycReviewData = async (doc) => {
+
+        try {
+
+            const extraction = await fetchAdminKycExtraction(
+                doc.id
+            );
+
+            setExtractionData(extraction);
+
+
+            if (doc.documentType === "PAN") {
+
+                const pan =
+                    await fetchAdminPanData(doc.id);
+
+                setPanData(pan);
+                setAadhaarData(null);
+
+            }
+
+
+            if (doc.documentType === "AADHAAR") {
+
+                const aadhaar =
+                    await fetchAdminAadhaarData(doc.id);
+
+                setAadhaarData(aadhaar);
+                setPanData(null);
+
+            }
+
+
+        } catch (err) {
+
+            console.error(err);
+
+            toast.error(
+                "Unable to load extracted KYC data"
+            );
+
+        }
+
+    };
+
+    const handleRetryExtraction = async (documentId) => {
+
+        try {
+
+            setProcessing(true);
+
+            await retryAdminKycExtraction(documentId);
+
+            toast.success(
+                "Extraction retry initiated"
+            );
+
+            setExtractionData(prev => ({
+                ...(prev || {}),
+                extractionStatus: "PENDING",
+                failureReason: null
+            }));
+
+        } catch (err) {
+
+            console.error(err);
+
+            toast.error(
+                err.response?.data?.message ||
+                "Unable to retry extraction"
+            );
+
+        } finally {
+
+            setProcessing(false);
+
+        }
+    };
+
+    useEffect(() => {
+
+        if (
+            !selectedDocument ||
+            extractionData?.extractionStatus !== "PENDING"
+        ) {
+            return;
+        }
+
+
+        const interval = setInterval(async () => {
+
+            try {
+
+                const extraction =
+                    await fetchAdminKycExtraction(
+                        selectedDocument.id
+                    );
+
+                setExtractionData(extraction);
+
+
+                if (
+                    extraction.extractionStatus === "SUCCESS" ||
+                    extraction.extractionStatus === "FAILED"
+                ) {
+
+                    clearInterval(interval);
+
+                    await loadKycReviewData(
+                        selectedDocument
+                    );
+
+                }
+
+            } catch (err) {
+
+                console.error(err);
+
+            }
+
+        }, 5000);
+
+
+        return () => clearInterval(interval);
+
+
+    }, [
+        selectedDocument,
+        extractionData?.extractionStatus
+    ]);
 
     useEffect(() => {
         return () => {
@@ -422,9 +562,19 @@ const KycManagementView = ({
                                         onClick={() => {
                                             if (selectedDocument?.id === doc.id) {
                                                 setSelectedDocument(null);
+                                                setExtractionData(null);
+                                                setPanData(null);
+                                                setAadhaarData(null);
                                                 handleHideDocument();
                                             } else {
+
                                                 setSelectedDocument(doc);
+
+                                                setExtractionData(null);
+                                                setPanData(null);
+                                                setAadhaarData(null);
+
+                                                loadKycReviewData(doc);
                                             }
                                         }}
                                     >
@@ -592,6 +742,201 @@ const KycManagementView = ({
                                                                 </div>
 
                                                             </div>
+
+                                                            <div style={styles.infoSection}>
+
+                                                                <h4 style={styles.sectionTitle}>
+                                                                    🔍 OCR Extraction
+                                                                </h4>
+                                                                {
+                                                                    extractionData && (
+
+                                                                        <>
+
+                                                                            <p>
+                                                                                Status:
+                                                                                {" "}
+                                                                                <strong>
+                                                                                    {extractionData.extractionStatus}
+                                                                                </strong>
+                                                                            </p>
+
+
+                                                                            {
+                                                                                extractionData?.extractionStatus === "FAILED" && (
+
+                                                                                    <button
+                                                                                        style={styles.retryButton}
+                                                                                        disabled={processing}
+                                                                                        onClick={() =>
+                                                                                            handleRetryExtraction(doc.id)
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            processing
+                                                                                                ? "Retrying..."
+                                                                                                : "🔄 Retry Extraction"
+                                                                                        }
+                                                                                    </button>
+
+                                                                                )
+                                                                            }
+
+                                                                        </>
+
+                                                                    )
+                                                                }
+
+                                                            </div>
+
+                                                            {
+                                                                panData && (
+
+                                                                    <div style={styles.infoSection}>
+
+                                                                        <h4 style={styles.sectionTitle}>
+                                                                            🪪 Extracted PAN Details
+                                                                        </h4>
+
+
+                                                                        <div style={styles.detailsGrid}>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    PAN Number
+                                                                                </span>
+
+                                                                                <p style={styles.documentNumberValue}>
+                                                                                    {panData.panNumber}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    Name
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {panData.fullName}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    Father Name
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {panData.fatherName}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    DOB
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {panData.dateOfBirth}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                )
+                                                            }
+
+                                                            {
+                                                                aadhaarData && (
+
+                                                                    <div style={styles.infoSection}>
+
+                                                                        <h4 style={styles.sectionTitle}>
+                                                                            🆔 Extracted Aadhaar Details
+                                                                        </h4>
+
+
+                                                                        <div style={styles.detailsGrid}>
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    Aadhaar Number
+                                                                                </span>
+
+                                                                                <p style={styles.documentNumberValue}>
+                                                                                    {aadhaarData.aadhaarNumber}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    Name
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {aadhaarData.fullName}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    DOB
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {aadhaarData.dateOfBirth}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    Gender
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {aadhaarData.gender}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    Mobile
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {aadhaarData.mobileNumber}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                            <div style={styles.infoCard}>
+                                                                                <span style={styles.infoLabel}>
+                                                                                    Address
+                                                                                </span>
+
+                                                                                <p style={styles.infoValue}>
+                                                                                    {aadhaarData.address}
+                                                                                </p>
+                                                                            </div>
+
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                )
+                                                            }
 
 
                                                             <div style={styles.previewSection}>
@@ -1173,6 +1518,29 @@ const styles = {
         display: "flex",
         gap: "8px",
         alignItems: "center"
+    },
+
+    documentNumberValue: {
+        margin: 0,
+        fontSize: "16px",
+        fontWeight: "800",
+        color: "#0d6360",
+        background: "#ecfdf5",
+        padding: "8px 12px",
+        borderRadius: "8px",
+        letterSpacing: "1.5px",
+        display: "inline-block"
+    },
+
+    retryButton: {
+        marginTop: "12px",
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "1px solid #0d6360",
+        background: "#ffffff",
+        color: "#0d6360",
+        cursor: "pointer",
+        fontWeight: "700"
     },
 };
 

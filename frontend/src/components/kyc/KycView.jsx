@@ -15,7 +15,13 @@ const KycView = () => {
     const [uploadingType, setUploadingType] = useState(null);
     const [previewDocument, setPreviewDocument] = useState(null);
     const [selectedFiles, setSelectedFiles] = useState({});
-    const [verifiedKycData, setVerifiedKycData] = useState(null);
+    const [kycDetails, setKycDetails] = useState({
+        pan: null,
+        aadhaar: null
+    });
+
+    const [showPan, setShowPan] = useState(false);
+    const [showAadhaar, setShowAadhaar] = useState(false);
 
     useEffect(() => {
         loadKyc();
@@ -42,44 +48,8 @@ const KycView = () => {
                 fetchMyKycDocuments()
             ]);
 
-
             setKycStatus(status);
             setDocuments(docs || []);
-
-
-            if (status.overallStatus === "VERIFIED") {
-
-                const panDocument =
-                    docs.find(
-                        d => d.documentType === "PAN"
-                    );
-
-
-                const aadhaarDocument =
-                    docs.find(
-                        d => d.documentType === "AADHAAR"
-                    );
-
-
-                if (panDocument && aadhaarDocument) {
-
-                    const [
-                        panData,
-                        aadhaarData
-                    ] = await Promise.all([
-                        fetchMyPanData(panDocument.id),
-                        fetchMyAadhaarData(aadhaarDocument.id)
-                    ]);
-
-
-                    setVerifiedKycData({
-                        panNumber: panData.panNumber,
-                        aadhaarNumber: aadhaarData.aadhaarNumber
-                    });
-
-                }
-            }
-
 
         } catch (err) {
 
@@ -95,6 +65,87 @@ const KycView = () => {
             setLoading(false);
 
         }
+    };
+
+    const handleViewPan = async () => {
+
+        try {
+
+            const panDocument =
+                documents.find(
+                    d => d.documentType === "PAN"
+                );
+
+
+            const data =
+                await fetchMyPanData(panDocument.id);
+
+
+            setKycDetails(prev => ({
+                ...prev,
+                pan: data.panNumber
+            }));
+
+            setShowPan(true);
+
+
+        } catch (err) {
+
+            toast.error("Unable to fetch PAN details");
+
+        }
+    };
+
+
+    const handleViewAadhaar = async () => {
+
+        try {
+
+            const aadhaarDocument =
+                documents.find(
+                    d => d.documentType === "AADHAAR"
+                );
+
+
+            const data =
+                await fetchMyAadhaarData(aadhaarDocument.id);
+
+
+            setKycDetails(prev => ({
+                ...prev,
+                aadhaar: data.aadhaarNumber
+            }));
+
+            setShowAadhaar(true);
+
+
+        } catch (err) {
+
+            toast.error("Unable to fetch Aadhaar details");
+
+        }
+
+    };
+
+    const maskPan = (pan) => {
+        if (!pan) return "";
+
+        return (
+            "*".repeat(pan.length - 4) +
+            pan.slice(-4)
+        );
+    };
+
+
+    const maskAadhaar = (aadhaar) => {
+        if (!aadhaar) return "";
+
+        const clean = aadhaar.replace(/\s/g, "");
+
+        return (
+            "*".repeat(clean.length - 4) +
+            clean.slice(-4)
+        );
     };
 
     const handleUpload = async (
@@ -271,7 +322,7 @@ const KycView = () => {
             }
 
             {
-                verifiedKycData && (
+                kycStatus?.overallStatus === "VERIFIED" && (
 
                     <div style={styles.kycDataCard}>
 
@@ -286,11 +337,46 @@ const KycView = () => {
                                 PAN Number
                             </span>
 
-                            <strong>
-                                {verifiedKycData.panNumber}
-                            </strong>
+
+                            <div style={styles.valueWithButton}>
+
+                                <strong>
+                                    {
+                                        showPan
+                                            ?
+                                            kycDetails.pan
+                                            :
+                                            maskPan(kycDetails.pan)
+                                    }
+                                </strong>
+
+
+                                <button
+                                    style={styles.smallButton}
+                                    onClick={() => {
+
+                                        if (showPan) {
+                                            setShowPan(false);
+                                        }
+                                        else {
+                                            handleViewPan();
+                                        }
+
+                                    }}
+                                >
+                                    {
+                                        showPan
+                                            ?
+                                            "Hide"
+                                            :
+                                            "View"
+                                    }
+                                </button>
+
+                            </div>
 
                         </div>
+
 
 
                         <div style={styles.kycDataRow}>
@@ -299,9 +385,43 @@ const KycView = () => {
                                 Aadhaar Number
                             </span>
 
-                            <strong>
-                                {verifiedKycData.aadhaarNumber}
-                            </strong>
+
+                            <div style={styles.valueWithButton}>
+
+                                <strong>
+                                    {
+                                        showAadhaar
+                                            ?
+                                            kycDetails.aadhaar
+                                            :
+                                            maskAadhaar(kycDetails.aadhaar)
+                                    }
+                                </strong>
+
+
+                                <button
+                                    style={styles.smallButton}
+                                    onClick={() => {
+
+                                        if (showAadhaar) {
+                                            setShowAadhaar(false);
+                                        }
+                                        else {
+                                            handleViewAadhaar();
+                                        }
+
+                                    }}
+                                >
+                                    {
+                                        showAadhaar
+                                            ?
+                                            "Hide"
+                                            :
+                                            "View"
+                                    }
+                                </button>
+
+                            </div>
 
                         </div>
 
@@ -893,10 +1013,27 @@ const styles = {
     kycDataRow: {
         display: "flex",
         justifyContent: "space-between",
+        alignItems: "center",
         padding: "12px 0",
         borderBottom: "1px solid #f1f5f9",
-        fontSize: "14px"
+        fontSize: "14px",
     },
+
+    valueWithButton: {
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+    },
+
+    smallButton: {
+        background: "#0d6360",
+        color: "#fff",
+        border: "none",
+        padding: "6px 12px",
+        borderRadius: "6px",
+        cursor: "pointer",
+        fontSize: "12px"
+    }
 };
 
 export default KycView;

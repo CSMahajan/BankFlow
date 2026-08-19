@@ -340,6 +340,20 @@ public class KycService {
             throw new IllegalStateException("Only pending documents can be verified");
         }
 
+        KycExtractedData extractedData =
+                kycExtractedDataRepository
+                        .findByKycDocumentId(documentId)
+                        .orElseThrow(() ->
+                                new IllegalStateException(
+                                        "OCR extraction not completed"
+                                )
+                        );
+
+
+        if (extractedData.getExtractionStatus() != KycExtractedData.ExtractionStatus.SUCCESS) {
+            throw new IllegalStateException("Document cannot be verified before successful OCR extraction");
+        }
+
         document.setKycVerificationStatus(KycDocument.KycVerificationStatus.VERIFIED);
 
         document.setRejectionReason(null);

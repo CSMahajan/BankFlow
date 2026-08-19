@@ -229,6 +229,32 @@ public class AdminController {
                 .body(resource);
     }
 
+    @GetMapping("/kyc/documents/{documentId}/download")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Resource> downloadKycDocument(
+            @PathVariable Long documentId) {
+
+        KycDocument document =
+                kycService.getAdminDocumentDetails(documentId);
+
+        Resource resource =
+                kycService.getAdminDocumentResource(documentId);
+
+        return ResponseEntity.ok()
+                .contentType(
+                        MediaType.parseMediaType(
+                                document.getContentType()
+                        )
+                )
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" +
+                                document.getOriginalFileName()
+                                + "\""
+                )
+                .body(resource);
+    }
+
     @PatchMapping("/kyc/documents/{documentId}/verify")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
-    fetchMyKycStatus, fetchMyKycDocuments, uploadKycDocument, viewMyKycDocument
+    fetchMyKycStatus, fetchMyKycDocuments,
+    uploadKycDocument, viewMyKycDocument,
+    fetchMyPanData, fetchMyAadhaarData
 } from "../../api/bankService";
 import toast from "react-hot-toast";
 
@@ -13,6 +15,7 @@ const KycView = () => {
     const [uploadingType, setUploadingType] = useState(null);
     const [previewDocument, setPreviewDocument] = useState(null);
     const [selectedFiles, setSelectedFiles] = useState({});
+    const [verifiedKycData, setVerifiedKycData] = useState(null);
 
     useEffect(() => {
         loadKyc();
@@ -30,6 +33,7 @@ const KycView = () => {
     const loadKyc = async () => {
         try {
             setLoading(true);
+
             const [
                 status,
                 docs
@@ -38,13 +42,58 @@ const KycView = () => {
                 fetchMyKycDocuments()
             ]);
 
+
             setKycStatus(status);
             setDocuments(docs || []);
+
+
+            if (status.overallStatus === "VERIFIED") {
+
+                const panDocument =
+                    docs.find(
+                        d => d.documentType === "PAN"
+                    );
+
+
+                const aadhaarDocument =
+                    docs.find(
+                        d => d.documentType === "AADHAAR"
+                    );
+
+
+                if (panDocument && aadhaarDocument) {
+
+                    const [
+                        panData,
+                        aadhaarData
+                    ] = await Promise.all([
+                        fetchMyPanData(panDocument.id),
+                        fetchMyAadhaarData(aadhaarDocument.id)
+                    ]);
+
+
+                    setVerifiedKycData({
+                        panNumber: panData.panNumber,
+                        aadhaarNumber: aadhaarData.aadhaarNumber
+                    });
+
+                }
+            }
+
+
         } catch (err) {
+
             console.error(err);
-            toast.error(err.response?.data?.message || "Unable to load KYC details");
+
+            toast.error(
+                err.response?.data?.message ||
+                "Unable to load KYC details"
+            );
+
         } finally {
+
             setLoading(false);
+
         }
     };
 
@@ -159,6 +208,8 @@ const KycView = () => {
 
     };
 
+
+
     if (loading) {
         return (
             <div style={styles.loading}>
@@ -214,6 +265,47 @@ const KycView = () => {
                     <div style={styles.successBanner}>
                         ✅ Your KYC verification is completed.
                         You can now access all banking services.
+                    </div>
+
+                )
+            }
+
+            {
+                verifiedKycData && (
+
+                    <div style={styles.kycDataCard}>
+
+                        <h3 style={styles.sectionTitle}>
+                            🔐 Verified Identity Details
+                        </h3>
+
+
+                        <div style={styles.kycDataRow}>
+
+                            <span>
+                                PAN Number
+                            </span>
+
+                            <strong>
+                                {verifiedKycData.panNumber}
+                            </strong>
+
+                        </div>
+
+
+                        <div style={styles.kycDataRow}>
+
+                            <span>
+                                Aadhaar Number
+                            </span>
+
+                            <strong>
+                                {verifiedKycData.aadhaarNumber}
+                            </strong>
+
+                        </div>
+
+
                     </div>
 
                 )
@@ -788,7 +880,23 @@ const styles = {
         fontSize: "13px",
         fontWeight: "700",
         background: "#f9fafb"
-    }
+    },
+
+    kycDataCard: {
+        background: "#ffffff",
+        padding: "20px",
+        borderRadius: "14px",
+        border: "1px solid #eef0ec",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.04)"
+    },
+
+    kycDataRow: {
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "12px 0",
+        borderBottom: "1px solid #f1f5f9",
+        fontSize: "14px"
+    },
 };
 
 export default KycView;

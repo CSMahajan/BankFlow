@@ -594,3 +594,24 @@ export const downloadAdminKycDocument = async (documentId) => {
 
   return response.data;
 };
+
+export const fetchMyPanData = async (documentId) => {
+
+  const response = await API.get(
+    `/kyc/documents/${documentId}/pan-data`
+  );
+
+  return response.data;
+
+};
+
+
+export const fetchMyAadhaarData = async (documentId) => {
+
+  const response = await API.get(
+    `/kyc/documents/${documentId}/aadhaar-data`
+  );
+
+  return response.data;
+
+};

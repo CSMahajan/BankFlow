@@ -3,6 +3,7 @@ import {
     fetchAdminKycDocuments,
     fetchAdminKycSummary,
     viewAdminKycDocument,
+    downloadAdminKycDocument,
     verifyKycDocument,
     rejectKycDocument,
     fetchAdminKycExtraction,
@@ -36,6 +37,7 @@ const KycManagementView = ({
     const [extractionData, setExtractionData] = useState(null);
     const [panData, setPanData] = useState(null);
     const [aadhaarData, setAadhaarData] = useState(null);
+    const [downloadingId, setDownloadingId] = useState(null);
 
     const loadData = async () => {
 
@@ -99,6 +101,30 @@ const KycManagementView = ({
         setPreviewDocument(null);
     };
 
+    const handleDownloadDocument = async (doc) => {
+        try {
+            setDownloadingId(doc.id);
+
+            const blob = await downloadAdminKycDocument(doc.id);
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = doc.originalFileName;
+
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+        } catch (err) {
+            toast.error("Unable to download document");
+        } finally {
+            setDownloadingId(null);
+        }
+    };
 
 
     const handleVerify = async (documentId) => {
@@ -247,6 +273,25 @@ const KycManagementView = ({
                 "Unable to load extracted KYC data"
             );
 
+        }
+
+    };
+
+    const getVerificationMessage = () => {
+
+        switch (extractionData?.extractionStatus) {
+
+            case "PENDING":
+                return "⏳ OCR extraction is still processing";
+
+            case "FAILED":
+                return "⚠ OCR extraction failed. Retry extraction first";
+
+            case "SUCCESS":
+                return null;
+
+            default:
+                return "⏳ OCR extraction status unavailable";
         }
 
     };
@@ -975,6 +1020,16 @@ const KycManagementView = ({
                                                                         }
                                                                     </button>
 
+                                                                    <button
+                                                                        style={styles.downloadButton}
+                                                                        disabled={downloadingId === doc.id}
+                                                                        onClick={() => handleDownloadDocument(doc)}
+                                                                    >
+                                                                        {downloadingId === doc.id
+                                                                            ? "Downloading..."
+                                                                            : "⬇ Download"
+                                                                        }
+                                                                    </button>
                                                                 </div>
 
 
@@ -1034,15 +1089,50 @@ const KycManagementView = ({
                                                                                 </button>
 
 
-                                                                                <button
-                                                                                    style={styles.verifyButton}
-                                                                                    disabled={processing}
-                                                                                    onClick={() =>
-                                                                                        handleVerify(doc.id)
+                                                                                <div style={{
+                                                                                    display: "flex",
+                                                                                    flexDirection: "column",
+                                                                                    alignItems: "flex-end"
+                                                                                }}>
+
+                                                                                    <button
+                                                                                        style={{
+                                                                                            ...styles.verifyButton,
+                                                                                            opacity:
+                                                                                                extractionData?.extractionStatus !== "SUCCESS"
+                                                                                                    ? 0.5
+                                                                                                    : 1,
+                                                                                            cursor:
+                                                                                                extractionData?.extractionStatus !== "SUCCESS"
+                                                                                                    ? "not-allowed"
+                                                                                                    : "pointer"
+                                                                                        }}
+                                                                                        disabled={
+                                                                                            processing ||
+                                                                                            extractionData?.extractionStatus !== "SUCCESS"
+                                                                                        }
+                                                                                        title={
+                                                                                            getVerificationMessage()
+                                                                                        }
+                                                                                        onClick={() =>
+                                                                                            handleVerify(doc.id)
+                                                                                        }
+                                                                                    >
+                                                                                        Verify
+                                                                                    </button>
+
+
+                                                                                    {
+                                                                                        getVerificationMessage() && (
+
+                                                                                            <span style={styles.verifyHint}>
+                                                                                                {getVerificationMessage()}
+                                                                                            </span>
+
+                                                                                        )
                                                                                     }
-                                                                                >
-                                                                                    Verify
-                                                                                </button>
+
+                                                                                </div>
 
                                                                             </div>
 
@@ -1542,6 +1632,35 @@ const styles = {
         cursor: "pointer",
         fontWeight: "700"
     },
+
+    downloadButton: {
+        padding: "7px 14px",
+        borderRadius: "7px",
+        border: "1px solid #0d6360",
+        background: "#ffffff",
+        color: "#0d6360",
+        cursor: "pointer",
+        fontWeight: "700",
+        fontSize: "13px",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
+        transition: "all 0.2s ease"
+    },
+
+    verifyHint: {
+        marginTop: "8px",
+        fontSize: "12px",
+        color: "#92400e",
+        background: "#fef3c7",
+        border: "1px solid #fde68a",
+        padding: "6px 10px",
+        borderRadius: "6px",
+        fontWeight: "600",
+        maxWidth: "250px",
+        textAlign: "right"
+    },
+
 };
 
 

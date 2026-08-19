@@ -582,3 +582,15 @@ export const fetchAdminAadhaarData = async (documentId) => {
 
   return response.data;
 };
+
+export const downloadAdminKycDocument = async (documentId) => {
+
+  const response = await API.get(
+    `/admin/kyc/documents/${documentId}/download`,
+    {
+      responseType: "blob"
+    }
+  );
+
+  return response.data;
+};

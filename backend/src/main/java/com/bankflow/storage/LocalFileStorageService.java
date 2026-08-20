@@ -43,7 +43,14 @@ public class LocalFileStorageService implements FileStorageService {
     public StoredFileMetadata store(MultipartFile file, Long userId) {
         try {
             String userFolder = "user-" + userId;
-            Path userDirectory = rootLocation.resolve(userFolder);
+            Path userDirectory =
+                    rootLocation
+                            .resolve(userFolder)
+                            .normalize();
+
+            if (!userDirectory.startsWith(rootLocation)) {
+                throw new RuntimeException("Invalid storage path");
+            }
             Files.createDirectories(userDirectory);
             String extension = "";
             String originalFilename = file.getOriginalFilename();
@@ -55,6 +62,9 @@ public class LocalFileStorageService implements FileStorageService {
             }
             String storedFileName = UUID.randomUUID() + extension;
             Path destination = userDirectory.resolve(storedFileName).normalize();
+            if (!destination.startsWith(rootLocation)) {
+                throw new RuntimeException("Invalid file path");
+            }
             Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
             log.info("File stored successfully: {}", destination);
 

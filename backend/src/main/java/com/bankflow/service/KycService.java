@@ -7,6 +7,7 @@ import com.bankflow.repository.KycAadhaarDataRepository;
 import com.bankflow.repository.KycDocumentRepository;
 import com.bankflow.repository.KycExtractedDataRepository;
 import com.bankflow.repository.KycPanDataRepository;
+import com.bankflow.security.FileSecurityValidator;
 import com.bankflow.security.VirusScanResult;
 import com.bankflow.security.VirusScanService;
 import com.bankflow.specification.KycDocumentSpecification;
@@ -40,6 +41,7 @@ public class KycService {
     private final AuditLogService auditLogService;
     private final EmailService emailService;
     private final VirusScanService virusScanService;
+    private final FileSecurityValidator fileSecurityValidator;
     private final KycExtractionEventPublisher kycExtractionEventPublisher;
     private final KycExtractedDataRepository kycExtractedDataRepository;
     private final KycPanDataRepository kycPanDataRepository;
@@ -51,7 +53,9 @@ public class KycService {
     @Transactional
     public KycDocument uploadDocument(MultipartFile file, KycDocument.DocumentType documentType) {
         User user = currentUserService.getCurrentUser();
-        validateFile(file);
+
+        fileSecurityValidator.validate(file);
+
         VirusScanResult scanResult =
                 virusScanService.scan(file);
 
@@ -719,20 +723,5 @@ public class KycService {
 
         return new KycStatusResponse.DocumentStatus(
                 true, document.getKycVerificationStatus().name(), document.getRejectionReason());
-    }
-
-    private void validateFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty");
-        }
-        long maxSize = 5 * 1024 * 1024;
-        if (file.getSize() > maxSize) {
-            throw new IllegalArgumentException("File size cannot exceed 5 MB");
-        }
-        String contentType = file.getContentType();
-        if (contentType == null || !(contentType.equals("application/pdf") ||
-                contentType.equals("image/png") || contentType.equals("image/jpeg"))) {
-            throw new IllegalArgumentException("Only PDF, PNG and JPG files are allowed");
-        }
     }
 }

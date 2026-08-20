@@ -3,6 +3,7 @@ package com.bankflow.filter;
 import com.bankflow.entity.User;
 import com.bankflow.repository.UserRepository;
 import com.bankflow.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +34,12 @@ class JwtAuthenticationFilterTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
+    private PrintWriter writer;
 
     @Mock
     private HttpServletRequest request;
@@ -48,7 +56,7 @@ class JwtAuthenticationFilterTest {
     private User mockUser;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         SecurityContextHolder.clearContext();
 
         mockUser = User.builder()
@@ -101,11 +109,12 @@ class JwtAuthenticationFilterTest {
     void doFilterInternal_JwtExtractionException_ContinuesChain() throws ServletException, IOException {
         when(request.getHeader("Authorization")).thenReturn("Bearer invalid.jwt.token");
         when(jwtService.extractEmail("invalid.jwt.token")).thenThrow(new RuntimeException("Malformed JWT"));
-
+        when(objectMapper.writeValueAsString(any())).thenReturn("{}");
+        when(response.getWriter()).thenReturn(writer);
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
-        verify(filterChain, times(1)).doFilter(request, response);
+        verify(filterChain, never()).doFilter(request,response);
         verifyNoInteractions(userRepository);
     }
 
@@ -148,11 +157,12 @@ class JwtAuthenticationFilterTest {
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
         when(jwtService.extractEmail(token)).thenReturn(email);
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-
+        when(objectMapper.writeValueAsString(any())).thenReturn("{}");
+        when(response.getWriter()).thenReturn(writer);
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
-        verify(filterChain, times(1)).doFilter(request, response);
+        verify(filterChain, never()).doFilter(request,response);
     }
 
     @Test
@@ -165,11 +175,12 @@ class JwtAuthenticationFilterTest {
         when(jwtService.extractEmail(token)).thenReturn(email);
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
         when(jwtService.isTokenValid(token, email)).thenReturn(false);
-
+        when(objectMapper.writeValueAsString(any())).thenReturn("{}");
+        when(response.getWriter()).thenReturn(writer);
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
-        verify(filterChain, times(1)).doFilter(request, response);
+        verify(filterChain, never()).doFilter(request,response);
     }
 
     @Test

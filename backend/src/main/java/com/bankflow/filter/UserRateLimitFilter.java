@@ -35,6 +35,11 @@ public class UserRateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
+        if(shouldSkip(request.getRequestURI())){
+            filterChain.doFilter(request,response);
+            return;
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null
@@ -77,6 +82,11 @@ public class UserRateLimitFilter extends OncePerRequestFilter {
                     MediaType.APPLICATION_JSON_VALUE
             );
 
+            response.setHeader(
+                    "Retry-After",
+                    String.valueOf(limit.getWindow())
+            );
+
             response.getWriter().write("""
                     {
                       "status":429,
@@ -89,5 +99,13 @@ public class UserRateLimitFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean shouldSkip(String path){
+
+        return path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.equals("/actuator/health");
+
     }
 }

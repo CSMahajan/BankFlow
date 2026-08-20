@@ -38,9 +38,13 @@ public class JwtService {
 
         String token = Jwts.builder()
                 .claims(extraClaims)
-                .id(UUID.randomUUID().toString())
                 .subject(email)
-                .issuedAt(new Date(System.currentTimeMillis()))
+                .id(UUID.randomUUID().toString())
+                .issuer(jwtProperties.getIssuer())
+                .audience()
+                .add(jwtProperties.getAudience())
+                .and()
+                .issuedAt(new Date())
                 .expiration(
                         new Date(
                                 System.currentTimeMillis()
@@ -118,6 +122,8 @@ public class JwtService {
         try {
             return Jwts.parser()
                     .verifyWith(getSigningKey())
+                    .requireIssuer(jwtProperties.getIssuer())
+                    .requireAudience(jwtProperties.getAudience())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();

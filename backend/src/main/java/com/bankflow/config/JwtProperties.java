@@ -15,8 +15,9 @@ import java.time.Duration;
 public class JwtProperties {
 
     private String secret;
-
     private Duration expiration;
+    private String issuer;
+    private String audience;
 
 
     @PostConstruct
@@ -31,6 +32,18 @@ public class JwtProperties {
         if (secret.getBytes().length < 32) {
             throw new IllegalStateException(
                     "JWT secret must be at least 256 bits (32 bytes)"
+            );
+        }
+
+        if (issuer == null || issuer.isBlank()) {
+            throw new IllegalStateException(
+                    "JWT issuer must not be empty"
+            );
+        }
+
+        if (audience == null || audience.isBlank()) {
+            throw new IllegalStateException(
+                    "JWT audience must not be empty"
             );
         }
 

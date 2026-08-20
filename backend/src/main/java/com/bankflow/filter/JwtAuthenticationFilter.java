@@ -2,12 +2,14 @@ package com.bankflow.filter;
 
 import com.bankflow.repository.UserRepository;
 import com.bankflow.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -26,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -50,8 +54,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userEmail = jwtService.extractEmail(jwt);
         } catch (Exception ex) {
-            log.warn("JWT extraction failed for request [{}]: {}", request.getRequestURI(), ex.getMessage());
-            filterChain.doFilter(request, response);
+
+            log.warn("Invalid JWT token for URI [{}]: {}", request.getRequestURI(), ex.getMessage());
+
+            sendUnauthorizedResponse(response, "Invalid or expired token");
             return;
         }
 
@@ -77,10 +83,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.debug("SecurityContext successfully populated with authority [ROLE_{}] for user [{}]",
                         user.getRole().name(), userEmail);
             } else {
-                log.warn("SecurityContext NOT populated: Token invalid or user [{}] no longer exists in database", userEmail);
+                log.warn(
+                        "SecurityContext NOT populated: " +
+                                "Token invalid or user [{}] no longer exists in database", userEmail);
+                sendUnauthorizedResponse(response, "Invalid token");
+                return;
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void sendUnauthorizedResponse(
+            HttpServletResponse response, String message) throws IOException {
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        response.getWriter()
+                .write(
+                        objectMapper.writeValueAsString(
+                                Map.of(
+                                        "status", 401,
+                                        "error", "Unauthorized",
+                                        "message", message
+                                )
+                        )
+                );
     }
 }

@@ -3,6 +3,7 @@ package com.bankflow.config;
 import com.bankflow.filter.JwtAuthenticationFilter;
 import com.bankflow.filter.RateLimitFilter;
 import com.bankflow.filter.UserRateLimitFilter;
+import com.bankflow.security.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +35,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final RateLimitFilter rateLimitFilter;
     private final UserRateLimitFilter userRateLimitFilter;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
 
     @Value("${app.cors-origin}")
     private String corsOrigin;
@@ -52,6 +54,11 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         // Require authentication for any other endpoint
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(
+                                authenticationEntryPoint
+                        )
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

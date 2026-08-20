@@ -57,6 +57,8 @@ app:
   jwt:
     secret: ${JWT_SECRET:bankflow-development-jwt-secret-only-for-local-development-change-in-production-2026}
     expiration: 1h
+    issuer: bankflow-api
+    audience: bankflow-client
 
   seed-admin: ${SEED_ADMIN:true}
 

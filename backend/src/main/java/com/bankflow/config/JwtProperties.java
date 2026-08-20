@@ -18,7 +18,7 @@ public class JwtProperties {
     private Duration expiration;
     private String issuer;
     private String audience;
-
+    private Duration refreshTokenExpiration;
 
     @PostConstruct
     public void validate() {
@@ -32,6 +32,12 @@ public class JwtProperties {
         if (secret.getBytes().length < 32) {
             throw new IllegalStateException(
                     "JWT secret must be at least 256 bits (32 bytes)"
+            );
+        }
+
+        if (refreshTokenExpiration == null) {
+            throw new IllegalStateException(
+                    "Refresh token expiration must not be empty"
             );
         }
 

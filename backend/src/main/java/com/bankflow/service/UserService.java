@@ -2,6 +2,7 @@ package com.bankflow.service;
 
 import com.bankflow.dto.*;
 import com.bankflow.entity.AuditAction;
+import com.bankflow.entity.RefreshToken;
 import com.bankflow.entity.User;
 import com.bankflow.entity.VerificationToken;
 import com.bankflow.exception.EmailVerificationException;
@@ -40,6 +41,7 @@ public class UserService {
     private final EmailService emailService;
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${app.email-verification.enabled:false}")
     private boolean emailVerificationEnabled;
@@ -84,6 +86,7 @@ public class UserService {
         );
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         log.info("Attempting authentication for email [{}]", request.email());
 
@@ -109,18 +112,41 @@ public class UserService {
             );
         }
 
-        // 3. Generate JWT token
-        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtService.generateToken(user.getEmail(), user.getRole().name());
+
+        String refreshToken = refreshTokenService.createRefreshToken(user);
 
         log.info("User [{}] authenticated successfully with role [{}]", user.getEmail(), user.getRole());
 
-        auditLogService.log(
-                user,
-                AuditAction.LOGIN,
-                "User logged in successfully"
+        auditLogService.log(user, AuditAction.LOGIN, "User logged in successfully");
+
+        return new AuthResponse(
+                accessToken,
+                refreshToken,
+                user.getEmail(),
+                user.getRole().name(),
+                user.getFullName()
         );
-        // 4. Return token and user metadata
-        return new AuthResponse(token, user.getEmail(), user.getRole().name(), user.getFullName());
+    }
+
+    @Transactional
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+
+        RefreshToken oldToken = refreshTokenService.validateRefreshToken(request.refreshToken());
+
+        User user = oldToken.getUser();
+
+        String newAccessToken = jwtService.generateToken(user.getEmail(), user.getRole().name());
+
+        String newRefreshToken = refreshTokenService.rotateRefreshToken(request.refreshToken(), user);
+
+        return new AuthResponse(
+                newAccessToken,
+                newRefreshToken,
+                user.getEmail(),
+                user.getRole().name(),
+                user.getFullName()
+        );
     }
 
     @Transactional

@@ -29,6 +29,12 @@ public class AuthController {
         userService.registerCustomer(request);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(userService.refreshToken(request));
+    }
+
     @GetMapping("/verify-email")
     public ResponseEntity<String> verifyEmail(@RequestParam String token) {
         verificationTokenService.verifyEmail(token);

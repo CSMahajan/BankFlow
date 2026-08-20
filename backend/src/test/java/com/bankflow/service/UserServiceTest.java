@@ -43,6 +43,9 @@ class UserServiceTest {
     private UserService userService;
 
     @Mock
+    private RefreshTokenService refreshTokenService;
+
+    @Mock
     private VerificationTokenService verificationTokenService;
 
     @Mock
@@ -206,17 +209,19 @@ class UserServiceTest {
         when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches("Secret@123", "encodedPassword123")).thenReturn(true);
         when(jwtService.generateToken("john@example.com", "CUSTOMER")).thenReturn("mock.jwt.token");
-
+        when(refreshTokenService.createRefreshToken(mockUser)).thenReturn("mock.refresh.token");
         AuthResponse response = userService.login(request);
 
         assertNotNull(response);
-        assertEquals("mock.jwt.token", response.token());
+        assertEquals("mock.refresh.token", response.refreshToken());
+        assertEquals("mock.jwt.token", response.accessToken());
         assertEquals("john@example.com", response.email());
         assertEquals("CUSTOMER", response.role());
 
         verify(userRepository, times(1)).findByEmail("john@example.com");
         verify(passwordEncoder, times(1)).matches("Secret@123", "encodedPassword123");
         verify(jwtService, times(1)).generateToken("john@example.com", "CUSTOMER");
+        verify(refreshTokenService, times(1)).createRefreshToken(mockUser);
     }
 
     @Test

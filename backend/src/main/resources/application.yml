@@ -59,6 +59,7 @@ app:
     expiration: 1h
     issuer: bankflow-api
     audience: bankflow-client
+    refresh-token-expiration: 30d
 
   seed-admin: ${SEED_ADMIN:true}
 

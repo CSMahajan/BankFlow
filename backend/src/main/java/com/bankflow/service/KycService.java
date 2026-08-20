@@ -7,6 +7,7 @@ import com.bankflow.repository.KycAadhaarDataRepository;
 import com.bankflow.repository.KycDocumentRepository;
 import com.bankflow.repository.KycExtractedDataRepository;
 import com.bankflow.repository.KycPanDataRepository;
+import com.bankflow.security.FileNameSanitizer;
 import com.bankflow.security.FileSecurityValidator;
 import com.bankflow.security.VirusScanResult;
 import com.bankflow.security.VirusScanService;
@@ -42,6 +43,7 @@ public class KycService {
     private final EmailService emailService;
     private final VirusScanService virusScanService;
     private final FileSecurityValidator fileSecurityValidator;
+    private final FileNameSanitizer fileNameSanitizer;
     private final KycExtractionEventPublisher kycExtractionEventPublisher;
     private final KycExtractedDataRepository kycExtractedDataRepository;
     private final KycPanDataRepository kycPanDataRepository;
@@ -62,7 +64,7 @@ public class KycService {
 
         if (!scanResult.clean()) {
             log.error("File scan found issue in security verification: {}", scanResult.message());
-            throw new IllegalArgumentException("File failed security scan: ");
+            throw new IllegalArgumentException("File failed security scan: " + scanResult.message());
         }
 
         List<KycDocument> existingDocuments =
@@ -84,6 +86,11 @@ public class KycService {
                 );
             }
         }
+
+        String sanitizedFileName =
+                fileNameSanitizer.sanitize(
+                        file.getOriginalFilename()
+                );
         StoredFileMetadata metadata =
                 fileStorageService.store(file, user.getId());
 
@@ -92,7 +99,7 @@ public class KycService {
             KycDocument document = KycDocument.builder()
                     .user(user)
                     .documentType(documentType)
-                    .originalFileName(file.getOriginalFilename())
+                    .originalFileName(sanitizedFileName)
                     .storedFileName(
                             Paths.get(metadata.path())
                                     .getFileName()
@@ -520,8 +527,8 @@ public class KycService {
             );
         }
 
-        if(document.getKycVerificationStatus()
-                != KycDocument.KycVerificationStatus.VERIFIED){
+        if (document.getKycVerificationStatus()
+                != KycDocument.KycVerificationStatus.VERIFIED) {
 
             throw new IllegalStateException(
                     "PAN data available only after KYC verification"
@@ -567,8 +574,8 @@ public class KycService {
             );
         }
 
-        if(document.getKycVerificationStatus()
-                != KycDocument.KycVerificationStatus.VERIFIED){
+        if (document.getKycVerificationStatus()
+                != KycDocument.KycVerificationStatus.VERIFIED) {
 
             throw new IllegalStateException(
                     "Aadhaar data available only after KYC verification"

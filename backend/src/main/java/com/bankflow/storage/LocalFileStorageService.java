@@ -45,8 +45,16 @@ public class LocalFileStorageService implements FileStorageService {
             String userFolder = "user-" + userId;
             Path userDirectory = rootLocation.resolve(userFolder);
             Files.createDirectories(userDirectory);
-            String storedFileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path destination = userDirectory.resolve(storedFileName);
+            String extension = "";
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension =
+                        originalFilename.substring(
+                                originalFilename.lastIndexOf(".")
+                        );
+            }
+            String storedFileName = UUID.randomUUID() + extension;
+            Path destination = userDirectory.resolve(storedFileName).normalize();
             Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
             log.info("File stored successfully: {}", destination);
 
@@ -65,10 +73,31 @@ public class LocalFileStorageService implements FileStorageService {
 
     @Override
     public void delete(String filePath) {
+
         try {
-            Files.deleteIfExists(rootLocation.resolve(filePath));
+
+            Path file =
+                    rootLocation
+                            .resolve(filePath)
+                            .normalize();
+
+
+            if (!file.startsWith(rootLocation)) {
+                throw new RuntimeException(
+                        "Invalid file path"
+                );
+            }
+
+
+            Files.deleteIfExists(file);
+
         } catch (IOException e) {
-            log.error("Failed deleting file {}", filePath);
+
+            log.error(
+                    "Failed deleting file {}",
+                    filePath,
+                    e
+            );
         }
     }
 

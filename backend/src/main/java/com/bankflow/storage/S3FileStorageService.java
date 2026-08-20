@@ -38,11 +38,22 @@ public class S3FileStorageService implements FileStorageService {
 
         try {
 
-            String key = "user-" + userId
-                    + "/"
-                    + UUID.randomUUID()
-                    + "_"
-                    + file.getOriginalFilename();
+            String extension = "";
+
+            String originalFilename = file.getOriginalFilename();
+
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension =
+                        originalFilename.substring(
+                                originalFilename.lastIndexOf(".")
+                        );
+            }
+
+            String key =
+                    "user-" + userId
+                            + "/"
+                            + UUID.randomUUID()
+                            + extension;
 
 
             PutObjectRequest request = PutObjectRequest.builder()
@@ -99,6 +110,10 @@ public class S3FileStorageService implements FileStorageService {
 
     @Override
     public void delete(String filePath) {
+
+        if (filePath == null || filePath.isBlank()) {
+            return;
+        }
 
         DeleteObjectRequest request =
                 DeleteObjectRequest.builder()

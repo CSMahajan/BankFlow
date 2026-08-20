@@ -5,9 +5,7 @@ import com.bankflow.entity.KycDocument;
 import com.bankflow.service.KycService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,9 +57,20 @@ public class KycController {
         Resource resource = kycService.getCustomerDocumentResource(documentId);
 
         return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .header(
+                        "X-Content-Type-Options",
+                        "nosniff"
+                )
                 .contentType(MediaType.parseMediaType(document.getContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + document.getOriginalFileName() + "\"")
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition
+                                .inline()
+                                .filename(document.getOriginalFileName())
+                                .build()
+                                .toString()
+                )
                 .body(resource);
     }
 

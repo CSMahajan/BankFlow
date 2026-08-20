@@ -9,10 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -163,7 +160,7 @@ public class AdminController {
     }
 
     @GetMapping("/loans/summary")
-    public LoanSummaryResponse getLoanSummary(){
+    public LoanSummaryResponse getLoanSummary() {
 
         return loanService.getLoanSummary();
 
@@ -171,7 +168,7 @@ public class AdminController {
 
     @GetMapping("/cards/summary")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CardSummaryResponse> getCardSummary(){
+    public ResponseEntity<CardSummaryResponse> getCardSummary() {
 
         return ResponseEntity.ok(
                 cardService.getCardSummaryForAdmin()
@@ -215,6 +212,11 @@ public class AdminController {
                 kycService.getAdminDocumentResource(documentId);
 
         return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .header(
+                        "X-Content-Type-Options",
+                        "nosniff"
+                )
                 .contentType(
                         MediaType.parseMediaType(
                                 document.getContentType()
@@ -222,9 +224,11 @@ public class AdminController {
                 )
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" +
-                                document.getOriginalFileName()
-                                + "\""
+                        ContentDisposition
+                                .inline()
+                                .filename(document.getOriginalFileName())
+                                .build()
+                                .toString()
                 )
                 .body(resource);
     }
@@ -241,6 +245,11 @@ public class AdminController {
                 kycService.getAdminDocumentResource(documentId);
 
         return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .header(
+                        "X-Content-Type-Options",
+                        "nosniff"
+                )
                 .contentType(
                         MediaType.parseMediaType(
                                 document.getContentType()
@@ -248,9 +257,10 @@ public class AdminController {
                 )
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" +
-                                document.getOriginalFileName()
-                                + "\""
+                        ContentDisposition
+                                .attachment()
+                                .filename(document.getOriginalFileName())
+                                .build().toString()
                 )
                 .body(resource);
     }
@@ -279,7 +289,7 @@ public class AdminController {
 
     @GetMapping("/kyc/summary")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<KycSummaryResponse> getKycSummary(){
+    public ResponseEntity<KycSummaryResponse> getKycSummary() {
 
         return ResponseEntity.ok(kycService.getKycSummary());
     }

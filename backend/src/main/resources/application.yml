@@ -54,7 +54,9 @@ app:
 
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
 
-  jwt-secret: ${JWT_SECRET:bankflow-development-jwt-secret-only-for-local-development-change-in-production-2026}
+  jwt:
+    secret: ${JWT_SECRET:bankflow-development-jwt-secret-only-for-local-development-change-in-production-2026}
+    expiration: 1h
 
   seed-admin: ${SEED_ADMIN:true}
 

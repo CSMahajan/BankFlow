@@ -1,12 +1,13 @@
 package com.bankflow.service;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import com.bankflow.config.JwtProperties;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,13 +15,19 @@ class JwtServiceTest {
 
     private JwtService jwtService;
 
-    // Minimum 256-bit secret key required for HMAC-SHA256
+    private JwtProperties jwtProperties;
+
     private final String testSecret = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
 
     @BeforeEach
     void setUp() {
-        jwtService = new JwtService();
-        ReflectionTestUtils.setField(jwtService, "jwtSecret", testSecret);
+
+        jwtProperties = new JwtProperties();
+
+        jwtProperties.setSecret(testSecret);
+        jwtProperties.setExpiration(Duration.ofHours(1));
+
+        jwtService = new JwtService(jwtProperties);
     }
 
     // ==========================================
@@ -52,6 +59,23 @@ class JwtServiceTest {
 
         String extractedRole = jwtService.extractRole(token);
         assertEquals(role, extractedRole);
+    }
+
+    @Test
+    @DisplayName("Generate Token and Extract JWT ID Success")
+    void generateToken_ExtractTokenId_Success() {
+
+        String token =
+                jwtService.generateToken(
+                        "user@example.com",
+                        "CUSTOMER"
+                );
+
+        String tokenId =
+                jwtService.extractTokenId(token);
+
+        assertNotNull(tokenId);
+        assertFalse(tokenId.isBlank());
     }
 
     // ==========================================
@@ -124,8 +148,12 @@ class JwtServiceTest {
         // Secret key must be >= 64 characters (512 bits) to meet JJWT security requirements
         String strongForeignSecret = "DifferentSecretKeyForTamperedTokenCheck12345678901234567890123456789012";
 
-        JwtService foreignJwtService = new JwtService();
-        ReflectionTestUtils.setField(foreignJwtService, "jwtSecret", strongForeignSecret);
+        JwtProperties foreignProperties = new JwtProperties();
+
+        foreignProperties.setSecret(strongForeignSecret);
+        foreignProperties.setExpiration(Duration.ofHours(1));
+
+        JwtService foreignJwtService = new JwtService(foreignProperties);
 
         assertThrows(SignatureException.class, () ->
                 foreignJwtService.extractEmail(token)
@@ -141,8 +169,12 @@ class JwtServiceTest {
         // Secret key must be >= 64 characters (512 bits) to meet JJWT security requirements
         String strongForeignSecret = "DifferentSecretKeyForTamperedTokenCheck12345678901234567890123456789012";
 
-        JwtService foreignJwtService = new JwtService();
-        ReflectionTestUtils.setField(foreignJwtService, "jwtSecret", strongForeignSecret);
+        JwtProperties foreignProperties = new JwtProperties();
+
+        foreignProperties.setSecret(strongForeignSecret);
+        foreignProperties.setExpiration(Duration.ofHours(1));
+
+        JwtService foreignJwtService = new JwtService(foreignProperties);
 
         boolean isValid = foreignJwtService.isTokenValid(token, email);
 

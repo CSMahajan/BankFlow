@@ -1,13 +1,14 @@
 package com.bankflow.service;
 
+import com.bankflow.config.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -15,17 +16,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${app.jwt-secret}")
-    private String jwtSecret;
+    private final JwtProperties jwtProperties;
 
-    // Token validity: 24 hours (in milliseconds)
-    private static final long EXPIRATION_TIME = 86_400_000;
 
     /**
      * Generate JWT Token for user
@@ -38,9 +38,15 @@ public class JwtService {
 
         String token = Jwts.builder()
                 .claims(extraClaims)
+                .id(UUID.randomUUID().toString())
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .expiration(
+                        new Date(
+                                System.currentTimeMillis()
+                                        + jwtProperties.getExpiration().toMillis()
+                        )
+                )
                 .signWith(getSigningKey())
                 .compact();
 
@@ -60,6 +66,15 @@ public class JwtService {
      */
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+    /**
+     * Extract JWT ID from token
+     */
+    public String extractTokenId(String token) {
+        return extractClaim(
+                token,
+                Claims::getId
+        );
     }
 
     /**
@@ -119,7 +134,7 @@ public class JwtService {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

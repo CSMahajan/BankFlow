@@ -1,6 +1,8 @@
 package com.bankflow.config;
 
 import com.bankflow.filter.JwtAuthenticationFilter;
+import com.bankflow.filter.RateLimitFilter;
+import com.bankflow.filter.UserRateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +32,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final RateLimitFilter rateLimitFilter;
+    private final UserRateLimitFilter userRateLimitFilter;
 
     @Value("${app.cors-origin}")
     private String corsOrigin;
@@ -52,7 +56,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        rateLimitFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        jwtAuthFilter,
+                        RateLimitFilter.class
+                )
+                .addFilterAfter(
+                        userRateLimitFilter,
+                        JwtAuthenticationFilter.class
+                );
 
         return http.build();
     }

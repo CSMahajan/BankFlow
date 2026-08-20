@@ -14,3 +14,6 @@ app:
 
   storage:
     type: local
+
+rate-limit:
+  enabled: true

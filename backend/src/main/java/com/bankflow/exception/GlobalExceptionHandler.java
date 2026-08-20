@@ -123,6 +123,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitExceeded(
+            RateLimitExceededException ex) {
+
+        log.warn("Rate limit exceeded: {}", ex.getMessage());
+
+        ErrorResponse error =
+                new ErrorResponse(
+                        HttpStatus.TOO_MANY_REQUESTS.value(),
+                        "Too Many Requests",
+                        ex.getMessage()
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(error);
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {

@@ -95,3 +95,30 @@ management:
   endpoint:
     health:
       show-details: never
+
+rate-limit:
+  enabled: true
+
+  login:
+    limit: 5
+    window: 1m
+
+  register:
+    limit: 3
+    window: 1h
+
+  forgot-password:
+    limit: 3
+    window: 1h
+
+  resend-verification:
+    limit: 3
+    window: 1h
+
+  kyc-upload:
+    limit: 5
+    window: 1h
+
+  user:
+    limit: 100
+    window: 60s

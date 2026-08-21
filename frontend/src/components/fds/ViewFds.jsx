@@ -221,19 +221,91 @@ const ViewFds = ({ onFdClosed }) => {
                         : "Close Fixed Deposit?"
                 }
                 message={
-                    confirmFd && isPrematureFd(confirmFd)
-                        ?
-                        `This Fixed Deposit has not matured yet.
-Deposit Amount:
-${formatCurrency(confirmFd.depositAmount)}
-Amount credited:
-${formatCurrency(confirmFd.depositAmount)}
-Only the principal amount will be credited.`
-                        :
-                        `This Fixed Deposit has matured.
+                    confirmFd &&
+                    (
+                        <div>
 
-Amount credited:
-${formatCurrency(confirmFd?.maturityAmount)}`
+                            <p style={{ marginBottom: "20px" }}>
+                                {
+                                    isPrematureFd(confirmFd)
+                                        ? "This Fixed Deposit has not matured yet."
+                                        : "This Fixed Deposit has matured."
+                                }
+                            </p>
+
+
+                            <div style={styles.confirmDetails}>
+
+                                <div style={styles.confirmRow}>
+                                    <span>Deposit Amount</span>
+                                    <strong>
+                                        {formatCurrency(confirmFd.depositAmount)}
+                                    </strong>
+                                </div>
+
+
+                                <div style={styles.confirmRow}>
+                                    <span>Interest Rate</span>
+                                    <strong>
+                                        {confirmFd.interestRate}% p.a.
+                                    </strong>
+                                </div>
+
+
+                                {
+                                    !isPrematureFd(confirmFd) && (
+                                        <div style={styles.confirmRow}>
+                                            <span>Maturity Amount</span>
+                                            <strong style={styles.amountHighlight}>
+                                                {formatCurrency(confirmFd.maturityAmount)}
+                                            </strong>
+                                        </div>
+                                    )
+                                }
+
+
+                                <div style={styles.confirmRow}>
+                                    <span>
+                                        {
+                                            isPrematureFd(confirmFd)
+                                                ? "Amount Credited"
+                                                : "Amount Released"
+                                        }
+                                    </span>
+
+                                    <strong style={styles.amountHighlight}>
+                                        {
+                                            formatCurrency(
+                                                isPrematureFd(confirmFd)
+                                                    ? confirmFd.depositAmount
+                                                    : confirmFd.maturityAmount
+                                            )
+                                        }
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            {
+                                isPrematureFd(confirmFd) && (
+                                    <p
+                                        style={{
+                                            marginTop: "18px",
+                                            color: "#ea580c",
+                                            fontWeight: "600"
+                                        }}
+                                    >
+                                        ⚠️ Only the principal amount will be credited.
+                                        Interest benefits will be lost.
+                                    </p>
+                                )
+                            }
+
+
+                        </div>
+                    )
                 }
                 confirmText={
                     confirmFd && isPrematureFd(confirmFd)
@@ -323,6 +395,32 @@ const styles = {
         color: "#fff",
         fontWeight: 700,
         cursor: "pointer",
+    },
+
+    confirmDetails: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+        backgroundColor: "#f9fafb",
+        padding: "14px",
+        borderRadius: "10px",
+        border: "1px solid #e5e7eb",
+    },
+
+
+    confirmRow: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        fontSize: "14px",
+        color: "#6b7280",
+    },
+
+
+    amountHighlight: {
+        fontSize: "18px",
+        color: "#0d6360",
+        fontWeight: "800",
     },
 };
 

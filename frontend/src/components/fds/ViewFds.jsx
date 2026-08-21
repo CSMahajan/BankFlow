@@ -2,53 +2,36 @@ import React, { useEffect, useState } from "react";
 import { fetchMyFixedDeposits, closeFixedDeposit } from "../../api/bankService";
 import { formatDate, formatCurrency } from "../../utils/formatUtils";
 import toast from "react-hot-toast";
+import ConfirmModal from "../ConfirmModal";
 
 const ViewFds = ({ onFdClosed }) => {
     const [fds, setFds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [confirmFd, setConfirmFd] = useState(null);
 
     const isPrematureFd = (fd) =>
         new Date(fd.maturityDate) > new Date();
 
-    const handleCloseFd = async (fd) => {
+    const handleCloseFd = (fd) => {
+        setConfirmFd(fd);
+    };
 
-        const confirmed = window.confirm(
-            isPrematureFd(fd)
-                ? `This Fixed Deposit has not matured yet.
-Deposit Amount: ${formatCurrency(fd.depositAmount)}
-Amount to be credited: ${formatCurrency(fd.depositAmount)}
-Only the principal amount will be credited.
-
-Do you want to continue?`
-                : `This Fixed Deposit has matured.
-
-Amount to be credited:
-${formatCurrency(fd.maturityAmount)}
-
-Do you want to continue?`
-        );
-
-        if (!confirmed) return;
-
+    const confirmCloseFd = async () => {
+        const fd = confirmFd;
+        setConfirmFd(null);
         try {
             await closeFixedDeposit(fd.fdNumber);
-
             toast.success(
                 isPrematureFd(fd)
                     ? `Principal amount of ${formatCurrency(fd.depositAmount)} credited successfully.`
                     : `${formatCurrency(fd.maturityAmount)} credited successfully.`
             );
-
             await loadFds();
             await onFdClosed?.();
-
         } catch (err) {
             console.error(err);
-            toast.error(
-                err.response?.data?.message ??
-                "Failed to close Fixed Deposit."
-            );
+            toast.error(err.response?.data?.message ?? "Failed to close Fixed Deposit.");
         }
     };
 
@@ -229,6 +212,40 @@ Do you want to continue?`
                 })}
 
             </div>
+
+            <ConfirmModal
+                open={!!confirmFd}
+                title={
+                    confirmFd && isPrematureFd(confirmFd)
+                        ? "Premature Close FD?"
+                        : "Close Fixed Deposit?"
+                }
+                message={
+                    confirmFd && isPrematureFd(confirmFd)
+                        ?
+                        `This Fixed Deposit has not matured yet.
+Deposit Amount:
+${formatCurrency(confirmFd.depositAmount)}
+Amount credited:
+${formatCurrency(confirmFd.depositAmount)}
+Only the principal amount will be credited.`
+                        :
+                        `This Fixed Deposit has matured.
+
+Amount credited:
+${formatCurrency(confirmFd?.maturityAmount)}`
+                }
+                confirmText={
+                    confirmFd && isPrematureFd(confirmFd)
+                        ? "Close FD"
+                        : "Release Amount"
+                }
+                danger={true}
+                onCancel={() =>
+                    setConfirmFd(null)
+                }
+                onConfirm={confirmCloseFd}
+            />
         </div>
     );
 };

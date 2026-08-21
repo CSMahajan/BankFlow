@@ -4,6 +4,7 @@ import { toggleAccountStatus } from "../../api/bankService";
 import { formatDate, formatCurrency } from "../../utils/formatUtils";
 import { getAccountStatusStyle } from '../../utils/accountStatusUtils';
 import toast from "react-hot-toast";
+import ConfirmModal from "../ConfirmModal";
 
 const AccountsView = ({
   accounts,
@@ -11,25 +12,47 @@ const AccountsView = ({
   error,
   refreshAccounts,
 }) => {
+  const [confirmAccount, setConfirmAccount] = React.useState(null);
 
-  const handleToggleStatus = async (account) => {
-    const confirmed = window.confirm(
-      account.accountStatus === "ACTIVE"
-        ? "Freeze this account?\n\nOutgoing transactions will not be allowed until it is activated again."
-        : "Activate this account?"
-    );
+  const handleToggleStatus = (account) => {
+    setConfirmAccount(account);
+  };
 
-    if (!confirmed) return;
+  const confirmToggleStatus = async () => {
+
+    const account = confirmAccount;
+
+    setConfirmAccount(null);
 
     try {
-      await toggleAccountStatus(account.accountNumber);
-      toast.success(account.accountStatus === "ACTIVE"
-        ? "✅ Account frozen successfully." : "✅ Account activated successfully.");
+
+      await toggleAccountStatus(
+        account.accountNumber
+      );
+
+
+      toast.success(
+        account.accountStatus === "ACTIVE"
+          ? "✅ Account frozen successfully."
+          : "✅ Account activated successfully."
+      );
+
+
       await refreshAccounts();
+
+
     } catch (err) {
+
       console.error(err);
-      toast.error(err.response?.data?.message ?? "Failed to update account status.");
+
+
+      toast.error(
+        err.response?.data?.message ??
+        "Failed to update account status."
+      );
+
     }
+
   };
 
   const totalBalance = accounts.reduce((sum, acc) => sum + (Number(acc.currentBalance) || 0), 0);
@@ -194,6 +217,45 @@ const AccountsView = ({
           </div>
         </div>
       )}
+      <ConfirmModal
+
+        open={!!confirmAccount}
+
+
+        title={
+          confirmAccount?.accountStatus === "ACTIVE"
+            ? "Freeze Account?"
+            : "Activate Account?"
+        }
+
+
+        message={
+          confirmAccount?.accountStatus === "ACTIVE"
+            ? "Outgoing transactions will not be allowed until this account is activated again."
+            : "This account will become active again."
+        }
+
+
+        confirmText={
+          confirmAccount?.accountStatus === "ACTIVE"
+            ? "Freeze Account"
+            : "Activate Account"
+        }
+
+
+        danger={
+          confirmAccount?.accountStatus === "ACTIVE"
+        }
+
+
+        onCancel={() =>
+          setConfirmAccount(null)
+        }
+
+
+        onConfirm={confirmToggleStatus}
+
+      />
     </div>
   );
 };

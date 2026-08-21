@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { fetchMyScheduledTransfers, cancelScheduledTransfer } from "../../api/bankService";
 import { formatCurrency, formatDate } from "../../utils/formatUtils";
+import ConfirmModal from "../ConfirmModal";
+import toast from "react-hot-toast";
 
 const ScheduledTransfersList = ({ refreshTrigger }) => {
 
     const [transfers, setTransfers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [confirmTransfer, setConfirmTransfer] = useState(null);
 
     const loadTransfers = async () => {
         try {
@@ -33,18 +36,19 @@ const ScheduledTransfersList = ({ refreshTrigger }) => {
         loadTransfers();
     }, [refreshTrigger]);
 
-    const handleCancel = async (transferId) => {
+    const handleCancel = (transfer) => {
+        setConfirmTransfer(transfer);
+    };
 
-        if (!window.confirm("Cancel this scheduled transfer?")) {
-            return;
-        }
-
+    const confirmCancelTransfer = async () => {
+        const transfer = confirmTransfer;
+        setConfirmTransfer(null);
         try {
-            await cancelScheduledTransfer(transferId);
+            await cancelScheduledTransfer(transfer.id);
             await loadTransfers();
         } catch (err) {
             console.error(err);
-            alert("Unable to cancel scheduled transfer.");
+            toast.error("Unable to cancel scheduled transfer.");
         }
     };
 
@@ -107,7 +111,7 @@ const ScheduledTransfersList = ({ refreshTrigger }) => {
 
                                 {transfer.status === "ACTIVE" && (
                                     <button
-                                        onClick={() => handleCancel(transfer.id)}
+                                        onClick={() => handleCancel(transfer)}
                                         style={styles.cancelButton}
                                         onMouseEnter={(e) =>
                                             e.currentTarget.style.background = "#fee2e2"
@@ -148,6 +152,74 @@ const ScheduledTransfersList = ({ refreshTrigger }) => {
                     </div>
                 ))
             )}
+            <ConfirmModal
+                open={!!confirmTransfer}
+                title="Cancel Scheduled Transfer?"
+                message={
+                    confirmTransfer
+                        ?
+                        (
+                            <div>
+
+                                <p style={{ marginBottom: "20px" }}>
+                                    You are about to cancel this scheduled transfer.
+                                </p>
+
+
+                                <div style={styles.confirmDetails}>
+
+                                    <div style={styles.confirmRow}>
+                                        <span>Amount</span>
+                                        <strong style={styles.amountHighlight}>
+                                            {formatCurrency(confirmTransfer.amount)}
+                                        </strong>
+                                    </div>
+
+
+                                    <div style={styles.confirmRow}>
+                                        <span>From Account</span>
+                                        <strong>
+                                            {confirmTransfer.sourceAccountNumber}
+                                        </strong>
+                                    </div>
+
+
+                                    <div style={styles.confirmRow}>
+                                        <span>To Account</span>
+                                        <strong>
+                                            {confirmTransfer.recipientAccountNumber}
+                                        </strong>
+                                    </div>
+
+
+                                    <div style={styles.confirmRow}>
+                                        <span>Frequency</span>
+                                        <strong>
+                                            {confirmTransfer.frequency}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+
+                                <p style={{
+                                    marginTop: "18px",
+                                    fontWeight: "600",
+                                    color: "#dc2626"
+                                }}>
+                                    This action cannot be undone.
+                                </p>
+
+                            </div>
+                        )
+                        :
+                        ""
+                }
+                confirmText="Cancel Transfer"
+                danger={true}
+                onCancel={() => setConfirmTransfer(null)}
+                onConfirm={confirmCancelTransfer}
+            />
         </div>
     );
 };
@@ -313,6 +385,30 @@ const styles = {
         borderRadius: "999px",
         fontWeight: 700,
         fontSize: "12px",
+    },
+
+    confirmDetails: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+        backgroundColor: "#f9fafb",
+        padding: "14px",
+        borderRadius: "10px",
+        border: "1px solid #e5e7eb",
+    },
+
+    confirmRow: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        fontSize: "14px",
+        color: "#6b7280",
+    },
+
+    amountHighlight: {
+        fontSize: "18px",
+        color: "#0d6360",
+        fontWeight: "800",
     },
 
 };

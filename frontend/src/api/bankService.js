@@ -369,10 +369,15 @@ export const exportTransactionsExcel = async (params) => {
   return response.data;
 };
 
-
 export const login = async (credentials) => {
   const response = await API.post("/auth/login", credentials);
   return response.data;
+};
+
+export const logout = async (refreshToken) => {
+  await API.post("/auth/logout", {
+    refreshToken,
+  });
 };
 
 export const registerCustomer = async (request) => {

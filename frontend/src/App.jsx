@@ -6,25 +6,26 @@ import ForgotPassword from "./components/ForgotPassword";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { Toaster } from "react-hot-toast";
 import VerifyEmailPage from '../src/pages/VerifyEmailPage';
+import { logout } from "./api/bankService";
 
 function App() {
   const [verificationToken, setVerificationToken] = useState(null);
   const [resetPasswordToken, setResetPasswordToken] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
   const [userRole, setUserRole] = useState(localStorage.getItem('userRole') || 'CUSTOMER');
   const [userName, setUserName] = useState(localStorage.getItem('fullName') || '');
   const [screen, setScreen] = useState('login');
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token);
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('userRole', userRole);
 
       if (userName) {
         localStorage.setItem('fullName', userName);
       }
     }
-  }, [token, userRole, userName]);
+  }, [accessToken, userRole, userName]);
 
   useEffect(() => {
 
@@ -42,35 +43,44 @@ function App() {
   }, []);
 
   const handleLoginSuccess = () => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = localStorage.getItem('accessToken');
     const storedRole = localStorage.getItem('userRole') || 'CUSTOMER';
     const storedName = localStorage.getItem('fullName') || '';
 
-    setToken(storedToken);
+    setAccessToken(storedToken);
     setUserRole(storedRole);
     setUserName(storedName);
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setToken(null);
-    setUserRole('CUSTOMER');
-    setUserName('');
-    setScreen('login');
-  };
+  const handleLogout = async () => {
 
-  if (verificationToken) {
-    return (
-      <VerifyEmailPage
-        token={verificationToken}
-        onGoToLogin={() => {
-          window.history.replaceState({}, "", "/");
-          setVerificationToken(null);
-          setScreen("login");
-        }}
-      />
-    );
-  }
+    const refreshToken =
+      localStorage.getItem("refreshToken");
+
+    try {
+
+      if (refreshToken) {
+        await logout(refreshToken);
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Logout failed",
+        error
+      );
+
+    } finally {
+
+      localStorage.clear();
+
+      setAccessToken(null);
+      setUserRole('CUSTOMER');
+      setUserName('');
+      setScreen('login');
+
+    }
+  };
 
   if (resetPasswordToken) {
     return (
@@ -80,7 +90,7 @@ function App() {
     );
   }
 
-  if (!token) {
+  if (!accessToken) {
 
     if (screen === "login") {
       return (

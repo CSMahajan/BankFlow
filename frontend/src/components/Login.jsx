@@ -29,11 +29,12 @@ const Login = ({
         password,
       });
 
-      const token = data.token || data.accessToken || data.jwt;
+      const accessToken = data.accessToken;
+      const refreshToken = data.refreshToken;
       const userRole = data.role || data.userRole || role;
 
       // 1. Check if backend sent name directly
-      let userFullName = data.fullName || data.name || data.username;
+      let userFullName = data.fullName;
 
       // 2. If missing, format email intelligently
       if (!userFullName && (data.email || email)) {
@@ -53,7 +54,8 @@ const Login = ({
       }
 
       // 3. Save to localStorage immediately
-      localStorage.setItem('token', token);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('userRole', userRole);
       localStorage.setItem('fullName', userFullName);
 

@@ -30,9 +30,14 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(
-            @Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(userService.refreshToken(request));
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@Valid @RequestBody LogoutRequest request) {
+        userService.logout(request);
     }
 
     @GetMapping("/verify-email")
@@ -43,27 +48,20 @@ public class AuthController {
 
     @PostMapping("/resend-verification")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void resendVerificationEmail(
-            @Valid @RequestBody ResendVerificationRequest request) {
+    public void resendVerificationEmail(@Valid @RequestBody ResendVerificationRequest request) {
         userService.resendVerificationEmail(request);
     }
 
     @PostMapping("/forgot-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void forgotPassword(
-            @Valid @RequestBody ForgotPasswordRequest request) {
-
+    public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         userService.forgotPassword(request);
-
     }
 
     @PostMapping("/reset-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void resetPassword(
-            @Valid @RequestBody ResetPasswordRequest request) {
-
+    public void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request);
-
     }
 
 }

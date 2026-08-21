@@ -3,6 +3,7 @@ package com.bankflow.service;
 import com.bankflow.config.JwtProperties;
 import com.bankflow.entity.RefreshToken;
 import com.bankflow.entity.User;
+import com.bankflow.exception.InvalidRefreshTokenException;
 import com.bankflow.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,28 +54,16 @@ public class RefreshTokenService {
 
         RefreshToken refreshToken =
                 refreshTokenRepository.findByTokenHash(tokenHash)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Invalid refresh token"
-                                )
-                        );
+                        .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
 
 
         if (refreshToken.isRevoked()) {
-            throw new IllegalArgumentException(
-                    "Refresh token has been revoked"
-            );
+            throw new InvalidRefreshTokenException("Refresh token has been revoked");
         }
 
-
-        if (refreshToken.getExpiryDate()
-                .isBefore(LocalDateTime.now())) {
-
-            throw new IllegalArgumentException(
-                    "Refresh token expired"
-            );
+        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidRefreshTokenException("Refresh token expired");
         }
-
 
         return refreshToken;
     }

@@ -150,6 +150,15 @@ public class UserService {
     }
 
     @Transactional
+    public void logout(LogoutRequest request) {
+
+        refreshTokenService.revokeToken(
+                request.refreshToken()
+        );
+
+    }
+
+    @Transactional
     public void changePassword(ChangePasswordRequest request) {
 
         User currentUser = getAuthenticatedUser();

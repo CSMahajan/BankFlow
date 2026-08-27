@@ -2,6 +2,8 @@ package com.bankflow.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public record GuardDutyScanEvent(
         String id,
 
@@ -32,7 +34,22 @@ public record GuardDutyScanEvent(
     }
 
     public record ScanResultDetails(
-            String scanResultStatus
+            String scanResultStatus,
+            List<Threat> threats,
+            List<String> statusReasons
+    ) {
+    }
+
+    public record Threat(
+            String name,
+            String source,
+            List<ItemDetail> itemDetails
+    ) {
+    }
+
+    public record ItemDetail(
+            String hash,
+            String itemPath
     ) {
     }
 }

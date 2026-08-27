@@ -54,6 +54,7 @@ public class KycExtractionProcessorService {
                         .orElseGet(() ->
                                 KycExtractedData.builder()
                                         .kycDocument(document)
+                                        .extractionStatus(KycExtractedData.ExtractionStatus.PENDING)
                                         .createdAt(LocalDateTime.now())
                                         .build()
                         );

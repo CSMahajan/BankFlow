@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -24,6 +26,14 @@ public class KycDocument {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(
+            mappedBy = "kycDocument",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+    private List<KycMalwareScan> malwareScans = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "document_type", nullable = false)

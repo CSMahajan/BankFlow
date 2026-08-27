@@ -31,4 +31,5 @@ public interface KycDocumentRepository
         """)
     long countPendingCustomers();
 
+    KycDocument findByS3ObjectKeyAndChecksum(String s3ObjectKey, String checksum);
 }

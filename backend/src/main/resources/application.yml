@@ -87,6 +87,8 @@ app:
   aws:
     region: ${AWS_REGION:ap-south-1}
     bucket: ${AWS_S3_BUCKET}
+    sqs:
+      kyc-malware-queue-url: ${AWS_SQS_KYC_MALWARE_QUEUE_URL}
 
   security:
     virus-scan-enabled: ${VIRUS_SCAN_ENABLED:false}

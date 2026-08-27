@@ -95,7 +95,7 @@ public class S3FileStorageService implements FileStorageService {
                     bucketName,
                     key,
                     "AES256",
-                    response.eTag()
+                    response.eTag().replace("\"", "")
             );
 
         } catch (IOException e) {

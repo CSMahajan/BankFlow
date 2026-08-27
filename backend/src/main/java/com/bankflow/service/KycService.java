@@ -3,10 +3,7 @@ package com.bankflow.service;
 import com.bankflow.dto.*;
 import com.bankflow.entity.*;
 import com.bankflow.exception.ResourceNotFoundException;
-import com.bankflow.repository.KycAadhaarDataRepository;
-import com.bankflow.repository.KycDocumentRepository;
-import com.bankflow.repository.KycExtractedDataRepository;
-import com.bankflow.repository.KycPanDataRepository;
+import com.bankflow.repository.*;
 import com.bankflow.security.FileNameSanitizer;
 import com.bankflow.security.FileSecurityValidator;
 import com.bankflow.security.VirusScanResult;
@@ -48,6 +45,7 @@ public class KycService {
     private final KycExtractedDataRepository kycExtractedDataRepository;
     private final KycPanDataRepository kycPanDataRepository;
     private final KycAadhaarDataRepository kycAadhaarDataRepository;
+    private final KycMalwareScanRepository kycMalwareScanRepository;
 
     @Value("${app.kyc.notification-enabled:false}")
     private boolean kycNotificationEnabled;
@@ -55,44 +53,26 @@ public class KycService {
     @Transactional
     public KycDocument uploadDocument(MultipartFile file, KycDocument.DocumentType documentType) {
         User user = currentUserService.getCurrentUser();
-
         fileSecurityValidator.validate(file);
-
-        VirusScanResult scanResult =
-                virusScanService.scan(file);
-
+        VirusScanResult scanResult = virusScanService.scan(file);
 
         if (!scanResult.clean()) {
             log.error("File scan found issue in security verification: {}", scanResult.message());
             throw new IllegalArgumentException("File failed security scan: " + scanResult.message());
         }
 
-        List<KycDocument> existingDocuments =
-                kycDocumentRepository
-                        .findByUserIdAndDocumentTypeOrderByUploadedAtDesc(
-                                user.getId(),
-                                documentType
-                        );
+        List<KycDocument> existingDocuments = kycDocumentRepository
+                .findByUserIdAndDocumentTypeOrderByUploadedAtDesc(user.getId(), documentType);
 
         if (!existingDocuments.isEmpty()) {
-
             KycDocument latest = existingDocuments.getFirst();
-
-            if (latest.getKycVerificationStatus()
-                    != KycDocument.KycVerificationStatus.REJECTED) {
-
-                throw new IllegalArgumentException(
-                        "Document already uploaded and cannot be replaced"
-                );
+            if (latest.getKycVerificationStatus() != KycDocument.KycVerificationStatus.REJECTED) {
+                throw new IllegalArgumentException("Document already uploaded and cannot be replaced");
             }
         }
 
-        String sanitizedFileName =
-                fileNameSanitizer.sanitize(
-                        file.getOriginalFilename()
-                );
-        StoredFileMetadata metadata =
-                fileStorageService.store(file, user.getId());
+        String sanitizedFileName = fileNameSanitizer.sanitize(file.getOriginalFilename());
+        StoredFileMetadata metadata = fileStorageService.store(file, user.getId());
 
         try {
 
@@ -115,10 +95,19 @@ public class KycService {
                     .fileSize(file.getSize())
                     .build();
 
-            KycDocument saved =
-                    kycDocumentRepository.save(document);
+            KycDocument saved = kycDocumentRepository.save(document);
 
-            kycExtractionEventPublisher.publish(saved.getId());
+            KycMalwareScan malwareScan = KycMalwareScan.builder()
+                    .kycDocument(saved)
+                    .status(KycMalwareScan.MalwareStatus.SCANNING)
+                    .provider("GUARDDUTY")
+                    .scanStartedAt(LocalDateTime.now())
+                    .attemptNumber(1)
+                    .build();
+
+            kycMalwareScanRepository.save(malwareScan);
+
+            //kycExtractionEventPublisher.publish(saved.getId());
 
             auditLogService.log(
                     AuditAction.KYC_DOCUMENT_UPLOADED,
@@ -698,22 +687,29 @@ public class KycService {
     @Transactional
     public void retryExtraction(Long documentId) {
 
-        KycExtractedData extractedData =
-                kycExtractedDataRepository
-                        .findByKycDocumentId(documentId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Extraction data not found"
-                                )
-                        );
+        KycDocument document = kycDocumentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("KYC document not found"));
 
+        if (document.getKycVerificationStatus() != KycDocument.KycVerificationStatus.PENDING) {
+            throw new IllegalStateException("Extraction can only be retried for pending KYC documents");
+        }
+
+        KycMalwareScan latestScan = kycMalwareScanRepository
+                .findFirstByKycDocumentIdOrderByCreatedAtDesc(documentId)
+                .orElseThrow(() -> new IllegalStateException("Malware scan record not found"));
+
+        if (latestScan.getStatus() != KycMalwareScan.MalwareStatus.CLEAN) {
+            throw new IllegalStateException("Extraction cannot be retried because malware scan has not passed");
+        }
+
+        KycExtractedData extractedData = kycExtractedDataRepository.findByKycDocumentId(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Extraction data not found"));
 
         if (extractedData.getExtractionStatus() != KycExtractedData.ExtractionStatus.FAILED) {
             throw new IllegalStateException("Only failed extractions can be retried");
         }
 
         extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.PENDING);
-
         extractedData.setFailureReason(null);
         extractedData.setUpdatedAt(LocalDateTime.now());
 

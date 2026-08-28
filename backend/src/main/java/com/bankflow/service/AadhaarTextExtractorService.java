@@ -158,38 +158,28 @@ public class AadhaarTextExtractorService {
 
     private String extractMobile(String text) {
 
-        Matcher matcher =
-                MOBILE_PATTERN.matcher(text);
-
-        return matcher.find()
-                ? matcher.group()
-                : null;
+        Matcher matcher = MOBILE_PATTERN.matcher(text);
+        return matcher.find() ? matcher.group() : null;
     }
 
 
     private String extractAddress(String text) {
 
         String[] lines = text.split("\\r?\\n");
-
-
         int mobileIndex = -1;
 
         // Find mobile number line - address ends before this
         for (int i = 0; i < lines.length; i++) {
-
             String line = lines[i].trim();
-
             if (line.matches(".*\\b[6-9]\\d{9}\\b.*")) {
                 mobileIndex = i;
                 break;
             }
         }
 
-
         if (mobileIndex == -1) {
             return null;
         }
-
 
         String name = extractName(text);
 
@@ -197,66 +187,38 @@ public class AadhaarTextExtractorService {
             return null;
         }
 
-
         int nameIndex = -1;
-
         // Find name line position
         for (int i = 0; i < mobileIndex; i++) {
-
-            if (lines[i].trim()
-                    .equalsIgnoreCase(name.trim())) {
-
+            if (lines[i].trim().equalsIgnoreCase(name.trim())) {
                 nameIndex = i;
                 break;
             }
         }
 
-
         if (nameIndex == -1) {
             return null;
         }
 
-
         StringBuilder address = new StringBuilder();
 
-
         for (int i = nameIndex + 1; i < mobileIndex; i++) {
-
             String line = lines[i].trim();
-
-
             if (line.isBlank()) {
                 continue;
             }
-
-
             // Ignore relationship line
-            if (line.matches(
-                    "(?i).*(S/O|D/O|W/O|C/O).*"
-            )) {
+            if (line.matches("(?i).*(S/O|D/O|W/O|C/O).*")) {
                 continue;
             }
-
-
-            address.append(line)
-                    .append(", ");
+            address.append(line).append(", ");
         }
-
-
         if (address.isEmpty()) {
             return null;
         }
 
-
-        String result =
-                address.substring(
-                        0,
-                        address.length() - 2
-                );
-
-
-        log.info("Extracted Aadhaar address: {}", result);
-
+        String result = address.substring(0, address.length() - 2);
+        log.info("address: {}", result);
         return result;
     }
 }

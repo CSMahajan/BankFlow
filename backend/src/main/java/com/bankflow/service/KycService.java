@@ -50,6 +50,9 @@ public class KycService {
     @Value("${app.kyc.notification-enabled:false}")
     private boolean kycNotificationEnabled;
 
+    @Value("${app.kyc.malware-scan-max-attempts:3}")
+    private int malwareScanMaxAttempts;
+
     @Transactional
     public KycDocument uploadDocument(MultipartFile file, KycDocument.DocumentType documentType) {
         User user = currentUserService.getCurrentUser();
@@ -727,33 +730,24 @@ public class KycService {
     @Transactional
     public void retryMalwareScan(Long documentId) {
 
-        KycDocument document = kycDocumentRepository.findById(documentId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("KYC document not found"));
+        KycDocument document = kycDocumentRepository
+                .findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("KYC document not found"));
 
-        if (document.getKycVerificationStatus()
-                != KycDocument.KycVerificationStatus.PENDING) {
-
-            throw new IllegalStateException(
-                    "Malware scan can only be retried for pending KYC documents"
-            );
+        if (document.getKycVerificationStatus() != KycDocument.KycVerificationStatus.PENDING) {
+            throw new IllegalStateException("Malware scan can only be retried for pending KYC documents");
         }
 
-        KycMalwareScan latestScan =
-                kycMalwareScanRepository
-                        .findFirstByKycDocumentIdOrderByCreatedAtDesc(documentId)
-                        .orElseThrow(() ->
-                                new IllegalStateException(
-                                        "Malware scan record not found"
-                                )
-                        );
+        KycMalwareScan latestScan = kycMalwareScanRepository
+                .findFirstByKycDocumentIdOrderByCreatedAtDesc(documentId)
+                .orElseThrow(() -> new IllegalStateException("Malware scan record not found"));
 
-        if (latestScan.getStatus()
-                != KycMalwareScan.MalwareStatus.FAILED) {
+        if (latestScan.getStatus() != KycMalwareScan.MalwareStatus.FAILED) {
+            throw new IllegalStateException("Malware scan can only be retried after a failed scan");
+        }
 
-            throw new IllegalStateException(
-                    "Malware scan can only be retried after a failed scan"
-            );
+        if (latestScan.getAttemptNumber() >= malwareScanMaxAttempts) {
+            throw new IllegalStateException("Maximum malware scan attempts reached");
         }
 
         KycMalwareScan retryScan =
@@ -767,15 +761,10 @@ public class KycService {
 
         kycMalwareScanRepository.save(retryScan);
 
-        guardDutyMalwareScanService.scanObject(
-                document.getS3ObjectKey()
-        );
+        guardDutyMalwareScanService.scanObject(document.getS3ObjectKey());
 
-        log.info(
-                "GuardDuty malware scan retry initiated. documentId={}, attemptNumber={}",
-                documentId,
-                retryScan.getAttemptNumber()
-        );
+        log.info("GuardDuty malware scan retry initiated. documentId={}, attemptNumber={}",
+                documentId, retryScan.getAttemptNumber());
     }
 
     private KycStatusResponse.DocumentStatus mapDocumentStatus(KycDocument document) {

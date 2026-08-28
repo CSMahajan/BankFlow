@@ -83,6 +83,7 @@ app:
 
   kyc:
     notification-enabled: ${KYC_NOTIFICATION_ENABLED:false}
+    malware-scan-max-attempts: ${KYC_MALWARE_SCAN_MAX_ATTEMPTS:3}
 
   aws:
     region: ${AWS_REGION:ap-south-1}

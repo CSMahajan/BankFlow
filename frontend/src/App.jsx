@@ -82,6 +82,18 @@ function App() {
     }
   };
 
+  if (verificationToken) {
+    return (
+      <VerifyEmailPage
+        token={verificationToken}
+        onGoToLogin={() => {
+          setVerificationToken(null);
+          setScreen("login");
+        }}
+      />
+    );
+  }
+
   if (resetPasswordToken) {
     return (
       <ResetPasswordPage

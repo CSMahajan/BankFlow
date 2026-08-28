@@ -38,9 +38,7 @@ public class AdminController {
     public ResponseEntity<List<AdminUserAccountResponse>> getUserAccounts(
             @PathVariable Long userId) {
 
-        return ResponseEntity.ok(
-                userService.getUserAccounts(userId)
-        );
+        return ResponseEntity.ok(userService.getUserAccounts(userId));
     }
 
     @GetMapping("/users/{userId}/cards")
@@ -48,9 +46,7 @@ public class AdminController {
     public ResponseEntity<List<AdminUserCardResponse>> getUserCards(
             @PathVariable Long userId) {
 
-        return ResponseEntity.ok(
-                userService.getUserCards(userId)
-        );
+        return ResponseEntity.ok(userService.getUserCards(userId));
     }
 
     @GetMapping("/users/{userId}/loans")
@@ -58,9 +54,7 @@ public class AdminController {
     public ResponseEntity<List<AdminUserLoanResponse>> getUserLoans(
             @PathVariable Long userId) {
 
-        return ResponseEntity.ok(
-                userService.getUserLoans(userId)
-        );
+        return ResponseEntity.ok(userService.getUserLoans(userId));
     }
 
     @GetMapping("/users/{userId}/fixed-deposits")
@@ -68,9 +62,7 @@ public class AdminController {
     public ResponseEntity<List<AdminUserFixedDepositResponse>> getUserFixedDeposits(
             @PathVariable Long userId) {
 
-        return ResponseEntity.ok(
-                userService.getUserFixedDeposits(userId)
-        );
+        return ResponseEntity.ok(userService.getUserFixedDeposits(userId));
     }
 
     @GetMapping("/accounts")
@@ -81,14 +73,7 @@ public class AdminController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Account.AccountStatus status) {
 
-        return ResponseEntity.ok(
-                accountService.getAllAccountsForAdmin(
-                        page,
-                        size,
-                        search,
-                        status
-                )
-        );
+        return ResponseEntity.ok(accountService.getAllAccountsForAdmin(page, size, search, status));
     }
 
     @PatchMapping("/accounts/{accountNumber}/freeze")
@@ -96,9 +81,7 @@ public class AdminController {
     public ResponseEntity<AccountResponse> freezeAccount(
             @PathVariable String accountNumber) {
 
-        return ResponseEntity.ok(
-                accountService.freezeAccountByAdmin(accountNumber)
-        );
+        return ResponseEntity.ok(accountService.freezeAccountByAdmin(accountNumber));
     }
 
     @PatchMapping("/accounts/{accountNumber}/unfreeze")
@@ -106,9 +89,7 @@ public class AdminController {
     public ResponseEntity<AccountResponse> unfreezeAccount(
             @PathVariable String accountNumber) {
 
-        return ResponseEntity.ok(
-                accountService.unfreezeAccountByAdmin(accountNumber)
-        );
+        return ResponseEntity.ok(accountService.unfreezeAccountByAdmin(accountNumber));
     }
 
     @GetMapping("/cards")
@@ -120,14 +101,7 @@ public class AdminController {
             @RequestParam(required = false) Card.CardStatus status
     ) {
 
-        return ResponseEntity.ok(
-                cardService.getAllCardsForAdmin(
-                        page,
-                        size,
-                        search,
-                        status
-                )
-        );
+        return ResponseEntity.ok(cardService.getAllCardsForAdmin(page, size, search, status));
     }
 
     @PatchMapping("/cards/{cardId}/block")
@@ -135,9 +109,7 @@ public class AdminController {
     public ResponseEntity<CardResponse> blockCard(
             @PathVariable Long cardId) {
 
-        return ResponseEntity.ok(
-                cardService.blockCardByAdmin(cardId)
-        );
+        return ResponseEntity.ok(cardService.blockCardByAdmin(cardId));
     }
 
     @PatchMapping("/cards/{cardId}/unblock")
@@ -145,34 +117,27 @@ public class AdminController {
     public ResponseEntity<CardResponse> unblockCard(
             @PathVariable Long cardId) {
 
-        return ResponseEntity.ok(
-                cardService.unblockCardByAdmin(cardId)
-        );
+        return ResponseEntity.ok(cardService.unblockCardByAdmin(cardId));
     }
 
     @GetMapping("/accounts/summary")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountSummaryResponse> getAccountSummary() {
 
-        return ResponseEntity.ok(
-                accountService.getAccountSummaryForAdmin()
-        );
+        return ResponseEntity.ok(accountService.getAccountSummaryForAdmin());
     }
 
     @GetMapping("/loans/summary")
     public LoanSummaryResponse getLoanSummary() {
 
         return loanService.getLoanSummary();
-
     }
 
     @GetMapping("/cards/summary")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CardSummaryResponse> getCardSummary() {
 
-        return ResponseEntity.ok(
-                cardService.getCardSummaryForAdmin()
-        );
+        return ResponseEntity.ok(cardService.getCardSummaryForAdmin());
     }
 
     @GetMapping("/kyc/documents")
@@ -186,18 +151,9 @@ public class AdminController {
             @RequestParam(required = false) String search,
 
             @RequestParam(required = false)
-            KycDocument.KycVerificationStatus status
+            KycDocument.KycVerificationStatus status) {
 
-    ) {
-
-        return ResponseEntity.ok(
-                kycService.getAllDocuments(
-                        page,
-                        size,
-                        search,
-                        status
-                )
-        );
+        return ResponseEntity.ok(kycService.getAllDocuments(page, size, search, status));
     }
 
     @GetMapping("/kyc/documents/{documentId}")
@@ -281,10 +237,7 @@ public class AdminController {
             @PathVariable Long documentId,
             @Valid @RequestBody KycRejectRequest request) {
 
-        kycService.rejectDocument(
-                documentId,
-                request.reason()
-        );
+        kycService.rejectDocument(documentId, request.reason());
     }
 
     @GetMapping("/kyc/summary")
@@ -299,19 +252,23 @@ public class AdminController {
     public ResponseEntity<AdminKycExtractionResponse> getExtractionStatus(
             @PathVariable Long documentId) {
 
-
-        return ResponseEntity.ok(
-                kycService.getAdminExtractionStatus(documentId)
-        );
+        return ResponseEntity.ok(kycService.getAdminExtractionStatus(documentId));
     }
 
     @PostMapping("/kyc/documents/{documentId}/extraction/retry")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void retryKycExtraction(
-            @PathVariable Long documentId) {
+    public void retryKycExtraction(@PathVariable Long documentId) {
 
         kycService.retryExtraction(documentId);
+    }
+
+    @PostMapping("/kyc/documents/{documentId}/malware-scan/retry")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void retryKycMalwareScan(@PathVariable Long documentId) {
+
+        kycService.retryMalwareScan(documentId);
     }
 
     @GetMapping("/kyc/documents/{documentId}/pan-data")
@@ -319,9 +276,7 @@ public class AdminController {
     public ResponseEntity<PanDataResponse> getPanData(
             @PathVariable Long documentId) {
 
-        return ResponseEntity.ok(
-                kycService.getAdminPanData(documentId)
-        );
+        return ResponseEntity.ok(kycService.getAdminPanData(documentId));
     }
 
     @GetMapping("/kyc/documents/{documentId}/aadhaar-data")
@@ -329,8 +284,6 @@ public class AdminController {
     public ResponseEntity<AadhaarDataResponse> getAadhaarData(
             @PathVariable Long documentId) {
 
-        return ResponseEntity.ok(
-                kycService.getAdminAadhaarData(documentId)
-        );
+        return ResponseEntity.ok(kycService.getAdminAadhaarData(documentId));
     }
 }

@@ -38,6 +38,7 @@ public class KycService {
     private final AuditLogService auditLogService;
     private final EmailService emailService;
     private final VirusScanService virusScanService;
+    private final GuardDutyMalwareScanService guardDutyMalwareScanService;
     private final FileSecurityValidator fileSecurityValidator;
     private final FileNameSanitizer fileNameSanitizer;
     private final KycExtractionEventPublisher kycExtractionEventPublisher;
@@ -672,6 +673,10 @@ public class KycService {
                                         "Extraction data not found"
                                 ));
 
+        KycMalwareScan latestScan =
+                kycMalwareScanRepository
+                        .findFirstByKycDocumentIdOrderByCreatedAtDesc(documentId)
+                        .orElse(null);
 
         return new AdminKycExtractionResponse(
                 documentId,
@@ -679,7 +684,9 @@ public class KycService {
                 extractedData.getExtractionStatus().name(),
                 extractedData.getFailureReason(),
                 extractedData.getCreatedAt(),
-                extractedData.getUpdatedAt()
+                extractedData.getUpdatedAt(),
+                latestScan != null ? latestScan.getAttemptNumber() : null,
+                latestScan != null ? latestScan.getStatus().name() : null
         );
     }
 
@@ -715,6 +722,60 @@ public class KycService {
         kycExtractedDataRepository.save(extractedData);
 
         kycExtractionEventPublisher.publish(documentId);
+    }
+
+    @Transactional
+    public void retryMalwareScan(Long documentId) {
+
+        KycDocument document = kycDocumentRepository.findById(documentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("KYC document not found"));
+
+        if (document.getKycVerificationStatus()
+                != KycDocument.KycVerificationStatus.PENDING) {
+
+            throw new IllegalStateException(
+                    "Malware scan can only be retried for pending KYC documents"
+            );
+        }
+
+        KycMalwareScan latestScan =
+                kycMalwareScanRepository
+                        .findFirstByKycDocumentIdOrderByCreatedAtDesc(documentId)
+                        .orElseThrow(() ->
+                                new IllegalStateException(
+                                        "Malware scan record not found"
+                                )
+                        );
+
+        if (latestScan.getStatus()
+                != KycMalwareScan.MalwareStatus.FAILED) {
+
+            throw new IllegalStateException(
+                    "Malware scan can only be retried after a failed scan"
+            );
+        }
+
+        KycMalwareScan retryScan =
+                KycMalwareScan.builder()
+                        .kycDocument(document)
+                        .status(KycMalwareScan.MalwareStatus.SCANNING)
+                        .provider("GUARDDUTY")
+                        .scanStartedAt(LocalDateTime.now())
+                        .attemptNumber(latestScan.getAttemptNumber() + 1)
+                        .build();
+
+        kycMalwareScanRepository.save(retryScan);
+
+        guardDutyMalwareScanService.scanObject(
+                document.getS3ObjectKey()
+        );
+
+        log.info(
+                "GuardDuty malware scan retry initiated. documentId={}, attemptNumber={}",
+                documentId,
+                retryScan.getAttemptNumber()
+        );
     }
 
     private KycStatusResponse.DocumentStatus mapDocumentStatus(KycDocument document) {

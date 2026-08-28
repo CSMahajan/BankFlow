@@ -1,4 +1,4 @@
-package com.bankflow.storage;
+package com.bankflow.service;
 
 import com.bankflow.dto.StoredFileMetadata;
 import lombok.extern.slf4j.Slf4j;

@@ -327,4 +327,110 @@ class FundTransferServiceTest {
 
         assertEquals("Destination account is inactive or frozen", ex.getMessage());
     }
+
+    @Test
+    @DisplayName("Execute Scheduled Transfer - Success")
+    void executeScheduledTransfer_Success() {
+        FundTransferRequest request = new FundTransferRequest(
+                "BF1000000001",
+                "BF2000000002",
+                new BigDecimal("2500.00"),
+                "Scheduled Rent"
+        );
+
+        when(accountRepository.findByAccountNumber("BF1000000001"))
+                .thenReturn(Optional.of(mockSourceAccount));
+        when(accountRepository.findByAccountNumber("BF2000000002"))
+                .thenReturn(Optional.of(mockTargetAccount));
+
+        assertDoesNotThrow(() ->
+                fundTransferService.executeScheduledTransfer(mockSourceUser, request)
+        );
+
+        assertEquals(
+                new BigDecimal("7500.00"),
+                mockSourceAccount.getCurrentBalance()
+        );
+
+        assertEquals(
+                new BigDecimal("4500.00"),
+                mockTargetAccount.getCurrentBalance()
+        );
+
+        verify(accountRepository).save(mockSourceAccount);
+        verify(accountRepository).save(mockTargetAccount);
+        verify(transactionRepository, times(2))
+                .save(any(Transaction.class));
+    }
+
+    @Test
+    @DisplayName("Transfer Funds - Blank Remark Does Not Appear In Description")
+    void transferFunds_BlankRemark_Success() {
+        mockAuthenticatedUser(mockSourceUser);
+
+        FundTransferRequest request = new FundTransferRequest(
+                "BF1000000001",
+                "BF2000000002",
+                new BigDecimal("1000.00"),
+                "   "
+        );
+
+        when(accountRepository.findByAccountNumber("BF1000000001"))
+                .thenReturn(Optional.of(mockSourceAccount));
+        when(accountRepository.findByAccountNumber("BF2000000002"))
+                .thenReturn(Optional.of(mockTargetAccount));
+
+        fundTransferService.transferFunds(request);
+
+        verify(transactionRepository, times(2))
+                .save(transactionCaptor.capture());
+
+        List<Transaction> transactions = transactionCaptor.getAllValues();
+
+        Transaction debitTx = transactions.stream()
+                .filter(t -> t.getTransactionType() == Transaction.TransactionType.DEBIT)
+                .findFirst()
+                .orElseThrow();
+
+        Transaction creditTx = transactions.stream()
+                .filter(t -> t.getTransactionType() == Transaction.TransactionType.CREDIT)
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(
+                "Transfer to BF2000000002",
+                debitTx.getDescription()
+        );
+
+        assertEquals(
+                "Transfer from BF1000000001",
+                creditTx.getDescription()
+        );
+    }
+
+    @Test
+    @DisplayName("Transfer Funds - Authenticated User Not Found")
+    void transferFunds_AuthenticatedUserNotFound_ThrowsException() {
+        when(authentication.getName()).thenReturn("unknown@example.com");
+
+        when(userRepository.findByEmail("unknown@example.com"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> fundTransferService.transferFunds(
+                        new FundTransferRequest(
+                                "BF1000000001",
+                                "BF2000000002",
+                                new BigDecimal("1000.00"),
+                                "Test"
+                        )
+                )
+        );
+
+        assertEquals("Authenticated user not found", ex.getMessage());
+
+        verifyNoInteractions(accountRepository);
+        verifyNoInteractions(transactionRepository);
+    }
 }

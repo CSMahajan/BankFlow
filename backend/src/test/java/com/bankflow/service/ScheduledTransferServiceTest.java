@@ -228,4 +228,261 @@ class ScheduledTransferServiceTest {
         verify(scheduledTransferRepository, times(1)).save(transferCaptor.capture());
         assertEquals(today.plusMonths(1), transferCaptor.getValue().getNextExecutionDate());
     }
+
+    @Test
+    @DisplayName("Create Scheduled Transfer - Throws Exception When Source Account Not Found")
+    void createScheduledTransfer_SourceAccountNotFound() {
+        mockAuthenticatedUser();
+
+        CreateScheduledTransferRequest request = new CreateScheduledTransferRequest(
+                "INVALID",
+                "REC987654321",
+                new BigDecimal("250.00"),
+                "Monthly Rent",
+                Frequency.MONTHLY,
+                LocalDate.now()
+        );
+
+        when(accountRepository.findByAccountNumber("INVALID"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> scheduledTransferService.createScheduledTransfer(request)
+        );
+
+        assertEquals("Source account not found: INVALID", ex.getMessage());
+        verify(scheduledTransferRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Create Scheduled Transfer - Throws Exception When Source Account Is Not Active")
+    void createScheduledTransfer_InactiveSource() {
+        mockAuthenticatedUser();
+
+        mockSourceAccount.setAccountStatus(Account.AccountStatus.FROZEN);
+
+        CreateScheduledTransferRequest request = new CreateScheduledTransferRequest(
+                "SRC123456789",
+                "REC987654321",
+                new BigDecimal("250.00"),
+                "Monthly Rent",
+                Frequency.MONTHLY,
+                LocalDate.now()
+        );
+
+        when(accountRepository.findByAccountNumber("SRC123456789"))
+                .thenReturn(Optional.of(mockSourceAccount));
+
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> scheduledTransferService.createScheduledTransfer(request)
+        );
+
+        assertEquals(
+                "Scheduled transfers can only be created from active accounts.",
+                ex.getMessage()
+        );
+
+        verify(scheduledTransferRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Create Scheduled Transfer - Throws Exception When Recipient Not Found")
+    void createScheduledTransfer_RecipientNotFound() {
+        mockAuthenticatedUser();
+
+        CreateScheduledTransferRequest request = new CreateScheduledTransferRequest(
+                "SRC123456789",
+                "INVALID",
+                new BigDecimal("250.00"),
+                "Monthly Rent",
+                Frequency.MONTHLY,
+                LocalDate.now()
+        );
+
+        when(accountRepository.findByAccountNumber("SRC123456789"))
+                .thenReturn(Optional.of(mockSourceAccount));
+
+        when(accountRepository.findByAccountNumber("INVALID"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> scheduledTransferService.createScheduledTransfer(request)
+        );
+
+        assertEquals("Recipient account not found: INVALID", ex.getMessage());
+
+        verify(scheduledTransferRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Create Scheduled Transfer - Throws Exception When Start Date Is In Past")
+    void createScheduledTransfer_PastStartDate() {
+        mockAuthenticatedUser();
+
+        CreateScheduledTransferRequest request = new CreateScheduledTransferRequest(
+                "SRC123456789",
+                "REC987654321",
+                new BigDecimal("250.00"),
+                "Monthly Rent",
+                Frequency.MONTHLY,
+                LocalDate.now().minusDays(1)
+        );
+
+        when(accountRepository.findByAccountNumber("SRC123456789"))
+                .thenReturn(Optional.of(mockSourceAccount));
+
+        when(accountRepository.findByAccountNumber("REC987654321"))
+                .thenReturn(Optional.of(mockRecipientAccount));
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> scheduledTransferService.createScheduledTransfer(request)
+        );
+
+        assertEquals(
+                "Scheduled transfer start date cannot be in the past.",
+                ex.getMessage()
+        );
+
+        verify(scheduledTransferRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Cancel Scheduled Transfer - Throws Exception When Transfer Not Found")
+    void cancelScheduledTransfer_NotFound() {
+        mockAuthenticatedUser();
+
+        when(scheduledTransferRepository.findById(999L))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> scheduledTransferService.cancelScheduledTransfer(999L)
+        );
+
+        assertEquals(
+                "Scheduled transfer not found with ID: 999",
+                ex.getMessage()
+        );
+
+        verify(scheduledTransferRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Cancel Scheduled Transfer - Throws AccessDeniedException For Another User")
+    void cancelScheduledTransfer_Unauthorized() {
+        mockAuthenticatedUser();
+
+        User otherUser = User.builder()
+                .id(99L)
+                .email("other@example.com")
+                .build();
+
+        mockScheduledTransfer.setUser(otherUser);
+
+        when(scheduledTransferRepository.findById(50L))
+                .thenReturn(Optional.of(mockScheduledTransfer));
+
+        assertThrows(
+                AccessDeniedException.class,
+                () -> scheduledTransferService.cancelScheduledTransfer(50L)
+        );
+
+        verify(scheduledTransferRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Cancel Scheduled Transfer - Throws Exception When Already Cancelled")
+    void cancelScheduledTransfer_AlreadyCancelled() {
+        mockAuthenticatedUser();
+
+        mockScheduledTransfer.setStatus(TransferStatus.CANCELLED);
+
+        when(scheduledTransferRepository.findById(50L))
+                .thenReturn(Optional.of(mockScheduledTransfer));
+
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> scheduledTransferService.cancelScheduledTransfer(50L)
+        );
+
+        assertEquals("Transfer is already cancelled", ex.getMessage());
+
+        verify(scheduledTransferRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Process Due Transfers - Continues When One Transfer Fails")
+    void processDueTransfers_ContinuesAfterFailure() {
+        ScheduledTransfer failedTransfer = ScheduledTransfer.builder()
+                .id(51L)
+                .user(mockUser)
+                .sourceAccountNumber("SRC111111111")
+                .recipientAccountNumber("REC111111111")
+                .amount(new BigDecimal("100.00"))
+                .description("Failed")
+                .frequency(Frequency.DAILY)
+                .status(TransferStatus.ACTIVE)
+                .nextExecutionDate(LocalDate.now())
+                .build();
+
+        ScheduledTransfer successfulTransfer = ScheduledTransfer.builder()
+                .id(52L)
+                .user(mockUser)
+                .sourceAccountNumber("SRC222222222")
+                .recipientAccountNumber("REC222222222")
+                .amount(new BigDecimal("200.00"))
+                .description("Successful")
+                .frequency(Frequency.DAILY)
+                .status(TransferStatus.ACTIVE)
+                .nextExecutionDate(LocalDate.now())
+                .build();
+
+        when(scheduledTransferRepository
+                .findByStatusAndNextExecutionDateLessThanEqual(
+                        TransferStatus.ACTIVE,
+                        LocalDate.now()))
+                .thenReturn(List.of(failedTransfer, successfulTransfer));
+
+        doAnswer(invocation -> {
+            FundTransferRequest request = invocation.getArgument(1);
+
+            if ("SRC111111111".equals(request.sourceAccountNumber())) {
+                throw new RuntimeException("Transfer failed");
+            }
+
+            return null;
+        }).when(transferService)
+                .executeScheduledTransfer(
+                        eq(mockUser),
+                        any(FundTransferRequest.class)
+                );
+
+        scheduledTransferService.processDueTransfers();
+
+        verify(transferService, times(2))
+                .executeScheduledTransfer(
+                        eq(mockUser),
+                        any(FundTransferRequest.class)
+                );
+
+        verify(scheduledTransferRepository)
+                .save(successfulTransfer);
+
+        assertEquals(
+                LocalDate.now().plusDays(1),
+                successfulTransfer.getNextExecutionDate()
+        );
+
+        // Failed transfer should not have its execution date advanced
+        assertEquals(
+                LocalDate.now(),
+                failedTransfer.getNextExecutionDate()
+        );
+    }
+
+
 }

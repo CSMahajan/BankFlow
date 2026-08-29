@@ -5,9 +5,7 @@ const KycSearchToolbar = ({
     setSearch,
     status,
     setStatus,
-    setPage,
 }) => {
-
     return (
         <div style={styles.toolbar}>
 
@@ -17,7 +15,6 @@ const KycSearchToolbar = ({
                     placeholder="Search customer, email..."
                     value={search}
                     onChange={(e) => {
-                        setPage(0);
                         setSearch(e.target.value);
                     }}
                     style={styles.searchInput}
@@ -28,7 +25,6 @@ const KycSearchToolbar = ({
                         <button
                             style={styles.clearButton}
                             onClick={() => {
-                                setPage(0);
                                 setSearch("");
                             }}
                         >
@@ -43,7 +39,6 @@ const KycSearchToolbar = ({
             <select
                 value={status}
                 onChange={(e) => {
-                    setPage(0);
                     setStatus(e.target.value);
                 }}
                 style={styles.filterSelect}

@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -54,6 +56,12 @@ class TransactionServiceTest {
 
     @Mock
     private Authentication authentication;
+
+    @Mock
+    private PdfExportService pdfExportService;
+
+    @Mock
+    private ExcelExportService excelExportService;
 
     @InjectMocks
     private TransactionService transactionService;
@@ -207,4 +215,352 @@ class TransactionServiceTest {
         assertEquals(2, result.size());
         verify(transactionRepository, times(1)).findByAccountAccountNumberOrderByTransactionDateDesc("BF1000000001");
     }
+
+    @Test
+    @DisplayName("Get My Transactions - Success")
+    void getMyTransactions_Success() {
+        mockAuthenticatedUser(mockUser);
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+        Page<Transaction> transactionPage =
+                new PageImpl<>(List.of(mockCreditTx, mockDebitTx), pageable, 2);
+
+        when(transactionRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(transactionPage);
+
+        Page<TransactionResponse> result =
+                transactionService.getMyTransactions(
+                        "BF1000000001",
+                        null,
+                        null,
+                        null,
+                        null,
+                        pageable
+                );
+
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
+
+        verify(transactionRepository, times(1))
+                .findAll(any(Specification.class), eq(pageable));
+    }
+
+    @Test
+    @DisplayName("Get My Transactions - Rejects Page Size Above 100")
+    void getMyTransactions_PageSizeTooLarge() {
+        mockAuthenticatedUser(mockUser);
+
+        Pageable pageable = PageRequest.of(0, 101);
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> transactionService.getMyTransactions(
+                        "BF1000000001",
+                        null,
+                        null,
+                        null,
+                        null,
+                        pageable
+                )
+        );
+
+        assertEquals("Maximum page size is 100", ex.getMessage());
+
+        verify(transactionRepository, never())
+                .findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("Get My Transactions - Rejects Start Date After End Date")
+    void getMyTransactions_InvalidDateRange() {
+        mockAuthenticatedUser(mockUser);
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+        LocalDate startDate = LocalDate.of(2026, 8, 20);
+        LocalDate endDate = LocalDate.of(2026, 8, 10);
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> transactionService.getMyTransactions(
+                        "BF1000000001",
+                        null,
+                        startDate,
+                        endDate,
+                        null,
+                        pageable
+                )
+        );
+
+        assertEquals("Start date cannot be after end date", ex.getMessage());
+
+        verify(transactionRepository, never())
+                .findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("Get My Transactions - Start Date Without End Date Uses Today")
+    void getMyTransactions_StartDateWithoutEndDate() {
+        mockAuthenticatedUser(mockUser);
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+        Page<Transaction> transactionPage =
+                new PageImpl<>(List.of(mockDebitTx), pageable, 1);
+
+        when(transactionRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(transactionPage);
+
+        Page<TransactionResponse> result =
+                transactionService.getMyTransactions(
+                        "BF1000000001",
+                        TransactionType.DEBIT,
+                        LocalDate.now().minusDays(30),
+                        null,
+                        null,
+                        pageable
+                );
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+
+        verify(transactionRepository)
+                .findAll(any(Specification.class), eq(pageable));
+    }
+
+    @Test
+    @DisplayName("Export Transactions PDF - Success")
+    void exportTransactionsPdf_Success() {
+        mockAuthenticatedUser(mockUser);
+
+        byte[] expectedPdf = "PDF-DATA".getBytes();
+
+        when(transactionRepository.findAll(
+                any(Specification.class),
+                any(Sort.class)
+        )).thenReturn(List.of(mockCreditTx, mockDebitTx));
+
+        when(pdfExportService.generateTransactionPdf(anyList()))
+                .thenReturn(expectedPdf);
+
+        byte[] result = transactionService.exportTransactionsPdf(
+                "BF1000000001",
+                TransactionType.CREDIT,
+                null,
+                null,
+                null
+        );
+
+        assertNotNull(result);
+        assertArrayEquals(expectedPdf, result);
+
+        verify(pdfExportService, times(1))
+                .generateTransactionPdf(anyList());
+
+        verify(transactionRepository, times(1))
+                .findAll(any(Specification.class), any(Sort.class));
+    }
+
+    @Test
+    @DisplayName("Export Transactions Excel - Success")
+    void exportTransactionsExcel_Success() {
+        mockAuthenticatedUser(mockUser);
+
+        byte[] expectedExcel = "EXCEL-DATA".getBytes();
+
+        when(transactionRepository.findAll(
+                any(Specification.class),
+                any(Sort.class)
+        )).thenReturn(List.of(mockCreditTx, mockDebitTx));
+
+        when(excelExportService.generateTransactionExcel(anyList()))
+                .thenReturn(expectedExcel);
+
+        byte[] result = transactionService.exportTransactionsExcel(
+                "BF1000000001",
+                null,
+                null,
+                null,
+                null
+        );
+
+        assertNotNull(result);
+        assertArrayEquals(expectedExcel, result);
+
+        verify(excelExportService, times(1))
+                .generateTransactionExcel(anyList());
+
+        verify(transactionRepository, times(1))
+                .findAll(any(Specification.class), any(Sort.class));
+    }
+
+    @Test
+    @DisplayName("Export Transactions PDF - Rejects Invalid Date Range")
+    void exportTransactionsPdf_InvalidDateRange() {
+        mockAuthenticatedUser(mockUser);
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> transactionService.exportTransactionsPdf(
+                        "BF1000000001",
+                        null,
+                        LocalDate.of(2026, 8, 20),
+                        LocalDate.of(2026, 8, 10),
+                        null
+                )
+        );
+
+        assertEquals("Start date cannot be after end date", ex.getMessage());
+
+        verify(transactionRepository, never())
+                .findAll(any(Specification.class), any(Sort.class));
+
+        verify(pdfExportService, never())
+                .generateTransactionPdf(anyList());
+    }
+
+    @Test
+    @DisplayName("Get Account Transactions For Admin - Success")
+    void getAccountTransactionsForAdmin_Success() {
+        mockAuthenticatedUser(mockAdminUser);
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+        Page<Transaction> transactionPage =
+                new PageImpl<>(
+                        List.of(mockCreditTx, mockDebitTx),
+                        pageable,
+                        2
+                );
+
+        when(transactionRepository
+                .findByAccountAccountNumberOrderByTransactionDateDesc(
+                        "BF1000000001",
+                        pageable
+                ))
+                .thenReturn(transactionPage);
+
+        Page<TransactionResponse> result =
+                transactionService.getAccountTransactionsForAdmin(
+                        "BF1000000001",
+                        pageable
+                );
+
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
+
+        verify(transactionRepository)
+                .findByAccountAccountNumberOrderByTransactionDateDesc(
+                        "BF1000000001",
+                        pageable
+                );
+    }
+
+    @Test
+    @DisplayName("Get Account Transactions For Admin - Rejects Page Size Above 100")
+    void getAccountTransactionsForAdmin_PageSizeTooLarge() {
+        mockAuthenticatedUser(mockAdminUser);
+
+        Pageable pageable = PageRequest.of(0, 101);
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> transactionService.getAccountTransactionsForAdmin(
+                        "BF1000000001",
+                        pageable
+                )
+        );
+
+        assertEquals("Maximum page size is 100", ex.getMessage());
+
+        verify(transactionRepository, never())
+                .findByAccountAccountNumberOrderByTransactionDateDesc(
+                        anyString(),
+                        any(Pageable.class)
+                );
+    }
+
+    @Test
+    @DisplayName("Get Transaction Details - Customer Can View Own Transaction")
+    void getTransactionDetails_OwnTransaction_Success() {
+        mockAuthenticatedUser(mockUser);
+
+        when(transactionRepository.findByTransactionId("TX100"))
+                .thenReturn(Optional.of(mockDebitTx));
+
+        TransactionResponse result =
+                transactionService.getTransactionDetails("TX100");
+
+        assertNotNull(result);
+        assertEquals("TX100", result.transactionId());
+        assertEquals("BF1000000001", result.accountNumber());
+        assertEquals(TransactionType.DEBIT, result.transactionType());
+        assertEquals(new BigDecimal("500.00"), result.amount());
+
+        verify(transactionRepository)
+                .findByTransactionId("TX100");
+    }
+
+    @Test
+    @DisplayName("Get Transaction Details - Customer Cannot View Another User's Transaction")
+    void getTransactionDetails_UnauthorizedUser() {
+        mockAuthenticatedUser(mockOtherUser);
+
+        when(transactionRepository.findByTransactionId("TX100"))
+                .thenReturn(Optional.of(mockDebitTx));
+
+        AccessDeniedException ex = assertThrows(
+                AccessDeniedException.class,
+                () -> transactionService.getTransactionDetails("TX100")
+        );
+
+        assertEquals(
+                "You are not authorized to view this transaction",
+                ex.getMessage()
+        );
+    }
+
+    @Test
+    @DisplayName("Get Transaction Details - Admin Can View Any Transaction")
+    void getTransactionDetails_Admin_Success() {
+        mockAuthenticatedUser(mockAdminUser);
+
+        when(transactionRepository.findByTransactionId("TX100"))
+                .thenReturn(Optional.of(mockDebitTx));
+
+        TransactionResponse result =
+                transactionService.getTransactionDetails("TX100");
+
+        assertNotNull(result);
+        assertEquals("TX100", result.transactionId());
+
+        verify(transactionRepository)
+                .findByTransactionId("TX100");
+    }
+
+    @Test
+    @DisplayName("Get Transaction Details - Throws When Transaction Not Found")
+    void getTransactionDetails_NotFound() {
+        mockAuthenticatedUser(mockUser);
+
+        when(transactionRepository.findByTransactionId("INVALID"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> transactionService.getTransactionDetails("INVALID")
+        );
+
+        assertEquals("Transaction not found", ex.getMessage());
+
+        verify(transactionRepository)
+                .findByTransactionId("INVALID");
+    }
+
+
+
+
 }

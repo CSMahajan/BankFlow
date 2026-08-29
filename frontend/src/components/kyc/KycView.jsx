@@ -4,6 +4,11 @@ import {
     uploadKycDocument, viewMyKycDocument,
     fetchMyPanData, fetchMyAadhaarData
 } from "../../api/bankService";
+import KycStatusCard from "./KycStatusCard";
+import KycVerifiedIdentity from "./KycVerifiedIdentity";
+import KycDocuments from "./KycDocuments";
+import KycHeader from "./KycHeader";
+import KycSuccessBanner from "./KycSuccessBanner";
 import toast from "react-hot-toast";
 
 
@@ -271,483 +276,58 @@ const KycView = () => {
 
     return (
         <div style={styles.container}>
-            <div style={styles.header}>
-                <h2 style={styles.title}>
-                    KYC Verification
-                </h2>
-                <p style={styles.subtitle}>
-                    Verify your identity by uploading required documents.
-                    This helps us keep your account secure.
-                </p>
-            </div>
-            <div style={styles.statusCard}>
-                <div>
-                    <h3 style={styles.sectionTitle}>
-                        🪪 Verification Status
-                    </h3>
-                    <p style={styles.statusDescription}>
-                        Complete your KYC verification to access all banking services.
-                    </p>
-                </div>
-                <div
-                    style={{
-                        ...styles.statusBadge,
-                        backgroundColor:
-                            getStatusColor(
-                                kycStatus?.overallStatus
-                            ).background,
-                        color:
-                            getStatusColor(
-                                kycStatus?.overallStatus
-                            ).color
-                    }}
-                >
-                    <span>
-                        ●
-                    </span>
-
-                    {kycStatus?.overallStatus || "PENDING"}
-                </div>
-            </div>
+            <KycHeader styles={styles} />
+            <KycStatusCard
+                status={kycStatus?.overallStatus}
+            />
 
             {
                 kycStatus?.overallStatus === "VERIFIED" && (
-
-                    <div style={styles.successBanner}>
-                        ✅ Your KYC verification is completed.
-                        You can now access all banking services.
-                    </div>
-
+                    <KycSuccessBanner styles={styles} />
                 )
             }
 
             {
                 kycStatus?.overallStatus === "VERIFIED" && (
 
-                    <div style={styles.kycDataCard}>
-
-                        <h3 style={styles.sectionTitle}>
-                            🔐 Verified Identity Details
-                        </h3>
-
-
-                        <div style={styles.kycDataRow}>
-
-                            <span>
-                                PAN Number
-                            </span>
-
-
-                            <div style={styles.valueWithButton}>
-
-                                <strong>
-                                    {
-                                        showPan
-                                            ?
-                                            kycDetails.pan
-                                            :
-                                            maskPan(kycDetails.pan)
-                                    }
-                                </strong>
-
-
-                                <button
-                                    style={styles.smallButton}
-                                    onClick={() => {
-
-                                        if (showPan) {
-                                            setShowPan(false);
-                                        }
-                                        else {
-                                            handleViewPan();
-                                        }
-
-                                    }}
-                                >
-                                    {
-                                        showPan
-                                            ?
-                                            "Hide"
-                                            :
-                                            "View"
-                                    }
-                                </button>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div style={styles.kycDataRow}>
-
-                            <span>
-                                Aadhaar Number
-                            </span>
-
-
-                            <div style={styles.valueWithButton}>
-
-                                <strong>
-                                    {
-                                        showAadhaar
-                                            ?
-                                            kycDetails.aadhaar
-                                            :
-                                            maskAadhaar(kycDetails.aadhaar)
-                                    }
-                                </strong>
-
-
-                                <button
-                                    style={styles.smallButton}
-                                    onClick={() => {
-
-                                        if (showAadhaar) {
-                                            setShowAadhaar(false);
-                                        }
-                                        else {
-                                            handleViewAadhaar();
-                                        }
-
-                                    }}
-                                >
-                                    {
-                                        showAadhaar
-                                            ?
-                                            "Hide"
-                                            :
-                                            "View"
-                                    }
-                                </button>
-
-                            </div>
-
-                        </div>
-
-
-                    </div>
-
-                )
-            }
-
-            <h3 style={styles.documentsTitle}>
-                Required Documents
-            </h3>
-
-
-            <div style={styles.grid}>
-                <DocumentCard
-                    title="PAN Card"
-                    icon="🪪"
-                    type="PAN"
-                    document={
-                        documents.find(
-                            d => d.documentType === "PAN"
-                        )
-                    }
-                    uploadingType={uploadingType}
-                    onUpload={handleUpload}
-                    onView={handleViewDocument}
-                    previewDocument={previewDocument}
-                    onHide={handleHideDocument}
-                    selectedFile={selectedFiles["PAN"]}
-                />
-                <DocumentCard
-                    title="Aadhaar Card"
-                    icon="🆔"
-                    type="AADHAAR"
-                    document={
-                        documents.find(
-                            d => d.documentType === "AADHAAR"
-                        )
-                    }
-                    uploadingType={uploadingType}
-                    onUpload={handleUpload}
-                    onView={handleViewDocument}
-                    previewDocument={previewDocument}
-                    onHide={handleHideDocument}
-                    selectedFile={selectedFiles["AADHAAR"]}
-                />
-            </div>
-        </div>
-    );
-};
-
-const DocumentCard = ({
-    title,
-    icon,
-    type,
-    document,
-    uploadingType,
-    onUpload,
-    onView,
-    previewDocument,
-    onHide,
-    selectedFile
-}) => {
-
-    const canUpload = !document || document.status === "REJECTED";
-
-    return (
-        <div style={styles.card}>
-
-            <div style={styles.cardHeader}>
-
-                <span style={styles.documentIcon}>
-                    {icon}
-                </span>
-
-                <div>
-                    <h3 style={styles.cardTitle}>
-                        {title}
-                    </h3>
-
-                    <p style={styles.cardSubtitle}>
-                        Upload clear {title} image or PDF
-                    </p>
-                </div>
-
-            </div>
-
-
-            <div style={styles.statusRow}>
-
-                <span>
-                    Status
-                </span>
-
-
-                <strong
-                    style={{
-                        padding: "4px 10px",
-                        borderRadius: "12px",
-                        backgroundColor:
-                            getStatusColor(
-                                document?.status
-                            ).background,
-                        color:
-                            getStatusColor(
-                                document?.status
-                            ).color,
-                        fontSize: "12px"
-                    }}
-                >
-                    {
-                        document?.status ||
-                        "NOT_UPLOADED"
-                    }
-                </strong>
-
-            </div>
-
-            {
-                !document && (
-
-                    <p style={styles.infoText}>
-                        Please upload this document to complete KYC.
-                    </p>
-
-                )
-            }
-
-            {
-                selectedFile && (
-
-                    <div style={styles.selectedFile}>
-
-                        📄 {selectedFile.name}
-
-                        <br />
-
-                        {
-                            (selectedFile.size / 1024 / 1024)
-                                .toFixed(2)
-                        }
-                        MB
-
-                    </div>
-
-                )
-            }
-
-            {
-                document?.status === "PENDING" && (
-
-                    <p style={styles.infoText}>
-                        Your document is under review.
-                    </p>
-
-                )
-            }
-
-            {
-                document?.status === "VERIFIED" && (
-
-                    <p style={styles.infoText}>
-                        Document verified successfully.
-                    </p>
-
-                )
-            }
-
-            {
-                document?.uploadedAt && (
-
-                    <p style={styles.infoText}>
-                        Uploaded On:
-                        {" "}
-                        {
-                            new Date(
-                                document.uploadedAt
-                            ).toLocaleDateString()
-                        }
-                    </p>
-
-                )
-            }
-
-            {
-                document?.originalFileName && (
-
-                    <p style={styles.infoText}>
-                        Uploaded File:
-                        {" "}
-                        {document.originalFileName}
-                    </p>
-
-                )
-            }
-
-            {
-                document?.id && (
-
-                    <button
-                        style={styles.viewButton}
-                        onClick={() => {
-                            if (!document?.id) {
-                                return;
-                            }
-
-                            if (
-                                previewDocument?.id === document.id
-                            ) {
-                                onHide();
+                    <KycVerifiedIdentity
+                        kycDetails={kycDetails}
+                        showPan={showPan}
+                        showAadhaar={showAadhaar}
+                        onViewPan={(show) => {
+                            if (show) {
+                                handleViewPan();
                             }
                             else {
-                                onView(document.id);
+                                setShowPan(false);
                             }
-
                         }}
-                    >
-                        {
-                            previewDocument?.id === document?.id
-                                ?
-                                "🙈 Hide Document"
-                                :
-                                "👁 View Document"
-                        }
-
-                    </button>
-                )
-
-
-            }
-
-            {
-                previewDocument &&
-                previewDocument.id === document?.id && (
-
-                    <div style={styles.previewContainer}>
-                        <p style={styles.previewTitle}>
-                            Preview: {document.originalFileName}
-                        </p>
-                        {
-                            previewDocument.type?.includes("pdf")
-                                ?
-                                (
-                                    <iframe
-                                        src={previewDocument.url}
-                                        title={title}
-                                        style={styles.previewFrame}
-                                    />
-                                )
-                                :
-                                (
-                                    <img
-                                        src={previewDocument.url}
-                                        alt={title}
-                                        style={styles.previewImage}
-                                    />
-                                )
-
-                        }
-
-                    </div>
-
-                )
-            }
-
-            {
-                document?.rejectionReason && (
-                    <div style={styles.rejectBox}>
-                        <strong>
-                            ❌ Document Rejected
-                        </strong>
-
-                        <p style={{ margin: "6px 0 0" }}>
-                            Reason: {document.rejectionReason}
-                        </p>
-                    </div>
-                )
-            }
-
-            {
-                canUpload && (
-
-                    <p style={styles.uploadHint}>
-                        Accepted formats: PDF, JPG, PNG
-                        <br />
-                        Maximum size: 5 MB
-                    </p>
-
-                )
-            }
-
-            {
-                canUpload && (
-
-                    <label style={styles.uploadButton}>
-
-                        {
-                            uploadingType === type
-                                ?
-                                "Uploading..."
-                                :
-                                "Upload Document"
-                        }
-
-
-                        <input
-                            type="file"
-                            hidden
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            disabled={
-                                uploadingType !== null
+                        onViewAadhaar={(show) => {
+                            if (show) {
+                                handleViewAadhaar();
                             }
-                            onChange={(e) =>
-                                onUpload(
-                                    e,
-                                    type
-                                )
+                            else {
+                                setShowAadhaar(false);
                             }
-                        />
-
-                    </label>
+                        }}
+                        maskPan={maskPan}
+                        maskAadhaar={maskAadhaar}
+                    />
 
                 )
             }
 
+            <KycDocuments
+                documents={documents}
+                uploadingType={uploadingType}
+                onUpload={handleUpload}
+                onView={handleViewDocument}
+                previewDocument={previewDocument}
+                onHide={handleHideDocument}
+                selectedFiles={selectedFiles}
+                getStatusColor={getStatusColor}
+                styles={styles}
+            />
         </div>
     );
 };
@@ -792,7 +372,6 @@ const getStatusColor = (status) => {
                 color: "#374151"
             };
     }
-
 };
 
 const styles = {
@@ -814,17 +393,6 @@ const styles = {
     subtitle: {
         color: "#6b7280",
         fontSize: "13px"
-    },
-
-    statusCard: {
-        background: "#ffffff",
-        padding: "24px",
-        borderRadius: "14px",
-        border: "1px solid #eef0ec",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.04)"
     },
 
     badge: {
@@ -873,18 +441,6 @@ const styles = {
         marginTop: "14px"
     },
 
-    sectionTitle: {
-        margin: 0,
-        fontSize: "18px",
-        color: "#111827"
-    },
-
-    statusDescription: {
-        marginTop: "6px",
-        fontSize: "13px",
-        color: "#6b7280"
-    },
-
     documentsTitle: {
         margin: "5px 0",
         fontSize: "18px",
@@ -928,16 +484,6 @@ const styles = {
         border: "1px solid #eef0ec",
         color: "#6b7280",
         fontSize: "14px",
-    },
-
-    statusBadge: {
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        padding: "8px 16px",
-        borderRadius: "20px",
-        fontWeight: "700",
-        fontSize: "13px",
     },
 
     cardSubtitle: {
@@ -1000,29 +546,6 @@ const styles = {
         fontSize: "13px",
         fontWeight: "700",
         background: "#f9fafb"
-    },
-
-    kycDataCard: {
-        background: "#ffffff",
-        padding: "20px",
-        borderRadius: "14px",
-        border: "1px solid #eef0ec",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.04)"
-    },
-
-    kycDataRow: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "12px 0",
-        borderBottom: "1px solid #f1f5f9",
-        fontSize: "14px",
-    },
-
-    valueWithButton: {
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
     },
 
     smallButton: {

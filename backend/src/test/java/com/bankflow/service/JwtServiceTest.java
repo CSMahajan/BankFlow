@@ -1,6 +1,7 @@
 package com.bankflow.service;
 
 import com.bankflow.config.JwtProperties;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
@@ -179,6 +180,50 @@ class JwtServiceTest {
         boolean isValid = foreignJwtService.isTokenValid(token, email);
 
         assertFalse(isValid);
+    }
+
+    @Test
+    @DisplayName("Is Token Valid - Expired Token Returns False")
+    void isTokenValid_ExpiredToken_ReturnsFalse() {
+        JwtProperties expiredProperties = new JwtProperties();
+
+        expiredProperties.setSecret(testSecret);
+        expiredProperties.setExpiration(Duration.ofMillis(-1));
+
+        JwtService expiredJwtService = new JwtService(expiredProperties);
+
+        String token = expiredJwtService.generateToken(
+                "user@example.com",
+                "CUSTOMER"
+        );
+
+        boolean isValid = expiredJwtService.isTokenValid(
+                token,
+                "user@example.com"
+        );
+
+        assertFalse(isValid);
+    }
+
+    @Test
+    @DisplayName("Extract Claim - Expired Token Throws ExpiredJwtException")
+    void extractClaim_ExpiredToken_ThrowsException() {
+        JwtProperties expiredProperties = new JwtProperties();
+
+        expiredProperties.setSecret(testSecret);
+        expiredProperties.setExpiration(Duration.ofMillis(-1));
+
+        JwtService expiredJwtService = new JwtService(expiredProperties);
+
+        String token = expiredJwtService.generateToken(
+                "user@example.com",
+                "CUSTOMER"
+        );
+
+        assertThrows(
+                ExpiredJwtException.class,
+                () -> expiredJwtService.extractEmail(token)
+        );
     }
 
 }

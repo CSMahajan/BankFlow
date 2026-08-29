@@ -94,7 +94,7 @@ public class KycExtractionProcessorService {
             extractedData.setExtractedText(extractedText);
             extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.SUCCESS);
             extractedData.setUpdatedAt(LocalDateTime.now());
-
+            extractedData.setFailureReason(null);
             log.info("OCR extraction successful. Document id: {}, Characters extracted: {}",
                     document.getId(), extractedText.length());
         } catch (Exception e) {

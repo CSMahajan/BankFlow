@@ -15,11 +15,16 @@ public class AadhaarTextExtractorService {
 
 
     private static final Pattern AADHAAR_PATTERN =
-            Pattern.compile("\\d{4}\\s?\\d{4}\\s?\\d{4}");
-
+            Pattern.compile("^\\s*(\\d{4}\\s+\\d{4}\\s+\\d{4})\\s*$");
 
     private static final Pattern MOBILE_PATTERN =
             Pattern.compile("\\b[6-9]\\d{9}\\b");
+
+    private static final Pattern FEMALE_PATTERN =
+            Pattern.compile("\\bFEMALE\\b", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern MALE_PATTERN =
+            Pattern.compile("\\bMALE\\b", Pattern.CASE_INSENSITIVE);
 
 
     public AadhaarExtractedData extract(String text) {
@@ -36,20 +41,12 @@ public class AadhaarTextExtractorService {
 
 
     private String extractAadhaarNumber(String text) {
-
         String[] lines = text.split("\\r?\\n");
 
-        Pattern pattern =
-                Pattern.compile(
-                        "^\\s*(\\d{4}\\s+\\d{4}\\s+\\d{4})\\s*$"
-                );
+        for (String line : lines) {
+            Matcher matcher = AADHAAR_PATTERN.matcher(line);
 
-        for(String line : lines) {
-
-            Matcher matcher = pattern.matcher(line);
-
-            if(matcher.matches()) {
-
+            if (matcher.matches()) {
                 return matcher.group(1)
                         .replaceAll("\\s", "");
             }
@@ -107,7 +104,21 @@ public class AadhaarTextExtractorService {
 
     private boolean isValidName(String line) {
 
-        if(line.matches(".*\\d+.*")) {
+        if (line == null || line.isBlank()) {
+            return false;
+        }
+
+        line = line.trim();
+
+        if (line.matches(".*\\d+.*")) {
+            return false;
+        }
+
+        if (line.matches("(?i)government of india")) {
+            return false;
+        }
+
+        if (line.matches("(?i).*(aadhaar|unique identification|dob|date of birth|male|female).*")) {
             return false;
         }
 
@@ -143,21 +154,18 @@ public class AadhaarTextExtractorService {
 
 
     private String extractGender(String text) {
-
-        if (text.contains("MALE")) {
-            return "MALE";
+        if (FEMALE_PATTERN.matcher(text).find()) {
+            return "FEMALE";
         }
 
-        if (text.contains("FEMALE")) {
-            return "FEMALE";
+        if (MALE_PATTERN.matcher(text).find()) {
+            return "MALE";
         }
 
         return null;
     }
 
-
     private String extractMobile(String text) {
-
         Matcher matcher = MOBILE_PATTERN.matcher(text);
         return matcher.find() ? matcher.group() : null;
     }
@@ -207,8 +215,15 @@ public class AadhaarTextExtractorService {
             if (line.isBlank()) {
                 continue;
             }
-            // Ignore relationship line
             if (line.matches("(?i).*(S/O|D/O|W/O|C/O).*")) {
+                continue;
+            }
+
+            if (line.matches("(?i).*\\b(DOB|D\\.O\\.B|Date of Birth)\\b.*")) {
+                continue;
+            }
+
+            if (line.matches("(?i)^(MALE|FEMALE)$")) {
                 continue;
             }
             address.append(line).append(", ");

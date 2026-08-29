@@ -4,10 +4,7 @@ import com.bankflow.dto.CreateFdRequest;
 import com.bankflow.dto.FdCalculatorRequest;
 import com.bankflow.dto.FdCalculatorResponse;
 import com.bankflow.dto.FdResponse;
-import com.bankflow.entity.Account;
-import com.bankflow.entity.FixedDeposit;
-import com.bankflow.entity.Transaction;
-import com.bankflow.entity.User;
+import com.bankflow.entity.*;
 import com.bankflow.repository.AccountRepository;
 import com.bankflow.repository.FixedDepositRepository;
 import com.bankflow.repository.TransactionRepository;
@@ -321,4 +318,260 @@ class FixedDepositServiceTest {
                 fdService.getFdByNumber("FD1234567890")
         );
     }
+
+    @Test
+    @DisplayName("Close Fixed Deposit - Matured FD Credits Maturity Amount")
+    void closeFixedDeposit_Matured_Success() {
+        mockAuthenticatedUser(mockUser);
+
+        mockFd.setMaturityDate(LocalDate.now().minusDays(1));
+        mockFd.setStatus(FixedDeposit.FdStatus.ACTIVE);
+        mockFd.setMaturityAmount(new BigDecimal("21332.14"));
+        mockAccount.setCurrentBalance(new BigDecimal("30000.00"));
+
+        when(fdRepository.findByFdNumber("FD1234567890"))
+                .thenReturn(Optional.of(mockFd));
+
+        when(accountRepository.save(mockAccount))
+                .thenReturn(mockAccount);
+
+        when(transactionRepository.save(any(Transaction.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(fdRepository.save(mockFd))
+                .thenReturn(mockFd);
+
+        FdResponse response = fdService.closeFixedDeposit("FD1234567890");
+
+        assertNotNull(response);
+
+        assertEquals(
+                FixedDeposit.FdStatus.MATURED_CLOSED.name(),
+                response.status()
+        );
+
+        assertEquals(LocalDate.now(), mockFd.getClosedDate());
+
+        // 30,000 + 21,332.14
+        assertEquals(
+                new BigDecimal("51332.14"),
+                mockAccount.getCurrentBalance()
+        );
+
+        verify(accountRepository).save(mockAccount);
+        verify(transactionRepository).save(any(Transaction.class));
+        verify(fdRepository).save(mockFd);
+        verify(auditLogService).log(
+                eq(AuditAction.FD_CLOSED),
+                contains("Closed Fixed Deposit FD1234567890")
+        );
+    }
+
+    @Test
+    @DisplayName("Close Fixed Deposit - Premature Closure Credits Principal Only")
+    void closeFixedDeposit_Premature_Success() {
+        mockAuthenticatedUser(mockUser);
+
+        mockFd.setMaturityDate(LocalDate.now().plusMonths(6));
+        mockFd.setStatus(FixedDeposit.FdStatus.ACTIVE);
+        mockFd.setDepositAmount(new BigDecimal("20000.00"));
+        mockFd.setMaturityAmount(new BigDecimal("21332.14"));
+        mockAccount.setCurrentBalance(new BigDecimal("30000.00"));
+
+        when(fdRepository.findByFdNumber("FD1234567890"))
+                .thenReturn(Optional.of(mockFd));
+
+        when(accountRepository.save(mockAccount))
+                .thenReturn(mockAccount);
+
+        when(transactionRepository.save(any(Transaction.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(fdRepository.save(mockFd))
+                .thenReturn(mockFd);
+
+        FdResponse response = fdService.closeFixedDeposit("FD1234567890");
+
+        assertNotNull(response);
+
+        assertEquals(
+                FixedDeposit.FdStatus.PREMATURELY_CLOSED.name(),
+                response.status()
+        );
+
+        assertEquals(
+                new BigDecimal("50000.00"),
+                mockAccount.getCurrentBalance()
+        );
+
+        assertEquals(
+                new BigDecimal("20000.00"),
+                response.creditedAmount()
+        );
+
+        verify(accountRepository).save(mockAccount);
+        verify(transactionRepository).save(any(Transaction.class));
+        verify(fdRepository).save(mockFd);
+        verify(auditLogService).log(
+                eq(AuditAction.FD_CLOSED),
+                contains("Prematurely closed Fixed Deposit FD1234567890")
+        );
+    }
+
+    @Test
+    @DisplayName("Close Fixed Deposit - FD Not Found")
+    void closeFixedDeposit_NotFound_ThrowsException() {
+        mockAuthenticatedUser(mockUser);
+
+        when(fdRepository.findByFdNumber("FD9999999999"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> fdService.closeFixedDeposit("FD9999999999")
+        );
+
+        assertEquals("Fixed Deposit not found", ex.getMessage());
+
+        verify(fdRepository, never()).save(any());
+        verify(accountRepository, never()).save(any());
+        verify(transactionRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Close Fixed Deposit - Non Active FD Throws Exception")
+    void closeFixedDeposit_NonActive_ThrowsException() {
+        mockAuthenticatedUser(mockUser);
+
+        mockFd.setStatus(FixedDeposit.FdStatus.MATURED_CLOSED);
+
+        when(fdRepository.findByFdNumber("FD1234567890"))
+                .thenReturn(Optional.of(mockFd));
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> fdService.closeFixedDeposit("FD1234567890")
+        );
+
+        assertEquals(
+                "Only active Fixed Deposits can be closed.",
+                ex.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any());
+        verify(transactionRepository, never()).save(any());
+        verify(fdRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Close Fixed Deposit - Unauthorized User Throws AccessDeniedException")
+    void closeFixedDeposit_UnauthorizedUser_ThrowsException() {
+        mockAuthenticatedUser(mockOtherUser);
+
+        when(fdRepository.findByFdNumber("FD1234567890"))
+                .thenReturn(Optional.of(mockFd));
+
+        AccessDeniedException ex = assertThrows(
+                AccessDeniedException.class,
+                () -> fdService.closeFixedDeposit("FD1234567890")
+        );
+
+        assertEquals(
+                "You are not authorized to close this Fixed Deposit",
+                ex.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any());
+        verify(transactionRepository, never()).save(any());
+        verify(fdRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Calculate Maturity - 3 Year Tenure Uses Correct Rate")
+    void calculateMaturity_ThreeYear_Success() {
+        FdCalculatorRequest request =
+                new FdCalculatorRequest(
+                        new BigDecimal("50000.00"),
+                        3
+                );
+
+        FdCalculatorResponse response =
+                fdService.calculateMaturity(request);
+
+        assertEquals(
+                new BigDecimal("7.00"),
+                response.interestRate()
+        );
+
+        assertEquals(
+                new BigDecimal("50000.00"),
+                response.depositAmount()
+        );
+
+        assertEquals(3, response.tenureYears());
+
+        assertTrue(
+                response.maturityAmount()
+                        .compareTo(response.depositAmount()) > 0
+        );
+    }
+
+    @Test
+    @DisplayName("Calculate Maturity - 5 Year Tenure Uses Correct Rate")
+    void calculateMaturity_FiveYear_Success() {
+        FdCalculatorRequest request =
+                new FdCalculatorRequest(
+                        new BigDecimal("50000.00"),
+                        5
+                );
+
+        FdCalculatorResponse response =
+                fdService.calculateMaturity(request);
+
+        assertEquals(
+                new BigDecimal("7.50"),
+                response.interestRate()
+        );
+
+        assertEquals(5, response.tenureYears());
+
+        assertTrue(
+                response.maturityAmount()
+                        .compareTo(response.depositAmount()) > 0
+        );
+    }
+
+    @Test
+    @DisplayName("Create Fixed Deposit - Inactive Source Account Throws Exception")
+    void createFixedDeposit_InactiveAccount_ThrowsException() {
+        mockAuthenticatedUser(mockUser);
+
+        mockAccount.setAccountStatus(Account.AccountStatus.INACTIVE);
+
+        CreateFdRequest request =
+                new CreateFdRequest(
+                        "BF1234567890",
+                        new BigDecimal("15000.00"),
+                        1
+                );
+
+        when(accountRepository.findByAccountNumber("BF1234567890"))
+                .thenReturn(Optional.of(mockAccount));
+
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> fdService.createFixedDeposit(request)
+        );
+
+        assertEquals(
+                "Fixed Deposits can only be opened from an active account.",
+                ex.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any());
+        verify(fdRepository, never()).save(any());
+        verify(transactionRepository, never()).save(any());
+    }
+
+
 }

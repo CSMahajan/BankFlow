@@ -620,3 +620,9 @@ export const fetchMyAadhaarData = async (documentId) => {
   return response.data;
 
 };
+
+export const retryAdminKycMalwareScan = async (documentId) => {
+  await API.post(
+    `/admin/kyc/documents/${documentId}/malware-scan/retry`
+  );
+};

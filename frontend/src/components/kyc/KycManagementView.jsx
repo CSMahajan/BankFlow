@@ -9,7 +9,8 @@ import {
     fetchAdminKycExtraction,
     fetchAdminPanData,
     fetchAdminAadhaarData,
-    retryAdminKycExtraction
+    retryAdminKycExtraction,
+    retryAdminKycMalwareScan
 } from "../../api/bankService";
 import { formatDateTime } from "../../utils/formatUtils";
 import KycSearchToolbar from "./KycSearchToolbar";
@@ -330,56 +331,54 @@ const KycManagementView = ({
         }
     };
 
-    useEffect(() => {
+    const handleRetryMalwareScan = async (documentId) => {
 
-        if (
-            !selectedDocument ||
-            extractionData?.extractionStatus !== "PENDING"
-        ) {
+        try {
+            setProcessing(true);
+            await retryAdminKycMalwareScan(documentId);
+            toast.success("Malware scan retry initiated");
+            setExtractionData(prev => ({
+                ...(prev || {}),
+                malwareScanStatus: "PENDING"
+            }));
+        } catch (err) {
+            console.error(err);
+            toast.error(err.response?.data?.message || "Unable to retry malware scan");
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!selectedDocument) {
             return;
         }
-
-
+        const isProcessing =
+            extractionData?.extractionStatus === "PENDING" || extractionData?.malwareScanStatus === "PENDING";
+        if (!isProcessing) {
+            return;
+        }
         const interval = setInterval(async () => {
-
             try {
-
-                const extraction =
-                    await fetchAdminKycExtraction(
-                        selectedDocument.id
-                    );
-
+                const extraction = await fetchAdminKycExtraction(selectedDocument.id);
                 setExtractionData(extraction);
-
-
-                if (
-                    extraction.extractionStatus === "SUCCESS" ||
-                    extraction.extractionStatus === "FAILED"
-                ) {
-
+                const extractionFinished = extraction.extractionStatus !== "PENDING";
+                const malwareFinished = extraction.malwareScanStatus !== "PENDING";
+                if (extractionFinished && malwareFinished) {
                     clearInterval(interval);
-
                     await loadKycReviewData(
                         selectedDocument
                     );
-
                 }
-
             } catch (err) {
-
                 console.error(err);
-
             }
-
         }, 5000);
-
-
         return () => clearInterval(interval);
-
-
     }, [
         selectedDocument,
-        extractionData?.extractionStatus
+        extractionData?.extractionStatus,
+        extractionData?.malwareScanStatus
     ]);
 
     useEffect(() => {
@@ -831,6 +830,54 @@ const KycManagementView = ({
 
                                                                     )
                                                                 }
+
+                                                            </div>
+
+                                                            <div style={styles.infoSection}>
+
+                                                                <h4 style={styles.sectionTitle}>
+                                                                    🛡️ Malware Scan
+                                                                </h4>
+
+                                                                {extractionData && (
+                                                                    <>
+
+                                                                        <p>
+                                                                            Status:
+                                                                            {" "}
+                                                                            <strong>
+                                                                                {extractionData.malwareScanStatus || "UNKNOWN"}
+                                                                            </strong>
+                                                                        </p>
+
+                                                                        <p>
+                                                                            Attempts:
+                                                                            {" "}
+                                                                            <strong>
+                                                                                {extractionData.malwareScanAttempt ?? 0}
+                                                                            </strong>
+                                                                        </p>
+
+                                                                        {extractionData.malwareScanStatus === "FAILED" && (
+
+                                                                            <button
+                                                                                style={styles.retryButton}
+                                                                                disabled={processing}
+                                                                                onClick={() =>
+                                                                                    handleRetryMalwareScan(doc.id)
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    processing
+                                                                                        ? "Retrying..."
+                                                                                        : "🔄 Retry Malware Scan"
+                                                                                }
+                                                                            </button>
+
+                                                                        )}
+
+                                                                    </>
+                                                                )}
 
                                                             </div>
 

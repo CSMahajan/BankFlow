@@ -1,10 +1,8 @@
 package com.bankflow.service;
 
-import com.bankflow.dto.AccountResponse;
-import com.bankflow.dto.BalanceResponse;
-import com.bankflow.dto.CreateAccountRequest;
-import com.bankflow.dto.UpdateProfileRequest;
+import com.bankflow.dto.*;
 import com.bankflow.entity.Account;
+import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.Transaction;
 import com.bankflow.entity.User;
 import com.bankflow.repository.AccountRepository;
@@ -284,4 +282,429 @@ class AccountServiceTest {
         verify(accountRepository, times(1))
                 .findAll(any(Specification.class), any(PageRequest.class));
     }
+
+    @Test
+    @DisplayName("Create Account with Null Initial Deposit Defaults to Zero")
+    void createAccount_NullInitialDeposit_Success() {
+        mockAuthenticatedUser(mockUser);
+
+        CreateAccountRequest request = new CreateAccountRequest(
+                Account.AccountType.SAVINGS,
+                "Main Branch",
+                null
+        );
+
+        when(accountRepository.existsByAccountNumber(anyString())).thenReturn(false);
+
+        when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> {
+            Account account = invocation.getArgument(0);
+            account.setId(102L);
+            account.setCreatedAt(LocalDateTime.now());
+            return account;
+        });
+
+        AccountResponse response = accountService.createAccount(request);
+
+        assertNotNull(response);
+        assertEquals(BigDecimal.ZERO, response.currentBalance());
+
+        verify(accountRepository, times(1)).save(any(Account.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+    }
+
+    @Test
+    @DisplayName("Get My Accounts When User Has No Accounts Returns Empty List")
+    void getMyAccounts_NoAccounts_ReturnsEmptyList() {
+        mockAuthenticatedUser(mockUser);
+
+        when(accountRepository.findByUserId(mockUser.getId()))
+                .thenReturn(List.of());
+
+        List<AccountResponse> result = accountService.getMyAccounts();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(accountRepository, times(1))
+                .findByUserId(mockUser.getId());
+    }
+
+    @Test
+    @DisplayName("Get Available Balance Account Not Found Throws Exception")
+    void getAvailableBalance_NotFound_ThrowsException() {
+        mockAuthenticatedUser(mockUser);
+
+        when(accountRepository.findByAccountNumber("BF9999999999"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> accountService.getAvailableBalance("BF9999999999")
+        );
+
+        assertEquals("Account not found", exception.getMessage());
+
+        verify(accountRepository, times(1))
+                .findByAccountNumber("BF9999999999");
+    }
+
+    @Test
+    @DisplayName("Toggle Account Status Active Account Freezes Account")
+    void toggleAccountStatus_ActiveAccount_FreezesAccount() {
+        mockAuthenticatedUser(mockUser);
+
+        mockAccount.setAccountStatus(Account.AccountStatus.ACTIVE);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        when(accountRepository.save(mockAccount))
+                .thenReturn(mockAccount);
+
+        AccountResponse response =
+                accountService.toggleAccountStatus(mockAccount.getAccountNumber());
+
+        assertNotNull(response);
+        assertEquals(Account.AccountStatus.FROZEN.name(), response.accountStatus());
+        assertEquals(Account.AccountStatus.FROZEN, mockAccount.getAccountStatus());
+
+        verify(accountRepository, times(1)).save(mockAccount);
+
+        verify(auditLogService, times(1)).log(
+                AuditAction.ACCOUNT_FROZEN,
+                "Account " + mockAccount.getAccountNumber() + " frozen"
+        );
+    }
+
+    @Test
+    @DisplayName("Toggle Account Status Frozen Account Activates Account")
+    void toggleAccountStatus_FrozenAccount_ActivatesAccount() {
+        mockAuthenticatedUser(mockUser);
+
+        mockAccount.setAccountStatus(Account.AccountStatus.FROZEN);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        when(accountRepository.save(mockAccount))
+                .thenReturn(mockAccount);
+
+        AccountResponse response =
+                accountService.toggleAccountStatus(mockAccount.getAccountNumber());
+
+        assertNotNull(response);
+        assertEquals(Account.AccountStatus.ACTIVE.name(), response.accountStatus());
+        assertEquals(Account.AccountStatus.ACTIVE, mockAccount.getAccountStatus());
+
+        verify(accountRepository, times(1)).save(mockAccount);
+
+        verify(auditLogService, times(1)).log(
+                AuditAction.ACCOUNT_ACTIVATED,
+                "Account " + mockAccount.getAccountNumber() + " activated"
+        );
+    }
+
+    @Test
+    @DisplayName("Toggle Account Status Another User Account Throws Access Denied")
+    void toggleAccountStatus_OtherUsersAccount_ThrowsAccessDenied() {
+        mockAuthenticatedUser(mockOtherUser);
+
+        mockAccount.setAccountStatus(Account.AccountStatus.ACTIVE);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        AccessDeniedException exception = assertThrows(
+                AccessDeniedException.class,
+                () -> accountService.toggleAccountStatus(mockAccount.getAccountNumber())
+        );
+
+        assertEquals(
+                "You are not authorized to modify this account",
+                exception.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Toggle Account Status Inactive Account Throws Exception")
+    void toggleAccountStatus_InactiveAccount_ThrowsException() {
+        mockAuthenticatedUser(mockUser);
+
+        mockAccount.setAccountStatus(Account.AccountStatus.INACTIVE);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> accountService.toggleAccountStatus(mockAccount.getAccountNumber())
+        );
+
+        assertEquals(
+                "Inactive accounts cannot be activated or frozen.",
+                exception.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Toggle Account Status Account Not Found Throws Exception")
+    void toggleAccountStatus_AccountNotFound_ThrowsException() {
+        mockAuthenticatedUser(mockUser);
+
+        when(accountRepository.findByAccountNumber("BF9999999999"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> accountService.toggleAccountStatus("BF9999999999")
+        );
+
+        assertEquals(
+                "Account not found with number: BF9999999999",
+                exception.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Get All Accounts For Admin Size Greater Than 100 Throws Exception")
+    void getAllAccountsForAdmin_SizeGreaterThan100_ThrowsException() {
+        mockAuthenticatedUser(mockAdminUser);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> accountService.getAllAccountsForAdmin(
+                        0,
+                        101,
+                        null,
+                        null
+                )
+        );
+
+        assertEquals("Maximum page size is 100", exception.getMessage());
+
+        verify(accountRepository, never())
+                .findAll(any(Specification.class), any(PageRequest.class));
+    }
+
+    @Test
+    @DisplayName("Get Account Summary For Admin Success")
+    void getAccountSummaryForAdmin_Success() {
+        mockAuthenticatedUser(mockAdminUser);
+
+        when(accountRepository.countByAccountStatus(Account.AccountStatus.ACTIVE))
+                .thenReturn(10L);
+
+        when(accountRepository.countByAccountStatus(Account.AccountStatus.FROZEN))
+                .thenReturn(3L);
+
+        when(accountRepository.countByAccountType(Account.AccountType.SAVINGS))
+                .thenReturn(8L);
+
+        when(accountRepository.countByAccountType(Account.AccountType.CURRENT))
+                .thenReturn(5L);
+
+        AccountSummaryResponse response =
+                accountService.getAccountSummaryForAdmin();
+
+        assertNotNull(response);
+
+        assertEquals(10L, response.activeAccounts());
+        assertEquals(3L, response.frozenAccounts());
+        assertEquals(8L, response.savingsAccounts());
+        assertEquals(5L, response.currentAccounts());
+
+        verify(accountRepository, times(1))
+                .countByAccountStatus(Account.AccountStatus.ACTIVE);
+
+        verify(accountRepository, times(1))
+                .countByAccountStatus(Account.AccountStatus.FROZEN);
+
+        verify(accountRepository, times(1))
+                .countByAccountType(Account.AccountType.SAVINGS);
+
+        verify(accountRepository, times(1))
+                .countByAccountType(Account.AccountType.CURRENT);
+    }
+
+    @Test
+    @DisplayName("Freeze Account By Admin Active Account Success")
+    void freezeAccountByAdmin_ActiveAccount_Success() {
+        mockAccount.setAccountStatus(Account.AccountStatus.ACTIVE);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        when(accountRepository.save(mockAccount))
+                .thenReturn(mockAccount);
+
+        AccountResponse response =
+                accountService.freezeAccountByAdmin(mockAccount.getAccountNumber());
+
+        assertNotNull(response);
+        assertEquals(Account.AccountStatus.FROZEN.name(), response.accountStatus());
+        assertEquals(Account.AccountStatus.FROZEN, mockAccount.getAccountStatus());
+
+        verify(accountRepository, times(1)).save(mockAccount);
+
+        verify(auditLogService, times(1)).log(
+                AuditAction.ACCOUNT_FROZEN,
+                "Account " + mockAccount.getAccountNumber() + " frozen"
+        );
+    }
+
+    @Test
+    @DisplayName("Freeze Account By Admin Already Frozen Throws Exception")
+    void freezeAccountByAdmin_AlreadyFrozen_ThrowsException() {
+        mockAccount.setAccountStatus(Account.AccountStatus.FROZEN);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> accountService.freezeAccountByAdmin(mockAccount.getAccountNumber())
+        );
+
+        assertEquals("Account is already frozen.", exception.getMessage());
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Freeze Account By Admin Inactive Account Throws Exception")
+    void freezeAccountByAdmin_InactiveAccount_ThrowsException() {
+        mockAccount.setAccountStatus(Account.AccountStatus.INACTIVE);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> accountService.freezeAccountByAdmin(mockAccount.getAccountNumber())
+        );
+
+        assertEquals("Inactive account cannot be frozen.", exception.getMessage());
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Freeze Account By Admin Account Not Found Throws Exception")
+    void freezeAccountByAdmin_AccountNotFound_ThrowsException() {
+        when(accountRepository.findByAccountNumber("BF9999999999"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> accountService.freezeAccountByAdmin("BF9999999999")
+        );
+
+        assertEquals(
+                "Account not found with number: BF9999999999",
+                exception.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Unfreeze Account By Admin Frozen Account Success")
+    void unfreezeAccountByAdmin_FrozenAccount_Success() {
+        mockAccount.setAccountStatus(Account.AccountStatus.FROZEN);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        when(accountRepository.save(mockAccount))
+                .thenReturn(mockAccount);
+
+        AccountResponse response =
+                accountService.unfreezeAccountByAdmin(mockAccount.getAccountNumber());
+
+        assertNotNull(response);
+        assertEquals(Account.AccountStatus.ACTIVE.name(), response.accountStatus());
+        assertEquals(Account.AccountStatus.ACTIVE, mockAccount.getAccountStatus());
+
+        verify(accountRepository, times(1)).save(mockAccount);
+
+        verify(auditLogService, times(1)).log(
+                AuditAction.ACCOUNT_ACTIVATED,
+                "Account " + mockAccount.getAccountNumber() + " activated"
+        );
+    }
+
+    @Test
+    @DisplayName("Unfreeze Account By Admin Already Active Throws Exception")
+    void unfreezeAccountByAdmin_AlreadyActive_ThrowsException() {
+        mockAccount.setAccountStatus(Account.AccountStatus.ACTIVE);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> accountService.unfreezeAccountByAdmin(mockAccount.getAccountNumber())
+        );
+
+        assertEquals("Account is already active.", exception.getMessage());
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Unfreeze Account By Admin Inactive Account Throws Exception")
+    void unfreezeAccountByAdmin_InactiveAccount_ThrowsException() {
+        mockAccount.setAccountStatus(Account.AccountStatus.INACTIVE);
+
+        when(accountRepository.findByAccountNumber(mockAccount.getAccountNumber()))
+                .thenReturn(Optional.of(mockAccount));
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> accountService.unfreezeAccountByAdmin(mockAccount.getAccountNumber())
+        );
+
+        assertEquals(
+                "Inactive account cannot be activated.",
+                exception.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("Unfreeze Account By Admin Account Not Found Throws Exception")
+    void unfreezeAccountByAdmin_AccountNotFound_ThrowsException() {
+        when(accountRepository.findByAccountNumber("BF9999999999"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> accountService.unfreezeAccountByAdmin("BF9999999999")
+        );
+
+        assertEquals(
+                "Account not found with number: BF9999999999",
+                exception.getMessage()
+        );
+
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(auditLogService, never()).log(any(), anyString());
+    }
+
+
 }

@@ -1,4 +1,4 @@
-package com.bankflow.ratelimit;
+package com.bankflow.service;
 
 import java.time.Duration;
 

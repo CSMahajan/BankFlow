@@ -1,4 +1,4 @@
-package com.bankflow.ratelimit;
+package com.bankflow.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -2,11 +2,8 @@ package com.bankflow.security;
 
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Paths;
-
 @Component
 public class FileNameSanitizer {
-
 
     public String sanitize(String originalFilename) {
 
@@ -16,16 +13,17 @@ public class FileNameSanitizer {
             return "uploaded-document";
         }
 
+        // Handle both Unix (/) and Windows (\) paths
+        String fileName = originalFilename
+                .replace('\\', '/');
 
-        String fileName =
-                Paths.get(originalFilename)
-                        .getFileName()
-                        .toString();
+        fileName = fileName.substring(
+                fileName.lastIndexOf('/') + 1
+        );
 
-
-        return fileName
-                .replaceAll("[^a-zA-Z0-9._-]", "_");
-
+        return fileName.replaceAll(
+                "[^a-zA-Z0-9._-]",
+                "*"
+        );
     }
-
 }

@@ -162,6 +162,13 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/bankflow/config/**</exclude>
+                                <exclude>com/bankflow/dto/**</exclude>
+                                <exclude>com/bankflow/entity/**</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

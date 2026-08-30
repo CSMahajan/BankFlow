@@ -1,7 +1,7 @@
 package com.bankflow.filter;
 
 import com.bankflow.config.RateLimitProperties;
-import com.bankflow.ratelimit.RateLimitService;
+import com.bankflow.service.RateLimitService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

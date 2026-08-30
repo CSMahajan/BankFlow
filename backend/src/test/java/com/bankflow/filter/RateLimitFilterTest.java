@@ -1,14 +1,13 @@
 package com.bankflow.filter;
 
 import com.bankflow.config.RateLimitProperties;
-import com.bankflow.ratelimit.RateLimitService;
+import com.bankflow.service.RateLimitService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;

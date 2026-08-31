@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram id="bankflow-erd" name="BankFlow ERD">
+    <mxGraphModel dx="2133" dy="958" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="e2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="User&lt;br&gt;id PK&lt;br&gt;fullName&lt;br&gt;email UNIQUE&lt;br&gt;password&lt;br&gt;emailVerified&lt;br&gt;role&lt;br&gt;createdAt" vertex="1">
+          <mxGeometry height="270" width="300" x="30" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;Account&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;accountNumber UNIQUE&lt;br&gt;user_id FK&lt;br&gt;accountType&lt;br&gt;branchName&lt;br&gt;currentBalance&lt;br&gt;accountStatus&lt;br&gt;createdAt" vertex="1">
+          <mxGeometry height="270" width="300" x="430" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;Card&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;cardNumber UNIQUE&lt;br&gt;account_id FK&lt;br&gt;cardType&lt;br&gt;cardStatus&lt;br&gt;cardHolderName&lt;br&gt;expiryDate&lt;br&gt;cvv&lt;br&gt;dailyLimit" vertex="1">
+          <mxGeometry height="270" width="300" x="820" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;FixedDeposit&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;fdNumber UNIQUE&lt;br&gt;user_id FK&lt;br&gt;source_account_id FK&lt;br&gt;depositAmount&lt;br&gt;interestRate&lt;br&gt;tenureYears&lt;br&gt;depositDate&lt;br&gt;maturityDate&lt;br&gt;closedDate&lt;br&gt;maturityAmount&lt;br&gt;status&lt;br&gt;createdAt" vertex="1">
+          <mxGeometry height="270" width="300" x="1210" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;Transaction&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;transactionId UNIQUE&lt;br&gt;account_id FK&lt;br&gt;transactionType&lt;br&gt;amount&lt;br&gt;availableBalance&lt;br&gt;description&lt;br&gt;transactionDate" vertex="1">
+          <mxGeometry height="270" width="300" x="40" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;ScheduledTransfer&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;user_id FK&lt;br&gt;sourceAccountNumber&lt;br&gt;recipientAccountNumber&lt;br&gt;amount&lt;br&gt;description&lt;br&gt;frequency&lt;br&gt;status&lt;br&gt;nextExecutionDate&lt;br&gt;createdAt" vertex="1">
+          <mxGeometry height="270" width="300" x="430" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;Loan&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;loanNumber UNIQUE&lt;br&gt;user_id FK&lt;br&gt;account_id FK&lt;br&gt;loanType&lt;br&gt;principalAmount&lt;br&gt;annualInterestRate&lt;br&gt;tenureMonths&lt;br&gt;monthlyEmi&lt;br&gt;remainingBalance&lt;br&gt;status&lt;br&gt;rejectionRemarks&lt;br&gt;startDate&lt;br&gt;nextDueDate&lt;br&gt;createdAt" vertex="1">
+          <mxGeometry height="270" width="300" x="820" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;LoanRepayment&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;loan_id FK&lt;br&gt;amountPaid&lt;br&gt;principalComponent&lt;br&gt;interestComponent&lt;br&gt;remainingLoanBalance&lt;br&gt;paymentDate&lt;br&gt;transactionReference" vertex="1">
+          <mxGeometry height="270" width="300" x="1210" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;KycDocument&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;user_id FK&lt;br&gt;documentType&lt;br&gt;originalFileName&lt;br&gt;storedFileName&lt;br&gt;storagePath&lt;br&gt;contentType&lt;br&gt;fileSize&lt;br&gt;kycVerificationStatus&lt;br&gt;uploadedAt&lt;br&gt;rejectionReason&lt;br&gt;storageType&lt;br&gt;s3Bucket&lt;br&gt;s3ObjectKey&lt;br&gt;encryptionType&lt;br&gt;checksum" vertex="1">
+          <mxGeometry height="270" width="300" x="40" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;KycAadhaarData&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;kycDocument_id FK UNIQUE&lt;br&gt;aadhaarNumber&lt;br&gt;fullName&lt;br&gt;dateOfBirth&lt;br&gt;gender&lt;br&gt;address&lt;br&gt;mobileNumber&lt;br&gt;createdAt&lt;br&gt;updatedAt" vertex="1">
+          <mxGeometry height="270" width="300" x="430" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;KycPanData&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;kycDocument_id FK UNIQUE&lt;br&gt;panNumber&lt;br&gt;fullName&lt;br&gt;fatherName&lt;br&gt;dateOfBirth&lt;br&gt;createdAt&lt;br&gt;updatedAt" vertex="1">
+          <mxGeometry height="270" width="300" x="820" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;KycExtractedData&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;kycDocument_id FK UNIQUE&lt;br&gt;extractedText&lt;br&gt;extractionStatus&lt;br&gt;failureReason&lt;br&gt;createdAt&lt;br&gt;updatedAt" vertex="1">
+          <mxGeometry height="270" width="300" x="1210" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;KycMalwareScan&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;kycDocument_id FK&lt;br&gt;status&lt;br&gt;provider&lt;br&gt;externalScanId&lt;br&gt;scanStartedAt&lt;br&gt;scanCompletedAt&lt;br&gt;result&lt;br&gt;failureReason&lt;br&gt;attemptNumber&lt;br&gt;createdAt&lt;br&gt;updatedAt" vertex="1">
+          <mxGeometry height="270" width="300" x="40" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;RefreshToken&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;user_id FK&lt;br&gt;tokenHash&lt;br&gt;revoked&lt;br&gt;expiryDate&lt;br&gt;createdAt" vertex="1">
+          <mxGeometry height="270" width="300" x="430" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;VerificationToken&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;token UNIQUE&lt;br&gt;tokenType&lt;br&gt;user_id FK&lt;br&gt;createdAt&lt;br&gt;expiryDate&lt;br&gt;used" vertex="1">
+          <mxGeometry height="270" width="300" x="820" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;spacing=8;" value="&lt;b&gt;AuditLog&lt;/b&gt;&lt;br&gt;id PK&lt;br&gt;action&lt;br&gt;performedBy&lt;br&gt;role&lt;br&gt;description&lt;br&gt;createdAt" vertex="1">
+          <mxGeometry height="270" width="300" x="1210" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="r100" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e3" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r101" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e5" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r102" edge="1" parent="1" source="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e5" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r103" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e7" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r104" edge="1" parent="1" source="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e6" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r105" edge="1" parent="1" source="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e4" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r106" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e8" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r107" edge="1" parent="1" source="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e8" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r108" edge="1" parent="1" source="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e9" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r109" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e10" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r110" edge="1" parent="1" source="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e11" value="1 : 1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r111" edge="1" parent="1" source="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e12" value="1 : 1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r112" edge="1" parent="1" source="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e13" value="1 : 1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r113" edge="1" parent="1" source="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e14" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r114" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e15" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r115" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" target="e16" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

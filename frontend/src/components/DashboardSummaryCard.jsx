@@ -142,7 +142,7 @@ const DashboardSummaryCard = ({
                     </div>
 
                     <div style={{ marginTop: '8px' }}>
-                        <strong>Amount:</strong>
+                        <strong>Amount: </strong>
                         {formatCurrency(summary.nextEmiAmount)}
                     </div>
                 </div>

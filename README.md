@@ -1,74 +1,155 @@
-# BankFlow — Retail Banking Account Management
+# BankFlow — Retail Banking Management Platform
 
-A portfolio-ready full-stack banking application based on the supplied Capgemini-style requirement brief. It adds a responsive UI to the required Java/Spring Boot REST API.
+BankFlow is a full-stack retail banking application built with **React** and **Java Spring Boot**.
 
-## What it demonstrates
+The project demonstrates how a modern banking platform can be designed with secure REST APIs, role-based access control, persistent banking data, asynchronous document processing, cloud integrations, validation, auditing, rate limiting, and automated testing.
 
-- JWT authentication with `CUSTOMER` and `ADMIN` roles
-- Savings/current account lifecycle and customer-owned access control
-- Fixed-deposit creation, validation, and maturity calculation
-- Transaction dashboard with date filtering and credit/debit totals
-- Swagger/OpenAPI documentation, global error responses, Bean Validation, JUnit/Mockito test structure
-- A responsive React dashboard rather than API-only screens
+> **Note:** BankFlow is a portfolio/learning project and is not intended for production banking use. Real banking systems require significantly stronger controls, regulatory compliance, audited infrastructure, enterprise-grade key management, fraud detection, operational monitoring, and additional security measures.
 
-> This is a learning/portfolio application. It is not suitable for real banking use: production banking needs audited identity checks, encryption key management, rate limiting, monitoring, ledgers, fraud controls, and regulatory compliance.
+---
 
-## Stack
+## Overview
 
-| Layer | Technology |
-| --- | --- |
-| API | Java 21, Spring Boot 3.4, Spring Security, JPA/Hibernate |
-| Data | PostgreSQL 16 (H2 profile for local demo) |
-| UI | React 18, Vite, plain CSS |
-| Quality | JUnit 5, Mockito, JaCoCo, OpenAPI/Swagger |
+BankFlow provides separate capabilities for customers and administrators while maintaining customer-owned data access and role-based authorization.
 
-## Run locally
+The application currently covers:
 
-### 1. Start the API
+- User registration and authentication
+- Email verification
+- Password reset
+- JWT-based authentication
+- Role-based access control
+- Bank account management
+- Account lifecycle management
+- Transactions
+- Cards
+- Loans
+- KYC document management
+- Malware scanning of uploaded KYC documents
+- Document extraction
+- Audit logging
+- API rate limiting
+- Filtering and searching using Spring Data JPA Specifications
+- PostgreSQL persistence
+- Database versioning with Flyway
+- REST API documentation using OpenAPI/Swagger
+- Automated unit testing
+- Code coverage using JaCoCo
 
-```bash
-cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=demo
-```
+---
 
-The API runs at `http://localhost:8080`; Swagger is at `http://localhost:8080/swagger-ui/index.html`.
+# Features
 
-Demo credentials: `admin@bankflow.dev` / `Password@123`, or `maya@bankflow.dev` / `Password@123`.
+## Authentication & Authorization
 
-### 2. Start the UI
+- User registration
+- Email verification
+- Login using JWT authentication
+- Password reset flow
+- Role-based authorization
+- `CUSTOMER` and `ADMIN` roles
+- Customer-owned resource access control
+- Spring Security integration
+- JWT authentication filter
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+---
 
-Open the URL Vite prints (usually `http://localhost:5173`). The UI uses its polished demo data until the API integration is enabled in `.env`.
+## Banking Accounts
 
-## Project structure
+Customers can manage their banking accounts through the application.
+
+Supported functionality includes:
+
+- Account creation
+- Account lifecycle management
+- Account status handling
+- Customer-specific account access
+- Account number based searching/filtering
+
+---
+
+## Transactions
+
+BankFlow provides transaction management and filtering capabilities.
+
+Features include:
+
+- Transaction history
+- Credit/debit transactions
+- Transaction type filtering
+- Account-based filtering
+- Date-range filtering
+- Search by transaction ID
+- Search by transaction description
+- Transaction dashboard information
+
+---
+
+## Cards
+
+Card management functionality includes:
+
+- Card management
+- Card status handling
+- Searching by card number
+- Searching by associated account number
+- Searching by customer name
+
+---
+
+## Loans
+
+BankFlow supports loan management functionality including:
+
+- Loan creation and management
+- Loan status filtering
+- Loan type filtering
+- Loan number searching
+- Customer-based searching
+- Disbursement account based searching
+
+---
+
+# KYC Document Processing
+
+One of the key workflows in BankFlow is the asynchronous processing of KYC documents.
+
+Uploaded documents are stored in **Amazon S3** and processed through a malware scanning workflow before continuing to document extraction.
+
+### KYC processing flow
 
 ```text
-bankflow/
-├── backend/                 # Spring Boot API
-│   ├── src/main/java/...    # domain-first packages
-│   ├── src/main/resources/
-│   └── src/test/java/...
-├── frontend/                # React customer dashboard
-├── docs/                    # API contract and architecture notes
-└── docker-compose.yml       # PostgreSQL for the non-demo profile
-```
-
-## Suggested GitHub milestones
-
-1. **Foundation:** this repository, login screen, dashboard, OpenAPI, local demo profile.
-2. **Secure APIs:** JWT filter, registration and role-based authorization.
-3. **Core banking:** complete account/FD/transaction persistence and service tests.
-4. **Polish:** integrate every UI action, add screenshots, CI, coverage badge and deployment.
-
-## Quality checklist before submission
-
-- [ ] Replace demo data with seeded PostgreSQL data and run all tests.
-- [ ] Add controller/service/repository test coverage and check `target/site/jacoco/index.html`.
-- [ ] Export a Postman collection from Swagger.
-- [ ] Add screenshots/GIF to this README and configure GitHub Actions.
-- [ ] Never commit `.env`, secrets, or a real JWT key.
+                  Customer
+                     │
+                     │ Upload KYC Document
+                     ▼
+              ┌─────────────┐
+              │  Spring API │
+              └──────┬──────┘
+                     │
+                     ▼
+                Amazon S3
+                     │
+                     ▼
+              Amazon GuardDuty
+               Malware Scan
+                     │
+                     ▼
+                Amazon SQS
+                     │
+                     ▼
+       KycMalwareScanListener
+                     │
+             ┌───────┴────────┐
+             │                │
+             ▼                ▼
+       CLEAN             THREATS_FOUND
+             │                │
+             ▼                ▼
+    Extraction Event       INFECTED
+             │
+             ▼
+       Document Extraction
+             │
+             ▼
+       Amazon Textract

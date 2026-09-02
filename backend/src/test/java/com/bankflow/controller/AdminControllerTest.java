@@ -492,4 +492,176 @@ class AdminControllerTest {
 
         verify(cardService).unblockCardByAdmin(1L);
     }
+
+    @Test
+    void getKycSummary_shouldReturnSummary() throws Exception {
+
+        KycSummaryResponse response =
+                new KycSummaryResponse(
+                        100,
+                        20,
+                        70,
+                        10,
+                        15
+                );
+
+        when(kycService.getKycSummary())
+                .thenReturn(response);
+
+        mockMvc.perform(get("/api/v1/admin/kyc/summary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalDocuments").value(100))
+                .andExpect(jsonPath("$.pendingDocuments").value(20))
+                .andExpect(jsonPath("$.verifiedDocuments").value(70))
+                .andExpect(jsonPath("$.rejectedDocuments").value(10))
+                .andExpect(jsonPath("$.pendingCustomers").value(15));
+
+        verify(kycService).getKycSummary();
+    }
+
+
+    @Test
+    void verifyKycDocument_shouldReturnNoContent() throws Exception {
+
+        doNothing().when(kycService).verifyDocument(1L);
+
+        mockMvc.perform(
+                        patch("/api/v1/admin/kyc/documents/1/verify")
+                )
+                .andExpect(status().isNoContent());
+
+        verify(kycService).verifyDocument(1L);
+    }
+
+
+    @Test
+    void rejectKycDocument_shouldReturnNoContent() throws Exception {
+
+        doNothing().when(kycService)
+                .rejectDocument(1L, "Document is unclear");
+
+        mockMvc.perform(
+                        patch("/api/v1/admin/kyc/documents/1/reject")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                {
+                                  "reason": "Document is unclear"
+                                }
+                                """)
+                )
+                .andExpect(status().isNoContent());
+
+        verify(kycService)
+                .rejectDocument(1L, "Document is unclear");
+    }
+
+
+    @Test
+    void rejectKycDocument_shouldReturnBadRequestWhenReasonIsBlank()
+            throws Exception {
+
+        mockMvc.perform(
+                        patch("/api/v1/admin/kyc/documents/1/reject")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                {
+                                  "reason": ""
+                                }
+                                """)
+                )
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(kycService);
+    }
+
+
+    @Test
+    void retryKycExtraction_shouldReturnAccepted() throws Exception {
+
+        doNothing().when(kycService).retryExtraction(1L);
+
+        mockMvc.perform(
+                        post("/api/v1/admin/kyc/documents/1/extraction/retry")
+                )
+                .andExpect(status().isAccepted());
+
+        verify(kycService).retryExtraction(1L);
+    }
+
+
+    @Test
+    void retryKycMalwareScan_shouldReturnAccepted() throws Exception {
+
+        doNothing().when(kycService).retryMalwareScan(1L);
+
+        mockMvc.perform(
+                        post("/api/v1/admin/kyc/documents/1/malware-scan/retry")
+                )
+                .andExpect(status().isAccepted());
+
+        verify(kycService).retryMalwareScan(1L);
+    }
+
+
+    @Test
+    void getPanData_shouldReturnPanData() throws Exception {
+
+        PanDataResponse response =
+                new PanDataResponse(
+                        1L,
+                        "ABCDE1234F",
+                        "John Doe",
+                        "Robert Doe",
+                        LocalDate.of(1995, 5, 10),
+                        LocalDateTime.of(2026, 1, 10, 10, 30)
+                );
+
+        when(kycService.getAdminPanData(1L))
+                .thenReturn(response);
+
+        mockMvc.perform(
+                        get("/api/v1/admin/kyc/documents/1/pan-data")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.documentId").value(1))
+                .andExpect(jsonPath("$.panNumber")
+                        .value("ABCDE1234F"))
+                .andExpect(jsonPath("$.fullName")
+                        .value("John Doe"));
+
+        verify(kycService).getAdminPanData(1L);
+    }
+
+
+    @Test
+    void getAadhaarData_shouldReturnAadhaarData() throws Exception {
+
+        AadhaarDataResponse response =
+                new AadhaarDataResponse(
+                        1L,
+                        "123456789012",
+                        "John Doe",
+                        LocalDate.of(1995, 5, 10),
+                        "MALE",
+                        "Nashik, Maharashtra",
+                        "9876543210",
+                        LocalDateTime.of(2026, 1, 10, 10, 30)
+                );
+
+        when(kycService.getAdminAadhaarData(1L))
+                .thenReturn(response);
+
+        mockMvc.perform(
+                        get("/api/v1/admin/kyc/documents/1/aadhaar-data")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.documentId").value(1))
+                .andExpect(jsonPath("$.aadhaarNumber")
+                        .value("123456789012"))
+                .andExpect(jsonPath("$.fullName")
+                        .value("John Doe"))
+                .andExpect(jsonPath("$.gender").value("MALE"));
+
+        verify(kycService).getAdminAadhaarData(1L);
+    }
 }

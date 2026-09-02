@@ -330,6 +330,184 @@ Start the development server:
 npm start
 ```
 Configure the frontend API base URL to point to the running backend.
+## 🐳 Docker Setup
+
+BankFlow can be run locally using Docker Compose in two different ways.
+
+### Prerequisites
+
+Make sure the following are installed:
+
+- Docker Desktop
+- Git
+
+Clone the repository and navigate to the project directory:
+
+```bash
+git clone <repository-url>
+cd BankFlow
+```
+
+---
+
+### Option 1: Build and Run BankFlow Locally
+
+This option builds the BankFlow backend and frontend Docker images locally.
+
+The configuration is provided in:
+
+```text
+docker-compose.yml
+```
+
+#### Start the application
+
+From the project root:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+
+- PostgreSQL
+- ClamAV
+- Spring Boot backend
+- React frontend
+
+The services communicate with each other through the Docker Compose network.
+
+#### Access the application
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+Backend:
+
+```text
+http://localhost:8080
+```
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+#### Stop the application
+
+```bash
+docker compose down
+```
+
+To stop the containers and also remove the PostgreSQL volume:
+
+```bash
+docker compose down -v
+```
+
+> Removing the volume deletes the local PostgreSQL data stored by Docker.
+
+---
+
+### Option 2: Run Using Pre-built Docker Images
+
+This option uses pre-built BankFlow images instead of building the backend and frontend locally.
+
+The configuration is provided in:
+
+```text
+docker-compose.images.yml
+```
+
+The backend and frontend images are pulled from Docker Hub, while PostgreSQL and ClamAV use their respective container images.
+
+#### Start the application
+
+From the project root:
+
+```bash
+docker compose -f docker-compose.images.yml up
+```
+
+To run the containers in detached mode:
+
+```bash
+docker compose -f docker-compose.images.yml up -d
+```
+
+#### Access the application
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+Backend:
+
+```text
+http://localhost:8080
+```
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+#### Stop the application
+
+```bash
+docker compose -f docker-compose.images.yml down
+```
+
+To also remove the PostgreSQL volume:
+
+```bash
+docker compose -f docker-compose.images.yml down -v
+```
+
+> The image-based Compose file contains placeholder values for environment variables such as the Brevo API key, mail sender, AWS S3 bucket, and super-admin password. Configure these values before running the setup. Never commit real credentials or API keys to the repository.
+
+---
+
+### Docker Compose Files
+
+| File | Purpose |
+| --- | --- |
+| `docker-compose.yml` | Builds the BankFlow backend and frontend images locally |
+| `docker-compose.images.yml` | Runs BankFlow using pre-built backend and frontend Docker images |
+
+### Service Architecture
+
+Both configurations run the application using the following services:
+
+```text
+                    ┌─────────────────┐
+                    │ React Frontend  │
+                    │     :5173       │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Spring Boot API │
+                    │     :8080       │
+                    └───────┬─────────┘
+                            │
+                  ┌─────────┴─────────┐
+                  ▼                   ▼
+          ┌──────────────┐    ┌──────────────┐
+          │  PostgreSQL  │    │    ClamAV    │
+          │     :5432    │    │    :3310     │
+          └──────────────┘    └──────────────┘
+```
+
+The local Docker setup uses PostgreSQL and ClamAV containers. Production deployment uses the externally hosted infrastructure described in the [Deployment](#️-deployment) section.
+
 ## ☁️ Deployment
 
 BankFlow is deployed using Render, Neon, AWS, and Brevo.

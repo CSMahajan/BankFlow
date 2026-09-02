@@ -331,37 +331,45 @@ npm start
 ```
 Configure the frontend API base URL to point to the running backend.
 ## ☁️ Deployment
+
 BankFlow is deployed using Render, Neon, AWS, and Brevo.
-### React Frontend
-│
-▼
-Render
-│
-│ REST API
-▼
+
+### Deployment Architecture
+
+```text
+React Frontend
+      │
+      ▼
+    Render
+      │
+      │ REST API
+      ▼
 Spring Boot Backend
-│
-├──► Neon PostgreSQL
-│
-├──► AWS S3
-├──► AWS GuardDuty
-├──► AWS EventBridge
-├──► AWS SQS
-├──► AWS Textract
-│
-└──► Brevo
+      │
+      ├──► Neon PostgreSQL
+      ├──► AWS S3
+      ├──► AWS GuardDuty
+      ├──► AWS EventBridge
+      ├──► AWS SQS
+      ├──► AWS Textract
+      └──► Brevo
+```
+
 The deployed application can be accessed through the project's configured Render deployment.
+
 ## 📚 Documentation
-Documentation	Description
-[System Architecture](docs/architecture/bankflow-system-architecture.drawio.png)	Application and infrastructure architecture
-[ERD](docs/data-model/bankflow-erd.drawio.png)	Database relationships and entities
-[Authentication Workflow](docs/workflows/BankFlow_Authentication_Workflows.drawio.png)	Authentication flow
-[Email & Password Workflow](docs/workflows/BankFlow_Email_Password_Workflows.drawio.png)	Email verification and password reset
-[JWT Authorization Workflow](docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.png)	JWT authorization flow
-[Refresh & Logout Workflow](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.png)	Refresh-token and logout flow
-[KYC Workflow](docs/workflows/BankFlow_KYC_Workflow.drawio.png)	Asynchronous KYC malware scanning and extraction
-[OpenAPI YAML](docs/api/bankflow_openapi.yml)	API specification
-[OpenAPI JSON](docs/api/bankflow_openapi.json)	API specification in JSON format
+
+| Documentation | Description |
+| --- | --- |
+| [System Architecture](docs/architecture/bankflow-system-architecture.drawio.png) | Application and infrastructure architecture |
+| [ERD](docs/data-model/bankflow-erd.drawio.png) | Database relationships and entities |
+| [Authentication Workflow](docs/workflows/BankFlow_Authentication_Workflows.drawio.png) | Authentication flow |
+| [Email & Password Workflow](docs/workflows/BankFlow_Email_Password_Workflows.drawio.png) | Email verification and password reset |
+| [JWT Authorization Workflow](docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.png) | JWT authorization flow |
+| [Refresh & Logout Workflow](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.png) | Refresh-token and logout flow |
+| [KYC Workflow](docs/workflows/BankFlow_KYC_Workflow.drawio.png) | Asynchronous KYC malware scanning and extraction |
+| [OpenAPI YAML](docs/api/bankflow_openapi.yml) | API specification |
+| [OpenAPI JSON](docs/api/bankflow_openapi.json) | API specification in JSON format |
 
 ## ⚠️ Disclaimer
 BankFlow is a portfolio and learning project intended to demonstrate full-stack development, backend architecture, security concepts, database design, testing, and cloud integration.

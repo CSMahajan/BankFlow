@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram name="BankFlow KYC Document Processing Workflow">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1600" pageHeight="1000">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <mxCell id="title" value="KYC Document Processing Workflow" style="text;html=1;strokeColor=none;fillColor=none;fontSize=24;fontStyle=1;fontColor=#1f2937;align=left;" vertex="1" parent="1"><mxGeometry x="40" y="25" width="600" height="45" as="geometry"/></mxCell>
+
+        <mxCell id="client" value="Customer / React Frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="40" y="130" width="210" height="60" as="geometry"/></mxCell>
+        <mxCell id="api" value="Spring Boot KYC API&lt;br&gt;Validate request + create KYC record" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="300" y="125" width="260" height="70" as="geometry"/></mxCell>
+        <mxCell id="s3" value="Private Amazon S3&lt;br&gt;Upload document" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#f59e0b;fontSize=13;fontColor=#78350f;" vertex="1" parent="1"><mxGeometry x="610" y="125" width="230" height="70" as="geometry"/></mxCell>
+        <mxCell id="guard" value="Amazon GuardDuty&lt;br&gt;Malware Protection for S3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#f59e0b;fontSize=13;fontColor=#78350f;" vertex="1" parent="1"><mxGeometry x="890" y="125" width="260" height="70" as="geometry"/></mxCell>
+        <mxCell id="eb" value="Amazon EventBridge&lt;br&gt;GuardDuty result event" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#f59e0b;fontSize=13;fontColor=#78350f;" vertex="1" parent="1"><mxGeometry x="1200" y="125" width="250" height="70" as="geometry"/></mxCell>
+
+        <mxCell id="sqs" value="Amazon SQS&lt;br&gt;Asynchronous event delivery" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#f59e0b;fontSize=13;fontColor=#78350f;" vertex="1" parent="1"><mxGeometry x="1200" y="285" width="250" height="70" as="geometry"/></mxCell>
+        <mxCell id="listener" value="KycMalwareScanListener&lt;br&gt;Consume + validate GuardDuty result" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#0891b2;fontSize=13;fontColor=#164e63;" vertex="1" parent="1"><mxGeometry x="880" y="280" width="290" height="80" as="geometry"/></mxCell>
+        <mxCell id="status" value="Update KYC malware-scan status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="560" y="290" width="250" height="60" as="geometry"/></mxCell>
+
+        <mxCell id="decision" value="CLEAN?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1"><mxGeometry x="600" y="420" width="170" height="75" as="geometry"/></mxCell>
+        <mxCell id="event" value="Publish existing KycExtractionEvent&lt;br&gt;via ApplicationEventPublisher" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="860" y="415" width="310" height="85" as="geometry"/></mxCell>
+        <mxCell id="textract" value="Amazon Textract&lt;br&gt;OCR / PAN &amp; Aadhaar text extraction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#f59e0b;fontSize=13;fontColor=#78350f;" vertex="1" parent="1"><mxGeometry x="1200" y="415" width="250" height="85" as="geometry"/></mxCell>
+        <mxCell id="persist" value="Persist extracted KYC data&lt;br&gt;Continue KYC verification flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1"><mxGeometry x="1200" y="575" width="250" height="75" as="geometry"/></mxCell>
+        <mxCell id="infected" value="INFECTED / threat detected&lt;br&gt;Stop OCR processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" vertex="1" parent="1"><mxGeometry x="300" y="565" width="260" height="70" as="geometry"/></mxCell>
+        <mxCell id="failed" value="Unexpected / duplicate / invalid event&lt;br&gt;Handle failure without OCR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" vertex="1" parent="1"><mxGeometry x="600" y="680" width="300" height="75" as="geometry"/></mxCell>
+
+        <mxCell id="e1" value="HTTPS / REST" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="client" target="api"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="Upload" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="api" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="Object scan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="s3" target="guard"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="Result event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="guard" target="eb"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="Route event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="eb" target="sqs"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="Consume message" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="sqs" target="listener"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="Process result" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="listener" target="status"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="status" target="decision"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="decision" target="event"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" value="NO → stop processing" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="decision" target="infected"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" value="Extraction event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="event" target="textract"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" value="Extracted text/data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;endArrow=block;endFill=1;" edge="1" parent="1" source="textract" target="persist"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" value="Invalid / unexpected" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;dashed=1;endArrow=block;endFill=1;" edge="1" parent="1" source="listener" target="failed"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,155 +1,370 @@
 # BankFlow — Retail Banking Management Platform
 
-BankFlow is a full-stack retail banking application built with **React** and **Java Spring Boot**.
+BankFlow is a full-stack retail banking management application built to demonstrate the design and implementation of a secure, modular banking system.
 
-The project demonstrates how a modern banking platform can be designed with secure REST APIs, role-based access control, persistent banking data, asynchronous document processing, cloud integrations, validation, auditing, rate limiting, and automated testing.
+It provides customer and administrator workflows for account management, transactions, fund transfers, cards, loans, fixed deposits, KYC processing, auditing, and authentication.
 
-> **Note:** BankFlow is a portfolio/learning project and is not intended for production banking use. Real banking systems require significantly stronger controls, regulatory compliance, audited infrastructure, enterprise-grade key management, fraud detection, operational monitoring, and additional security measures.
+The project is built with **React**, **Java 21**, **Spring Boot**, and **PostgreSQL**, with AWS services used for asynchronous KYC document processing.
+
+> **Portfolio / Learning Project**
+>
+> BankFlow is an educational and portfolio project and is **not intended for use as production banking software**. Real banking systems require substantially stronger security controls, regulatory compliance, audited infrastructure, fraud detection, operational controls, and resilience mechanisms.
 
 ---
 
-## Overview
+## ✨ Features
 
-BankFlow provides separate capabilities for customers and administrators while maintaining customer-owned data access and role-based authorization.
+### Authentication & Authorization
 
-The application currently covers:
-
-- User registration and authentication
+- Customer registration and login
 - Email verification
-- Password reset
+- Forgot-password and password-reset workflows
 - JWT-based authentication
+- Refresh-token based session renewal
+- Logout and token invalidation
 - Role-based access control
-- Bank account management
+- Customer and administrator access separation
+- Customer-owned resource authorization
+- Password change
+- Rate limiting for selected operations
+
+### 🏦 Banking Accounts
+
+- View customer accounts
+- Account details and balances
 - Account lifecycle management
-- Transactions
-- Cards
-- Loans
-- KYC document management
-- Malware scanning of uploaded KYC documents
-- Document extraction
-- Audit logging
-- API rate limiting
-- Filtering and searching using Spring Data JPA Specifications
-- PostgreSQL persistence
-- Database versioning with Flyway
-- REST API documentation using OpenAPI/Swagger
-- Automated unit testing
-- Code coverage using JaCoCo
+- Daily transaction-limit management
+- Account freezing and unfreezing
+- Administrative account management
+- Account transaction history
 
----
-
-# Features
-
-## Authentication & Authorization
-
-- User registration
-- Email verification
-- Login using JWT authentication
-- Password reset flow
-- Role-based authorization
-- `CUSTOMER` and `ADMIN` roles
-- Customer-owned resource access control
-- Spring Security integration
-- JWT authentication filter
-
----
-
-## Banking Accounts
-
-Customers can manage their banking accounts through the application.
-
-Supported functionality includes:
-
-- Account creation
-- Account lifecycle management
-- Account status handling
-- Customer-specific account access
-- Account number based searching/filtering
-
----
-
-## Transactions
-
-BankFlow provides transaction management and filtering capabilities.
-
-Features include:
+### 💸 Transactions & Transfers
 
 - Transaction history
-- Credit/debit transactions
-- Transaction type filtering
-- Account-based filtering
+- Transaction filtering and searching
+- Account-based transaction filtering
 - Date-range filtering
-- Search by transaction ID
-- Search by transaction description
-- Transaction dashboard information
+- Transaction-type filtering
+- Fund transfers between accounts
+- Transfer validation
+- Scheduled fund transfers
+- Scheduled-transfer management
 
----
+### 💳 Cards
 
-## Cards
+- Customer card management
+- View card details
+- Card status management
+- Administrative card management
+- Block and unblock cards
 
-Card management functionality includes:
+### 💰 Loans
 
-- Card management
-- Card status handling
-- Searching by card number
-- Searching by associated account number
-- Searching by customer name
+- Loan application
+- Loan details and status
+- Loan approval/rejection workflows
+- Loan repayment / EMI payment
+- Administrative loan management
 
----
+### 📈 Fixed Deposits
 
-## Loans
+- Fixed-deposit calculation
+- Open fixed deposits
+- View fixed deposits
+- Fixed-deposit details and maturity information
 
-BankFlow supports loan management functionality including:
+### 🪪 KYC Document Processing
 
-- Loan creation and management
-- Loan status filtering
-- Loan type filtering
-- Loan number searching
-- Customer-based searching
-- Disbursement account based searching
+BankFlow implements an asynchronous KYC document-processing pipeline using AWS services.
 
----
-
-# KYC Document Processing
-
-One of the key workflows in BankFlow is the asynchronous processing of KYC documents.
-
-Uploaded documents are stored in **Amazon S3** and processed through a malware scanning workflow before continuing to document extraction.
-
-### KYC processing flow
+The high-level flow is:
 
 ```text
-                  Customer
-                     │
-                     │ Upload KYC Document
-                     ▼
-              ┌─────────────┐
-              │  Spring API │
-              └──────┬──────┘
-                     │
-                     ▼
-                Amazon S3
-                     │
-                     ▼
-              Amazon GuardDuty
-               Malware Scan
-                     │
-                     ▼
-                Amazon SQS
-                     │
-                     ▼
-       KycMalwareScanListener
-                     │
-             ┌───────┴────────┐
-             │                │
-             ▼                ▼
-       CLEAN             THREATS_FOUND
-             │                │
-             ▼                ▼
-    Extraction Event       INFECTED
-             │
-             ▼
-       Document Extraction
-             │
-             ▼
-       Amazon Textract
+Customer
+   │
+   ▼
+React Frontend
+   │
+   ▼
+Spring Boot KYC API
+   │
+   ▼
+Private Amazon S3
+   │
+   ▼
+Amazon GuardDuty
+Malware Protection for S3
+   │
+   ▼
+Amazon EventBridge
+   │
+   ▼
+Amazon SQS
+   │
+   ▼
+KycMalwareScanListener
+   │
+   ├─────────────── Threat / Invalid ───────────────► Stop processing
+   │
+   ▼
+CLEAN
+   │
+   ▼
+KycExtractionEvent
+   │
+   ▼
+Amazon Textract
+   │
+   ▼
+Extracted KYC Data
+```
+
+The malware scan result is processed asynchronously. Clean documents continue to the existing KYC extraction flow, while infected documents are prevented from reaching OCR processing.
+The listener also handles unexpected, duplicate, or invalid event scenarios without starting the extraction process.
+See the detailed workflow:
+[**KYC Document Processing Workflow**](docs/workflows/BankFlow_KYC_Workflow.drawio.png)
+🛠️ Technology Stack
+Frontend
+- React
+- JavaScript
+- REST API integration
+- React-based customer and administrator dashboards
+Backend
+- Java 21
+- Spring Boot 3.4.7
+- Spring Security
+- JWT authentication
+- Spring Data JPA
+- Hibernate
+- Bean Validation
+- Spring Data JPA Specifications
+- Flyway
+- Springdoc OpenAPI
+- Spring Boot Actuator
+Database
+- PostgreSQL
+- Neon PostgreSQL
+- Flyway database migrations
+AWS
+- Amazon S3
+- Amazon GuardDuty Malware Protection for S3
+- Amazon EventBridge
+- Amazon SQS
+- Amazon Textract
+Other Services / Libraries
+- Brevo — email delivery
+- OpenPDF — PDF generation
+- Apache POI — document processing
+- Mockito / JUnit — testing
+- JaCoCo — test coverage
+Deployment
+- Render — frontend and backend hosting
+- Neon — PostgreSQL
+- AWS — cloud services
+- Brevo — email delivery
+🏗️ Architecture
+BankFlow follows a layered backend architecture with a React frontend communicating with Spring Boot REST APIs.
+The application integrates PostgreSQL for persistence and external services for email, document storage, malware scanning, asynchronous messaging, and OCR.
+System Architecture
+
+[View / edit the Draw.io source](docs/architecture/bankflow-system-architecture.drawio.xml)
+🗄️ Data Model
+The application's relational data model is documented using an ER diagram covering users, accounts, transactions, cards, loans, fixed deposits, KYC data, scheduled transfers, refresh tokens, verification tokens, and audit information.
+
+[View / edit the Draw.io source](docs/data-model/bankflow-erd.drawio.xml)
+🔄 Workflows
+The repository contains detailed workflow diagrams for the application's authentication and security flows.
+Authentication
+[![Authentication Workflow\]\(docs/workflows/BankFlow_Authentication_Workflows.drawio.png)](docs/workflows/BankFlow_Authentication_Workflows.drawio.png)
+[Editable Draw.io source](docs/workflows/BankFlow_Authentication_Workflows.drawio.xml)
+Email Verification & Password Reset
+[![Email & Password Workflow\]\(docs/workflows/BankFlow_Email_Password_Workflows.drawio.png)](docs/workflows/BankFlow_Email_Password_Workflows.drawio.png)
+[Editable Draw.io source](docs/workflows/BankFlow_Email_Password_Workflows.drawio.xml)
+JWT Authorization
+[![JWT Authorization Workflow\]\(docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.png)](docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.png)
+[Editable Draw.io source](docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.xml)
+Refresh Token & Logout
+[![Refresh & Logout Workflow\]\(docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.png)](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.png)
+[Editable Draw.io source](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.xml)
+KYC Document Processing
+[![KYC Workflow\]\(docs/workflows/BankFlow_KYC_Workflow.drawio.png)](docs/workflows/BankFlow_KYC_Workflow.drawio.png)
+[Editable Draw.io source](docs/workflows/BankFlow_KYC_Workflow.drawio.xml)
+
+
+📖 API Documentation
+BankFlow exposes REST APIs documented using OpenAPI.
+OpenAPI Specification
+- [OpenAPI YAML](docs/api/bankflow_openapi.yml)
+- [OpenAPI JSON](docs/api/bankflow_openapi.json)
+The OpenAPI specification provides the API contract for the backend endpoints, request/response models, and security configuration.
+Swagger UI
+When running the backend locally, Swagger UI is available at:
+http://localhost:8080/swagger-ui/index.html
+🖥️ Application Screenshots
+The repository contains representative screenshots of both customer and administrator functionality.
+
+Customer
+Login
+Dashboard
+Accounts
+Transactions
+Cards
+Loans
+KYC Upload
+
+Administrator
+Dashboard
+User Management
+Account Management
+Card Management
+Loan Approvals
+KYC Verification
+Audit Logs
+
+🧪 Testing
+The backend contains unit tests covering the application's important business logic and service-layer components.
+Testing uses:
+- JUnit
+- Mockito
+- Spring testing utilities where required
+- JaCoCo for code coverage reporting
+The focus of testing is on meaningful application behavior, including business rules, validation, authorization-related logic, and service interactions.
+
+🔐 Security
+Security-related functionality implemented in BankFlow includes:
+- Spring Security
+- JWT authentication
+- Refresh-token workflow
+- Role-based authorization
+- Customer resource ownership checks
+- Password hashing
+- Email verification
+- Password-reset tokens
+- Rate limiting
+- Audit logging
+- Private S3 KYC document storage
+- Asynchronous malware scanning before OCR processing
+- Malware result handling through AWS event-driven processing
+
+📂 Project Structure
+BankFlow/
+│
+├── frontend/
+│   └── React application
+│
+├── backend/
+│   └── Spring Boot application
+│
+├── docs/
+│   ├── architecture/
+│   │   ├── bankflow-system-architecture.drawio.png
+│   │   └── bankflow-system-architecture.drawio.xml
+│   │
+│   ├── data-model/
+│   │   ├── bankflow-erd.drawio.png
+│   │   └── bankflow-erd.drawio.xml
+│   │
+│   ├── workflows/
+│   │   ├── BankFlow_Authentication_Workflows.drawio.png
+│   │   ├── BankFlow_Authentication_Workflows.drawio.xml
+│   │   ├── BankFlow_Email_Password_Workflows.drawio.png
+│   │   ├── BankFlow_Email_Password_Workflows.drawio.xml
+│   │   ├── BankFlow_JWT_Authorization_Workflow.drawio.png
+│   │   ├── BankFlow_JWT_Authorization_Workflow.drawio.xml
+│   │   ├── BankFlow_KYC_Workflow.drawio.png
+│   │   ├── BankFlow_KYC_Workflow.drawio.xml
+│   │   ├── BankFlow_Refresh_Logout_Workflow.drawio.png
+│   │   └── BankFlow_Refresh_Logout_Workflow.drawio.xml
+│   │
+│   ├── api/
+│   │   ├── bankflow_openapi.yml
+│   │   └── bankflow_openapi.json
+│   │
+│   └── screenshots/
+│       ├── customer/
+│       └── admin/
+│
+└── README.md
+
+🚀 Running Locally 
+
+Backend
+Requirements:
+- Java 21
+- Maven
+- PostgreSQL or a configured PostgreSQL-compatible database
+- Required AWS configuration
+- Required Brevo configuration
+
+Configure the required environment variables/application properties and start the Spring Boot application.
+
+The backend runs by default on:
+http://localhost:8080
+
+Swagger UI:
+http://localhost:8080/swagger-ui/index.html
+
+Frontend
+Requirements:
+- Node.js
+- npm
+- 
+Install dependencies:
+npm install
+
+Start the development server:
+npm start
+
+Configure the frontend API base URL to point to the running backend.
+
+☁️ Deployment
+BankFlow is deployed using:
+
+React Frontend
+      │
+      ▼
+    Render
+      │
+      │ REST API
+      ▼
+Spring Boot Backend
+      │
+      ├──► Neon PostgreSQL
+      │
+      ├──► AWS S3
+      ├──► AWS GuardDuty
+      ├──► AWS EventBridge
+      ├──► AWS SQS
+      ├──► AWS Textract
+      │
+      └──► Brevo
+The deployed application can be accessed through the project's configured Render deployment.
+
+📚 Documentation
+Documentation	Description
+[System Architecture](docs/architecture/bankflow-system-architecture.drawio.png)	Application and infrastructure architecture
+[ERD](docs/data-model/bankflow-erd.drawio.png)	Database relationships and entities
+[Authentication Workflow](docs/workflows/BankFlow_Authentication_Workflows.drawio.png)	Authentication flow
+[Email & Password Workflow](docs/workflows/BankFlow_Email_Password_Workflows.drawio.png)	Email verification and password reset
+[JWT Authorization Workflow](docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.png)	JWT authorization flow
+[Refresh & Logout Workflow](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.png)	Refresh-token and logout flow
+[KYC Workflow](docs/workflows/BankFlow_KYC_Workflow.drawio.png)	Asynchronous KYC malware scanning and extraction
+[OpenAPI YAML](docs/api/bankflow_openapi.yml)	API specification
+[OpenAPI JSON](docs/api/bankflow_openapi.json)	API specification in JSON format
+
+
+⚠️ Disclaimer
+BankFlow is a portfolio and learning project intended to demonstrate full-stack development, backend architecture, security concepts, database design, testing, and cloud integration.
+It should not be used for handling real banking operations or sensitive financial information.
+A production banking platform would require additional controls such as:
+- Regulatory compliance
+- Independent security audits
+- Enterprise-grade key management
+- Hardware-backed security controls
+- Advanced fraud detection
+- Transaction monitoring
+- High-availability and disaster-recovery architecture
+- Comprehensive observability
+- Stronger operational controls
+- Formal threat modeling and penetration testing
+- Industry-specific compliance requirements

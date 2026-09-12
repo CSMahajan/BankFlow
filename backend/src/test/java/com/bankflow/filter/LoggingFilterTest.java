@@ -53,7 +53,6 @@ class LoggingFilterTest {
         // Verify that MDC contains traceId WHILE the filter chain is executing
         doAnswer(invocation -> {
             // Uncomment/adjust key name according to your MDC key (e.g., "traceId" or "X-Trace-Id")
-            // assertNotNull(MDC.get("traceId"));
             return null;
         }).when(filterChain).doFilter(request, response);
 

@@ -295,7 +295,7 @@ class LocalFileStorageServiceTest {
     }
 
     @Test
-    void delete_shouldDeleteExistingFile() throws IOException {
+    void delete_shouldDeleteExistingFile() {
 
         MultipartFile file = new MockMultipartFile(
                 "file",

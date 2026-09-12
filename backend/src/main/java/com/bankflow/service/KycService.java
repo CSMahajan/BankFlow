@@ -110,8 +110,6 @@ public class KycService {
 
             kycMalwareScanRepository.save(malwareScan);
 
-            //kycExtractionEventPublisher.publish(saved.getId());
-
             auditLogService.log(
                     AuditAction.KYC_DOCUMENT_UPLOADED,
                     "KYC document uploaded: "

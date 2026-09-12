@@ -56,7 +56,7 @@ class JwtAuthenticationFilterTest {
     private User mockUser;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         SecurityContextHolder.clearContext();
 
         mockUser = User.builder()

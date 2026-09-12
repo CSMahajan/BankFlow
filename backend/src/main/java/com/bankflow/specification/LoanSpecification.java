@@ -5,6 +5,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class LoanSpecification {
 
+    private LoanSpecification() {}
+
     public static Specification<Loan> status(Loan.LoanStatus status) {
         return (root, query, cb) -> {
 

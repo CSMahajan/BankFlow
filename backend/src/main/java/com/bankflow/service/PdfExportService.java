@@ -99,14 +99,6 @@ public class PdfExportService {
         return cell;
     }
 
-    private PdfPCell createCell(String text) {
-        return createCell(text, Element.ALIGN_LEFT, Color.WHITE);
-    }
-
-    private PdfPCell createCell(String text, int alignment) {
-        return createCell(text, alignment, Color.WHITE);
-    }
-
     private PdfPCell createCell(String text, int alignment, Color backgroundColor) {
 
         Font font = FontFactory.getFont(FontFactory.HELVETICA, 10);

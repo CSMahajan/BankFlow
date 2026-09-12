@@ -66,7 +66,6 @@ class CardServiceTest {
 
     private User mockUser;
     private User mockOtherUser;
-    private User mockAdminUser;
 
     private Account mockAccount;
     private Card mockCard;
@@ -86,13 +85,6 @@ class CardServiceTest {
                 .fullName("Jane Smith")
                 .email("jane@example.com")
                 .role(User.Role.CUSTOMER)
-                .build();
-
-        mockAdminUser = User.builder()
-                .id(99L)
-                .fullName("Admin User")
-                .email("admin@bankflow.com")
-                .role(User.Role.ADMIN)
                 .build();
 
         mockAccount = Account.builder()

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class KycDocumentSpecification {
 
+    private KycDocumentSpecification() {}
 
     public static Specification<KycDocument> status(
             KycDocument.KycVerificationStatus status) {

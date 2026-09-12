@@ -18,6 +18,7 @@ public class S3Config {
 
         return S3Client.builder()
                 .region(Region.of(region))
+                .credentialsProvider(DefaultCredentialsProvider.builder().build())
                 .build();
     }
 }

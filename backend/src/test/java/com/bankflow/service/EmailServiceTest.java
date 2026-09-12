@@ -3,7 +3,6 @@ package com.bankflow.service;
 import com.bankflow.dto.BrevoEmailRequest;
 import com.bankflow.dto.BrevoEmailResponse;
 import com.bankflow.dto.BrevoRecipient;
-import com.bankflow.dto.BrevoSender;
 import com.bankflow.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EmailServiceTest {

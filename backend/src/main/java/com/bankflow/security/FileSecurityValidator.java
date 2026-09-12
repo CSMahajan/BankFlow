@@ -11,7 +11,7 @@ public class FileSecurityValidator {
 
 
     private static final long MAX_FILE_SIZE =
-            5 * 1024 * 1024;
+            5 * 1024 * 1024L;
 
 
     public void validate(MultipartFile file) {

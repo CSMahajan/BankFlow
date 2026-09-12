@@ -3,13 +3,11 @@ package com.bankflow.controller;
 import com.bankflow.dto.AccountResponse;
 import com.bankflow.dto.BalanceResponse;
 import com.bankflow.dto.CreateAccountRequest;
-import com.bankflow.dto.UpdateProfileRequest;
 import com.bankflow.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

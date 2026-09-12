@@ -2,7 +2,6 @@ package com.bankflow.controller;
 
 import com.bankflow.config.SecurityConfig;
 import com.bankflow.dto.*;
-import com.bankflow.exception.GlobalExceptionHandler;
 import com.bankflow.filter.JwtAuthenticationFilter;
 import com.bankflow.filter.RateLimitFilter;
 import com.bankflow.filter.UserRateLimitFilter;
@@ -13,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

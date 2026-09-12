@@ -218,7 +218,6 @@ class ScheduledTransferServiceTest {
         );
 
         FundTransferRequest capturedRequest = requestCaptor.getValue();
-        User capturedUser = userCaptor.getValue();
         assertEquals("SRC123456789", capturedRequest.sourceAccountNumber());
         assertEquals("REC987654321", capturedRequest.targetAccountNumber());
         assertEquals(new BigDecimal("250.00"), capturedRequest.amount());

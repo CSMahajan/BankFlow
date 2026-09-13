@@ -44,7 +44,7 @@ public class PanTextExtractorService {
 
         for (int i = 0; i < lines.length; i++) {
 
-            if (lines[i].trim().equalsIgnoreCase("Name")
+            if (lines[i].trim().contains("/ Name")
                     && i + 1 < lines.length) {
 
                 return lines[i + 1].trim();
@@ -60,7 +60,7 @@ public class PanTextExtractorService {
 
         for (int i = 0; i < lines.length; i++) {
 
-            if (lines[i].trim().equalsIgnoreCase("Father's Name")
+            if (lines[i].trim().contains("Father's Name")
                     && i + 1 < lines.length) {
 
                 return lines[i + 1].trim();

@@ -22,7 +22,7 @@ class PanTextExtractorServiceTest {
 
         String text = """
                 INCOME TAX DEPARTMENT
-                Name
+                / Name
                 Rahul Sharma
                 Father's Name
                 Rajesh Sharma
@@ -76,7 +76,7 @@ class PanTextExtractorServiceTest {
     void extract_shouldReturnNullWhenPanNumberIsMissing() {
 
         String text = """
-                Name
+                / Name
                 Rahul Sharma
                 Father's Name
                 Rajesh Sharma
@@ -93,7 +93,7 @@ class PanTextExtractorServiceTest {
     void extract_shouldExtractName() {
 
         String text = """
-                Name
+                / Name
                 Rahul Sharma
                 """;
 
@@ -141,7 +141,7 @@ class PanTextExtractorServiceTest {
     void extract_shouldReturnNullWhenFatherNameIsMissing() {
 
         String text = """
-                Name
+                / Name
                 Rahul Sharma
                 Date of Birth
                 15/08/1995
@@ -173,7 +173,7 @@ class PanTextExtractorServiceTest {
     void extract_shouldReturnNullWhenDobIsMissing() {
 
         String text = """
-                Name
+                / Name
                 Rahul Sharma
                 Father's Name
                 Rajesh Sharma
@@ -222,7 +222,7 @@ class PanTextExtractorServiceTest {
 
                 Permanent Account Number Card
 
-                Name
+                / Name
                 Rahul Sharma
 
                 Father's Name
@@ -262,7 +262,7 @@ class PanTextExtractorServiceTest {
     void extract_shouldNotExtractInvalidPanNumber() {
 
         String text = """
-                Name
+                / Name
                 Rahul Sharma
                 Father's Name
                 Rajesh Sharma

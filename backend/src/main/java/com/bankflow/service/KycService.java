@@ -32,6 +32,9 @@ import java.util.List;
 @Slf4j
 public class KycService {
 
+    public static final String FOR_USER_ID = " for user ID ";
+    public static final String EXTRACTION_DATA_NOT_FOUND = "Extraction data not found";
+    public static final String KYC_DOCUMENT_NOT_FOUND = "KYC Document not found";
     private final KycDocumentRepository kycDocumentRepository;
     private final FileStorageService fileStorageService;
     private final CurrentUserService currentUserService;
@@ -114,7 +117,7 @@ public class KycService {
                     AuditAction.KYC_DOCUMENT_UPLOADED,
                     "KYC document uploaded: "
                             + documentType
-                            + " for user ID "
+                            + FOR_USER_ID
                             + user.getId()
             );
 
@@ -220,8 +223,9 @@ public class KycService {
 
         User user = currentUserService.getCurrentUser();
 
-        KycDocument document = kycDocumentRepository.findById(
-                documentId).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+        KycDocument document = kycDocumentRepository
+                .findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException(KYC_DOCUMENT_NOT_FOUND));
 
         // Important security check
         if (!document.getUser().getId().equals(user.getId())) {
@@ -240,7 +244,7 @@ public class KycService {
                 kycDocumentRepository.findById(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Document not found"
+                                        KYC_DOCUMENT_NOT_FOUND
                                 )
                         );
 
@@ -257,7 +261,7 @@ public class KycService {
                         .findByKycDocumentId(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Extraction data not found"
+                                        EXTRACTION_DATA_NOT_FOUND
                                 )
                         );
 
@@ -335,7 +339,7 @@ public class KycService {
 
         KycDocument document = kycDocumentRepository.findById(documentId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("KYC document not found"));
+                        new ResourceNotFoundException(KYC_DOCUMENT_NOT_FOUND));
 
         if (document.getKycVerificationStatus() != KycDocument.KycVerificationStatus.PENDING) {
             throw new IllegalStateException("Only pending documents can be verified");
@@ -370,7 +374,7 @@ public class KycService {
                 AuditAction.KYC_DOCUMENT_VERIFIED,
                 "KYC document verified: "
                         + document.getDocumentType()
-                        + " for user ID "
+                        + FOR_USER_ID
                         + document.getUser().getId()
         );
     }
@@ -390,7 +394,7 @@ public class KycService {
 
         KycDocument document = kycDocumentRepository.findById(documentId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("KYC document not found"));
+                        new ResourceNotFoundException(KYC_DOCUMENT_NOT_FOUND));
 
         if (document.getKycVerificationStatus() != KycDocument.KycVerificationStatus.PENDING) {
             throw new IllegalStateException("Only pending documents can be rejected");
@@ -411,7 +415,7 @@ public class KycService {
                 AuditAction.KYC_DOCUMENT_REJECTED,
                 "KYC document rejected: "
                         + document.getDocumentType()
-                        + " for user ID "
+                        + FOR_USER_ID
                         + document.getUser().getId()
                         + ". Reason: "
                         + reason.trim()
@@ -434,7 +438,7 @@ public class KycService {
         return kycDocumentRepository.findById(documentId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "KYC document not found"
+                                KYC_DOCUMENT_NOT_FOUND
                         ));
     }
 
@@ -444,7 +448,7 @@ public class KycService {
                 kycDocumentRepository.findById(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Document not found"
+                                        KYC_DOCUMENT_NOT_FOUND
                                 )
                         );
         if (!document.getUser().getId()
@@ -507,7 +511,7 @@ public class KycService {
                 kycDocumentRepository.findById(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Document not found"
+                                        KYC_DOCUMENT_NOT_FOUND
                                 )
                         );
 
@@ -553,7 +557,7 @@ public class KycService {
                 kycDocumentRepository.findById(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Document not found"
+                                        KYC_DOCUMENT_NOT_FOUND
                                 )
                         );
 
@@ -602,7 +606,7 @@ public class KycService {
                 kycDocumentRepository.findById(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Document not found"
+                                        KYC_DOCUMENT_NOT_FOUND
                                 )
                         );
 
@@ -635,7 +639,7 @@ public class KycService {
                 kycDocumentRepository.findById(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Document not found"
+                                        KYC_DOCUMENT_NOT_FOUND
                                 )
                         );
 
@@ -671,7 +675,7 @@ public class KycService {
                         .findByKycDocumentId(documentId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Extraction data not found"
+                                        EXTRACTION_DATA_NOT_FOUND
                                 ));
 
         KycMalwareScan latestScan =
@@ -695,7 +699,7 @@ public class KycService {
     public void retryExtraction(Long documentId) {
 
         KycDocument document = kycDocumentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("KYC document not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(KYC_DOCUMENT_NOT_FOUND));
 
         if (document.getKycVerificationStatus() != KycDocument.KycVerificationStatus.PENDING) {
             throw new IllegalStateException("Extraction can only be retried for pending KYC documents");
@@ -710,7 +714,7 @@ public class KycService {
         }
 
         KycExtractedData extractedData = kycExtractedDataRepository.findByKycDocumentId(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Extraction data not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(EXTRACTION_DATA_NOT_FOUND));
 
         if (extractedData.getExtractionStatus() != KycExtractedData.ExtractionStatus.FAILED) {
             throw new IllegalStateException("Only failed extractions can be retried");
@@ -730,7 +734,7 @@ public class KycService {
 
         KycDocument document = kycDocumentRepository
                 .findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("KYC document not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(KYC_DOCUMENT_NOT_FOUND));
 
         if (document.getKycVerificationStatus() != KycDocument.KycVerificationStatus.PENDING) {
             throw new IllegalStateException("Malware scan can only be retried for pending KYC documents");

@@ -250,7 +250,7 @@ public class FixedDepositService {
         double p = principal.doubleValue();
         double r = annualRate.doubleValue() / 100.0;
         int n = 4;
-        double amount = p * Math.pow(1 + (r / n), n * years);
+        double amount = p * Math.pow(1.0 + (r / n), (double) n * years);
 
         return BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP);
     }

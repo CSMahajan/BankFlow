@@ -12,6 +12,9 @@ import com.bankflow.filter.RateLimitFilter;
 import com.bankflow.filter.UserRateLimitFilter;
 import com.bankflow.service.CardService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -89,15 +93,17 @@ class CardControllerTest {
         when(cardService.issueCard(any(IssueCardRequest.class)))
                 .thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/cards/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "accountNumber": "1234567890",
-                                  "cardType": "DEBIT",
-                                  "dailyLimit": 50000.00
-                                }
-                                """))
+        mockMvc.perform(
+                        post("/api/v1/cards/issue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "accountNumber": "1234567890",
+                                          "cardType": "DEBIT",
+                                          "dailyLimit": 50000.00
+                                        }
+                                        """)
+                )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.accountNumber").value("1234567890"))
@@ -118,7 +124,9 @@ class CardControllerTest {
         when(cardService.getMyCards())
                 .thenReturn(List.of(response));
 
-        mockMvc.perform(get("/api/v1/cards/my-cards"))
+        mockMvc.perform(
+                        get("/api/v1/cards/my-cards")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -135,7 +143,9 @@ class CardControllerTest {
         when(cardService.toggleCardStatus(1L))
                 .thenReturn(response);
 
-        mockMvc.perform(patch("/api/v1/cards/1/toggle-status"))
+        mockMvc.perform(
+                        patch("/api/v1/cards/1/toggle-status")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.cardStatus").value("ACTIVE"));
@@ -152,8 +162,10 @@ class CardControllerTest {
         when(cardService.updateDailyLimit(1L, newLimit))
                 .thenReturn(response);
 
-        mockMvc.perform(patch("/api/v1/cards/1/limit")
-                        .param("newLimit", "75000.00"))
+        mockMvc.perform(
+                        patch("/api/v1/cards/1/limit")
+                                .param("newLimit", "75000.00")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.dailyLimit").value(50000.00));
@@ -161,80 +173,76 @@ class CardControllerTest {
         verify(cardService).updateDailyLimit(1L, newLimit);
     }
 
-    @Test
-    void issueCard_shouldReturnBadRequest_whenAccountNumberIsMissing() throws Exception {
-        mockMvc.perform(post("/api/v1/cards/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "cardType": "DEBIT",
-                                  "dailyLimit": 50000.00
-                                }
-                                """))
+    // ==========================================
+    // ISSUE CARD VALIDATION TESTS
+    // ==========================================
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("invalidIssueCardRequests")
+    void issueCard_shouldReturnBadRequest(
+            String testCase,
+            String requestBody
+    ) throws Exception {
+
+        mockMvc.perform(
+                        post("/api/v1/cards/issue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody)
+                )
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(cardService);
     }
 
-    @Test
-    void issueCard_shouldReturnBadRequest_whenCardTypeIsMissing() throws Exception {
-        mockMvc.perform(post("/api/v1/cards/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "accountNumber": "1234567890",
-                                  "dailyLimit": 50000.00
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(cardService);
-    }
-
-    @Test
-    void issueCard_shouldReturnBadRequest_whenDailyLimitIsMissing() throws Exception {
-        mockMvc.perform(post("/api/v1/cards/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "accountNumber": "1234567890",
-                                  "cardType": "DEBIT"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(cardService);
-    }
-
-    @Test
-    void issueCard_shouldReturnBadRequest_whenDailyLimitIsBelowMinimum() throws Exception {
-        mockMvc.perform(post("/api/v1/cards/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "accountNumber": "1234567890",
-                                  "cardType": "DEBIT",
-                                  "dailyLimit": 999.99
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(cardService);
-    }
-
-    @Test
-    void issueCard_shouldReturnBadRequest_whenAccountNumberIsBlank() throws Exception {
-        mockMvc.perform(post("/api/v1/cards/issue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "accountNumber": "",
-                                  "cardType": "DEBIT",
-                                  "dailyLimit": 50000.00
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(cardService);
+    private static Stream<Arguments> invalidIssueCardRequests() {
+        return Stream.of(
+                Arguments.of(
+                        "Account number missing",
+                        """
+                        {
+                          "cardType": "DEBIT",
+                          "dailyLimit": 50000.00
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Card type missing",
+                        """
+                        {
+                          "accountNumber": "1234567890",
+                          "dailyLimit": 50000.00
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Daily limit missing",
+                        """
+                        {
+                          "accountNumber": "1234567890",
+                          "cardType": "DEBIT"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Daily limit below minimum",
+                        """
+                        {
+                          "accountNumber": "1234567890",
+                          "cardType": "DEBIT",
+                          "dailyLimit": 999.99
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Account number blank",
+                        """
+                        {
+                          "accountNumber": "",
+                          "cardType": "DEBIT",
+                          "dailyLimit": 50000.00
+                        }
+                        """
+                )
+        );
     }
 }

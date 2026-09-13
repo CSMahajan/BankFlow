@@ -82,7 +82,7 @@ class InMemoryRateLimitServiceTest {
     }
 
     @Test
-    void isAllowed_shouldResetCountWhenWindowExpires() throws InterruptedException {
+    void isAllowed_shouldResetCountWhenWindowExpires() {
 
         InMemoryRateLimitService service =
                 new InMemoryRateLimitService();
@@ -90,10 +90,13 @@ class InMemoryRateLimitServiceTest {
         Duration window = Duration.ofMillis(50);
 
         assertTrue(service.isAllowed("user-1", 1, window));
-
         assertFalse(service.isAllowed("user-1", 1, window));
 
-        Thread.sleep(100);
+        long endTime = System.nanoTime() + window.toNanos();
+
+        while (System.nanoTime() < endTime) {
+            Thread.onSpinWait();
+        }
 
         assertTrue(service.isAllowed("user-1", 1, window));
     }

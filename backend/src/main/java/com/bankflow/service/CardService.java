@@ -27,20 +27,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Random;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CardService {
 
+    public static final String CARD_NOT_FOUND_WITH_ID = "Card not found with ID: ";
+    public static final String CARD = "Card ";
     private final CardRepository cardRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;
-    private final Random random = new Random();
+    private final SecureRandom random = new SecureRandom();
 
     @Transactional
     public CardResponse issueCard(IssueCardRequest request) {
@@ -109,7 +111,7 @@ public class CardService {
         log.info("Toggling card status for card ID [{}] by user [{}]", cardId, currentUser.getEmail());
 
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("Card not found with ID: " + cardId));
+                .orElseThrow(() -> new IllegalArgumentException(CARD_NOT_FOUND_WITH_ID + cardId));
 
         if (!card.getAccount().getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not authorized to modify this card");
@@ -130,14 +132,14 @@ public class CardService {
             log.info("Card [{}] has been FROZEN", cardId);
             auditLogService.log(
                     AuditAction.CARD_FROZEN,
-                    "Card " + maskCardNumber(card.getCardNumber()) + " frozen"
+                    CARD + maskCardNumber(card.getCardNumber()) + " frozen"
             );
         } else {
             card.setCardStatus(CardStatus.ACTIVE);
             log.info("Card [{}] has been UNFROZEN/ACTIVATED", cardId);
             auditLogService.log(
                     AuditAction.CARD_ACTIVATED,
-                    "Card " + maskCardNumber(card.getCardNumber()) + " activated"
+                    CARD + maskCardNumber(card.getCardNumber()) + " activated"
             );
         }
 
@@ -151,7 +153,7 @@ public class CardService {
         log.info("Updating daily limit for card ID [{}]", cardId);
 
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new IllegalArgumentException("Card not found with ID: " + cardId));
+                .orElseThrow(() -> new IllegalArgumentException(CARD_NOT_FOUND_WITH_ID + cardId));
 
         if (!card.getAccount().getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not authorized to modify this card");
@@ -249,7 +251,7 @@ public class CardService {
         log.info("ADMIN action: Blocking card [{}]", cardId);
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Card not found with ID: " + cardId));
+                        new IllegalArgumentException(CARD_NOT_FOUND_WITH_ID + cardId));
 
         if (card.getCardStatus() == CardStatus.BLOCKED) {
             throw new IllegalStateException("Card is already blocked.");
@@ -258,7 +260,7 @@ public class CardService {
         Card updatedCard = cardRepository.save(card);
         auditLogService.log(
                 AuditAction.CARD_BLOCKED,
-                "Card " + maskCardNumber(updatedCard.getCardNumber()) + " blocked"
+                CARD + maskCardNumber(updatedCard.getCardNumber()) + " blocked"
         );
         return mapToResponse(updatedCard);
     }
@@ -268,7 +270,7 @@ public class CardService {
         log.info("ADMIN action: Unblocking card [{}]", cardId);
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Card not found with ID: " + cardId));
+                        new IllegalArgumentException(CARD_NOT_FOUND_WITH_ID + cardId));
         if (card.getCardStatus() != CardStatus.BLOCKED) {
             throw new IllegalStateException("Only blocked cards can be unblocked.");
         }
@@ -276,7 +278,7 @@ public class CardService {
         Card updatedCard = cardRepository.save(card);
         auditLogService.log(
                 AuditAction.CARD_UNBLOCKED,
-                "Card " + maskCardNumber(updatedCard.getCardNumber()) + " unblocked"
+                CARD + maskCardNumber(updatedCard.getCardNumber()) + " unblocked"
         );
         return mapToResponse(updatedCard);
     }

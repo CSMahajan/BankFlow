@@ -218,10 +218,6 @@ class KycControllerTest {
         verify(kycService).getMyKycStatus();
     }
 
-    // ---------------------------------------------------------
-    // GET /api/v1/kyc/documents/{documentId}
-    // ---------------------------------------------------------
-
     @Test
     void viewDocument_shouldReturnResourceWithHeaders() throws Exception {
 

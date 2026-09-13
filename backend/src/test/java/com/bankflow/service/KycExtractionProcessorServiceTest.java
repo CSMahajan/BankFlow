@@ -291,11 +291,10 @@ class KycExtractionProcessorServiceTest {
         service.process(documentId);
 
         verify(panTextExtractorService)
-                .extract(
-                        "Permanent Account Number\n"
-                                + "ABCDE1234F\n"
-                                + "JOHN DOE"
-                );
+                .extract("""
+                Permanent Account Number
+                ABCDE1234F
+                JOHN DOE""");
 
         verify(panExtractionValidator)
                 .validate(panData);
@@ -461,15 +460,14 @@ class KycExtractionProcessorServiceTest {
         service.process(documentId);
 
         verify(aadhaarTextExtractorService)
-                .extract(
-                        "Government of India\n"
-                                + "1234 5678 9012\n"
-                                + "JOHN DOE\n"
-                                + "01/01/1990\n"
-                                + "MALE\n"
-                                + "Mumbai Maharashtra\n"
-                                + "9876543210"
-                );
+                .extract("""
+                Government of India
+                1234 5678 9012
+                JOHN DOE
+                01/01/1990
+                MALE
+                Mumbai Maharashtra
+                9876543210""");
 
         verify(aadhaarExtractionValidator)
                 .validate(aadhaarData);

@@ -8,6 +8,9 @@ import com.bankflow.filter.RateLimitFilter;
 import com.bankflow.filter.UserRateLimitFilter;
 import com.bankflow.service.ScheduledTransferService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,6 +25,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -159,118 +163,90 @@ class ScheduledTransferControllerTest {
         verify(scheduledTransferService).cancelScheduledTransfer(1L);
     }
 
-    @Test
-    void createScheduledTransfer_whenSourceAccountMissing_shouldReturn400()
-            throws Exception {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("invalidScheduledTransferRequests")
+    void createScheduledTransfer_whenInvalidRequest_shouldReturn400(
+            String testCase,
+            String requestBody
+    ) throws Exception {
 
         mockMvc.perform(post("/api/v1/scheduled-transfers")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "recipientAccountNumber": "0987654321",
-                                  "amount": 5000.00,
-                                  "frequency": "MONTHLY",
-                                  "startDate": "2026-10-02"
-                                }
-                                """))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(scheduledTransferService);
     }
 
-    @Test
-    void createScheduledTransfer_whenRecipientAccountMissing_shouldReturn400()
-            throws Exception {
-
-        mockMvc.perform(post("/api/v1/scheduled-transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "amount": 5000.00,
-                                  "frequency": "MONTHLY",
-                                  "startDate": "2026-10-02"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(scheduledTransferService);
-    }
-
-    @Test
-    void createScheduledTransfer_whenAmountMissing_shouldReturn400()
-            throws Exception {
-
-        mockMvc.perform(post("/api/v1/scheduled-transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "recipientAccountNumber": "0987654321",
-                                  "frequency": "MONTHLY",
-                                  "startDate": "2026-10-02"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(scheduledTransferService);
-    }
-
-    @Test
-    void createScheduledTransfer_whenAmountBelowMinimum_shouldReturn400()
-            throws Exception {
-
-        mockMvc.perform(post("/api/v1/scheduled-transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "recipientAccountNumber": "0987654321",
-                                  "amount": 0.50,
-                                  "frequency": "MONTHLY",
-                                  "startDate": "2026-10-02"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(scheduledTransferService);
-    }
-
-    @Test
-    void createScheduledTransfer_whenFrequencyMissing_shouldReturn400()
-            throws Exception {
-
-        mockMvc.perform(post("/api/v1/scheduled-transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "recipientAccountNumber": "0987654321",
-                                  "amount": 5000.00,
-                                  "startDate": "2026-10-02"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(scheduledTransferService);
-    }
-
-    @Test
-    void createScheduledTransfer_whenStartDateMissing_shouldReturn400()
-            throws Exception {
-
-        mockMvc.perform(post("/api/v1/scheduled-transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "recipientAccountNumber": "0987654321",
-                                  "amount": 5000.00,
-                                  "frequency": "MONTHLY"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(scheduledTransferService);
+    private static Stream<Arguments> invalidScheduledTransferRequests() {
+        return Stream.of(
+                Arguments.of(
+                        "Source account missing",
+                        """
+                        {
+                          "recipientAccountNumber": "0987654321",
+                          "amount": 5000.00,
+                          "frequency": "MONTHLY",
+                          "startDate": "2026-10-02"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Recipient account missing",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "amount": 5000.00,
+                          "frequency": "MONTHLY",
+                          "startDate": "2026-10-02"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Amount missing",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "recipientAccountNumber": "0987654321",
+                          "frequency": "MONTHLY",
+                          "startDate": "2026-10-02"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Amount below minimum",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "recipientAccountNumber": "0987654321",
+                          "amount": 0.50,
+                          "frequency": "MONTHLY",
+                          "startDate": "2026-10-02"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Frequency missing",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "recipientAccountNumber": "0987654321",
+                          "amount": 5000.00,
+                          "startDate": "2026-10-02"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Start date missing",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "recipientAccountNumber": "0987654321",
+                          "amount": 5000.00,
+                          "frequency": "MONTHLY"
+                        }
+                        """
+                )
+        );
     }
 }

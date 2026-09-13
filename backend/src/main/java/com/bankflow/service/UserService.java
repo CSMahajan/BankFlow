@@ -31,6 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
+    public static final String USER_NOT_FOUND = "User not found";
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final CardRepository cardRepository;
@@ -400,7 +401,7 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+                        new ResourceNotFoundException(USER_NOT_FOUND));
 
         return new UserDetailsResponse(
                 user.getId(),
@@ -426,7 +427,7 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+                        new ResourceNotFoundException(USER_NOT_FOUND));
 
         return accountRepository.findByUserId(user.getId())
                 .stream()
@@ -450,7 +451,7 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+                        new ResourceNotFoundException(USER_NOT_FOUND));
 
         return cardRepository.findByAccountUserId(user.getId())
                 .stream()
@@ -473,7 +474,7 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+                        new ResourceNotFoundException(USER_NOT_FOUND));
 
         return loanRepository.findByUserId(user.getId())
                 .stream()
@@ -499,7 +500,7 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+                        new ResourceNotFoundException(USER_NOT_FOUND));
 
         return fixedDepositRepository.findByUserId(user.getId())
                 .stream()

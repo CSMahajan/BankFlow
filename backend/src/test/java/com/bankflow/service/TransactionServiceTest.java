@@ -17,7 +17,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -31,10 +35,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
@@ -126,8 +138,7 @@ class TransactionServiceTest {
                 .description("Salary Deposit")
                 .build();
 
-        // Setup Spring Security Context Mock
-        lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
 
@@ -138,7 +149,8 @@ class TransactionServiceTest {
 
     private void mockAuthenticatedUser(User user) {
         when(authentication.getName()).thenReturn(user.getEmail());
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(user.getEmail()))
+                .thenReturn(Optional.of(user));
     }
 
     // ==========================================
@@ -149,15 +161,26 @@ class TransactionServiceTest {
     @DisplayName("Get Dashboard Summary - Success With Non-Zero Totals")
     void getDashboardSummary_Success_WithTotals() {
         mockAuthenticatedUser(mockUser);
-        when(accountRepository.findByAccountNumber("BF1000000001")).thenReturn(Optional.of(mockAccount));
-        when(transactionRepository.findTop10ByAccountIdOrderByTransactionDateDesc(10L))
-                .thenReturn(List.of(mockCreditTx, mockDebitTx));
-        when(transactionRepository.sumAmountByAccountIdAndTransactionType(10L, TransactionType.CREDIT))
-                .thenReturn(new BigDecimal("2000.00"));
-        when(transactionRepository.sumAmountByAccountIdAndTransactionType(10L, TransactionType.DEBIT))
-                .thenReturn(new BigDecimal("500.00"));
 
-        AccountDashboardSummary summary = transactionService.getDashboardSummary("BF1000000001");
+        when(accountRepository.findByAccountNumber("BF1000000001"))
+                .thenReturn(Optional.of(mockAccount));
+
+        when(transactionRepository
+                .findTop10ByAccountIdOrderByTransactionDateDesc(10L))
+                .thenReturn(List.of(mockCreditTx, mockDebitTx));
+
+        when(transactionRepository.sumAmountByAccountIdAndTransactionType(
+                10L,
+                TransactionType.CREDIT
+        )).thenReturn(new BigDecimal("2000.00"));
+
+        when(transactionRepository.sumAmountByAccountIdAndTransactionType(
+                10L,
+                TransactionType.DEBIT
+        )).thenReturn(new BigDecimal("500.00"));
+
+        AccountDashboardSummary summary =
+                transactionService.getDashboardSummary("BF1000000001");
 
         assertNotNull(summary);
         assertEquals("BF1000000001", summary.accountNumber());
@@ -171,15 +194,26 @@ class TransactionServiceTest {
     @DisplayName("Get Dashboard Summary - Null Totals Default To Zero")
     void getDashboardSummary_NullTotals_DefaultsToZero() {
         mockAuthenticatedUser(mockUser);
-        when(accountRepository.findByAccountNumber("BF1000000001")).thenReturn(Optional.of(mockAccount));
-        when(transactionRepository.findTop10ByAccountIdOrderByTransactionDateDesc(10L))
-                .thenReturn(Collections.emptyList());
-        when(transactionRepository.sumAmountByAccountIdAndTransactionType(10L, TransactionType.CREDIT))
-                .thenReturn(null);
-        when(transactionRepository.sumAmountByAccountIdAndTransactionType(10L, TransactionType.DEBIT))
-                .thenReturn(null);
 
-        AccountDashboardSummary summary = transactionService.getDashboardSummary("BF1000000001");
+        when(accountRepository.findByAccountNumber("BF1000000001"))
+                .thenReturn(Optional.of(mockAccount));
+
+        when(transactionRepository
+                .findTop10ByAccountIdOrderByTransactionDateDesc(10L))
+                .thenReturn(Collections.emptyList());
+
+        when(transactionRepository.sumAmountByAccountIdAndTransactionType(
+                10L,
+                TransactionType.CREDIT
+        )).thenReturn(null);
+
+        when(transactionRepository.sumAmountByAccountIdAndTransactionType(
+                10L,
+                TransactionType.DEBIT
+        )).thenReturn(null);
+
+        AccountDashboardSummary summary =
+                transactionService.getDashboardSummary("BF1000000001");
 
         assertNotNull(summary);
         assertEquals(BigDecimal.ZERO, summary.totalCreditAmount());
@@ -191,10 +225,19 @@ class TransactionServiceTest {
     @DisplayName("Get Dashboard Summary - Unauthorized User Throws AccessDeniedException")
     void getDashboardSummary_UnauthorizedUser_ThrowsException() {
         mockAuthenticatedUser(mockOtherUser);
-        when(accountRepository.findByAccountNumber("BF1000000001")).thenReturn(Optional.of(mockAccount));
 
-        assertThrows(AccessDeniedException.class, () ->
-                transactionService.getDashboardSummary("BF1000000001")
+        when(accountRepository.findByAccountNumber("BF1000000001"))
+                .thenReturn(Optional.of(mockAccount));
+
+        AccessDeniedException exception = assertThrows(
+                AccessDeniedException.class,
+                () -> transactionService.getDashboardSummary("BF1000000001")
+        );
+
+        assertNotNull(exception);
+        assertEquals(
+                "You are not authorized to view transactions for this account",
+                exception.getMessage()
         );
     }
 
@@ -206,14 +249,23 @@ class TransactionServiceTest {
     @DisplayName("Get All Transactions For Admin - Success")
     void getAllTransactionsForAdmin_Success() {
         mockAuthenticatedUser(mockAdminUser);
-        when(transactionRepository.findByAccountAccountNumberOrderByTransactionDateDesc("BF1000000001"))
+
+        when(transactionRepository
+                .findByAccountAccountNumberOrderByTransactionDateDesc(
+                        "BF1000000001"
+                ))
                 .thenReturn(List.of(mockCreditTx, mockDebitTx));
 
-        List<TransactionResponse> result = transactionService.getAllTransactionsForAdmin("BF1000000001");
+        List<TransactionResponse> result =
+                transactionService.getAllTransactionsForAdmin("BF1000000001");
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        verify(transactionRepository, times(1)).findByAccountAccountNumberOrderByTransactionDateDesc("BF1000000001");
+
+        verify(transactionRepository)
+                .findByAccountAccountNumberOrderByTransactionDateDesc(
+                        "BF1000000001"
+                );
     }
 
     @Test
@@ -224,10 +276,16 @@ class TransactionServiceTest {
         Pageable pageable = PageRequest.of(0, 20);
 
         Page<Transaction> transactionPage =
-                new PageImpl<>(List.of(mockCreditTx, mockDebitTx), pageable, 2);
+                new PageImpl<>(
+                        List.of(mockCreditTx, mockDebitTx),
+                        pageable,
+                        2
+                );
 
-        when(transactionRepository.findAll(any(Specification.class), eq(pageable)))
-                .thenReturn(transactionPage);
+        when(transactionRepository.findAll(
+                any(Specification.class),
+                eq(pageable)
+        )).thenReturn(transactionPage);
 
         Page<TransactionResponse> result =
                 transactionService.getMyTransactions(
@@ -243,7 +301,7 @@ class TransactionServiceTest {
         assertEquals(2, result.getTotalElements());
         assertEquals(2, result.getContent().size());
 
-        verify(transactionRepository, times(1))
+        verify(transactionRepository)
                 .findAll(any(Specification.class), eq(pageable));
     }
 
@@ -294,7 +352,10 @@ class TransactionServiceTest {
                 )
         );
 
-        assertEquals("Start date cannot be after end date", ex.getMessage());
+        assertEquals(
+                "Start date cannot be after end date",
+                ex.getMessage()
+        );
 
         verify(transactionRepository, never())
                 .findAll(any(Specification.class), any(Pageable.class));
@@ -308,16 +369,24 @@ class TransactionServiceTest {
         Pageable pageable = PageRequest.of(0, 20);
 
         Page<Transaction> transactionPage =
-                new PageImpl<>(List.of(mockDebitTx), pageable, 1);
+                new PageImpl<>(
+                        List.of(mockDebitTx),
+                        pageable,
+                        1
+                );
 
-        when(transactionRepository.findAll(any(Specification.class), eq(pageable)))
-                .thenReturn(transactionPage);
+        when(transactionRepository.findAll(
+                any(Specification.class),
+                eq(pageable)
+        )).thenReturn(transactionPage);
+
+        LocalDate startDate = LocalDate.now().minusDays(30);
 
         Page<TransactionResponse> result =
                 transactionService.getMyTransactions(
                         "BF1000000001",
                         TransactionType.DEBIT,
-                        LocalDate.now().minusDays(30),
+                        startDate,
                         null,
                         null,
                         pageable
@@ -329,6 +398,10 @@ class TransactionServiceTest {
         verify(transactionRepository)
                 .findAll(any(Specification.class), eq(pageable));
     }
+
+    // ==========================================
+    // EXPORT TESTS
+    // ==========================================
 
     @Test
     @DisplayName("Export Transactions PDF - Success")
@@ -356,10 +429,10 @@ class TransactionServiceTest {
         assertNotNull(result);
         assertArrayEquals(expectedPdf, result);
 
-        verify(pdfExportService, times(1))
+        verify(pdfExportService)
                 .generateTransactionPdf(anyList());
 
-        verify(transactionRepository, times(1))
+        verify(transactionRepository)
                 .findAll(any(Specification.class), any(Sort.class));
     }
 
@@ -389,10 +462,10 @@ class TransactionServiceTest {
         assertNotNull(result);
         assertArrayEquals(expectedExcel, result);
 
-        verify(excelExportService, times(1))
+        verify(excelExportService)
                 .generateTransactionExcel(anyList());
 
-        verify(transactionRepository, times(1))
+        verify(transactionRepository)
                 .findAll(any(Specification.class), any(Sort.class));
     }
 
@@ -401,18 +474,24 @@ class TransactionServiceTest {
     void exportTransactionsPdf_InvalidDateRange() {
         mockAuthenticatedUser(mockUser);
 
+        LocalDate startDate = LocalDate.of(2026, 8, 20);
+        LocalDate endDate = LocalDate.of(2026, 8, 10);
+
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> transactionService.exportTransactionsPdf(
                         "BF1000000001",
                         null,
-                        LocalDate.of(2026, 8, 20),
-                        LocalDate.of(2026, 8, 10),
+                        startDate,
+                        endDate,
                         null
                 )
         );
 
-        assertEquals("Start date cannot be after end date", ex.getMessage());
+        assertEquals(
+                "Start date cannot be after end date",
+                ex.getMessage()
+        );
 
         verify(transactionRepository, never())
                 .findAll(any(Specification.class), any(Sort.class));
@@ -420,6 +499,10 @@ class TransactionServiceTest {
         verify(pdfExportService, never())
                 .generateTransactionPdf(anyList());
     }
+
+    // ==========================================
+    // ADMIN ACCOUNT TRANSACTIONS TESTS
+    // ==========================================
 
     @Test
     @DisplayName("Get Account Transactions For Admin - Success")
@@ -482,6 +565,10 @@ class TransactionServiceTest {
                         any(Pageable.class)
                 );
     }
+
+    // ==========================================
+    // TRANSACTION DETAILS TESTS
+    // ==========================================
 
     @Test
     @DisplayName("Get Transaction Details - Customer Can View Own Transaction")
@@ -559,8 +646,4 @@ class TransactionServiceTest {
         verify(transactionRepository)
                 .findByTransactionId("INVALID");
     }
-
-
-
-
 }

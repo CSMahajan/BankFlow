@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -82,14 +85,13 @@ class UserRateLimitFilterTest {
         verifyNoInteractions(rateLimitService);
     }
 
-    @Test
-    void doFilter_shouldSkipSwaggerUi()
+    @ParameterizedTest(name = "should skip rate limiting for {0}")
+    @MethodSource("excludedPaths")
+    void doFilter_shouldSkipExcludedPaths(String path)
             throws ServletException, IOException {
 
         when(properties.isEnabled()).thenReturn(true);
-
-        when(request.getRequestURI())
-                .thenReturn("/swagger-ui/index.html");
+        when(request.getRequestURI()).thenReturn(path);
 
         filter.doFilterInternal(
                 request,
@@ -105,98 +107,15 @@ class UserRateLimitFilterTest {
         verifyNoInteractions(rateLimitService);
     }
 
-    @Test
-    void doFilter_shouldSkipSwaggerUiResources()
-            throws ServletException, IOException {
-
-        when(properties.isEnabled()).thenReturn(true);
-
-        when(request.getRequestURI())
-                .thenReturn("/swagger-ui/some-resource.js");
-
-        filter.doFilterInternal(
-                request,
-                response,
-                filterChain
+    private static Stream<String> excludedPaths() {
+        return Stream.of(
+                "/swagger-ui/index.html",
+                "/swagger-ui/some-resource.js",
+                "/v3/api-docs",
+                "/v3/api-docs/swagger-config",
+                "/actuator/health"
         );
-
-        verify(filterChain).doFilter(
-                request,
-                response
-        );
-
-        verifyNoInteractions(rateLimitService);
     }
-
-    @Test
-    void doFilter_shouldSkipApiDocs()
-            throws ServletException, IOException {
-
-        when(properties.isEnabled()).thenReturn(true);
-
-        when(request.getRequestURI())
-                .thenReturn("/v3/api-docs");
-
-        filter.doFilterInternal(
-                request,
-                response,
-                filterChain
-        );
-
-        verify(filterChain).doFilter(
-                request,
-                response
-        );
-
-        verifyNoInteractions(rateLimitService);
-    }
-
-    @Test
-    void doFilter_shouldSkipApiDocsResources()
-            throws ServletException, IOException {
-
-        when(properties.isEnabled()).thenReturn(true);
-
-        when(request.getRequestURI())
-                .thenReturn("/v3/api-docs/swagger-config");
-
-        filter.doFilterInternal(
-                request,
-                response,
-                filterChain
-        );
-
-        verify(filterChain).doFilter(
-                request,
-                response
-        );
-
-        verifyNoInteractions(rateLimitService);
-    }
-
-    @Test
-    void doFilter_shouldSkipActuatorHealth()
-            throws ServletException, IOException {
-
-        when(properties.isEnabled()).thenReturn(true);
-
-        when(request.getRequestURI())
-                .thenReturn("/actuator/health");
-
-        filter.doFilterInternal(
-                request,
-                response,
-                filterChain
-        );
-
-        verify(filterChain).doFilter(
-                request,
-                response
-        );
-
-        verifyNoInteractions(rateLimitService);
-    }
-
     @Test
     void doFilter_shouldContinueWhenAuthenticationIsNull()
             throws ServletException, IOException {

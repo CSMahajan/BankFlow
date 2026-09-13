@@ -90,21 +90,21 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
 
-    private boolean checkLimit(String key, RateLimitProperties.Limit limit, HttpServletResponse response) throws IOException {
+    private boolean checkLimit(String key, RateLimitProperties.LimitWindowConfig limitWindowConfig, HttpServletResponse response) throws IOException {
 
-        boolean allowed = rateLimitService.isAllowed(key, limit.getLimit(), limit.getWindow());
+        boolean allowed = rateLimitService.isAllowed(key, limitWindowConfig.getLimit(), limitWindowConfig.getWindow());
 
         if (!allowed) {
 
             log.warn(
-                    "Rate limit exceeded for key: {}",
+                    "Rate limitWindowConfig exceeded for key: {}",
                     key
             );
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setHeader(
                     "Retry-After",
-                    String.valueOf(limit.getWindow())
+                    String.valueOf(limitWindowConfig.getWindow())
             );
             response.getWriter()
                     .write("""

@@ -6,7 +6,7 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryRateLimitServiceTest {
+class InMemoryRateLimitWindowConfigServiceTest {
 
     @Test
     void isAllowed_shouldAllowRequestWhenLimitIsNotReached() {

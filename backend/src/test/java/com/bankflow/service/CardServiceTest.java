@@ -510,7 +510,7 @@ class CardServiceTest {
     // =========================================================
 
     @Test
-    @DisplayName("Update Daily Limit - Success")
+    @DisplayName("Update Daily LimitWindowConfig - Success")
     void updateDailyLimit_Success() {
 
         mockAuthenticatedUser(mockUser);
@@ -545,7 +545,7 @@ class CardServiceTest {
     }
 
     @Test
-    @DisplayName("Update Daily Limit - Unauthorized User")
+    @DisplayName("Update Daily LimitWindowConfig - Unauthorized User")
     void updateDailyLimit_UnauthorizedUser() {
 
         mockAuthenticatedUser(mockOtherUser);
@@ -563,7 +563,7 @@ class CardServiceTest {
     }
 
     @Test
-    @DisplayName("Update Daily Limit - Frozen Card")
+    @DisplayName("Update Daily LimitWindowConfig - Frozen Card")
     void updateDailyLimit_FrozenCard() {
 
         mockAuthenticatedUser(mockUser);
@@ -583,7 +583,7 @@ class CardServiceTest {
     }
 
     @Test
-    @DisplayName("Update Daily Limit - Inactive Account")
+    @DisplayName("Update Daily LimitWindowConfig - Inactive Account")
     void updateDailyLimit_InactiveAccount() {
 
         mockAuthenticatedUser(mockUser);

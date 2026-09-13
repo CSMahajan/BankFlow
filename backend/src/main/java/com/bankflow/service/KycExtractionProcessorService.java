@@ -72,11 +72,10 @@ public class KycExtractionProcessorService {
             DetectDocumentTextRequest request =
                     DetectDocumentTextRequest.builder()
                             .document(documentBuilder ->
-                                    documentBuilder.s3Object(
-                                            S3Object.builder()
+                                    documentBuilder.s3Object(s3ObjectBuilder ->
+                                            s3ObjectBuilder
                                                     .bucket(document.getS3Bucket())
                                                     .name(document.getS3ObjectKey())
-                                                    .build()
                                     )
                             )
                             .build();

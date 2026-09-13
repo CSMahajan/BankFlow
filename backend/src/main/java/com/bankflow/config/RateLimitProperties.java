@@ -15,21 +15,21 @@ public class RateLimitProperties {
 
     private boolean enabled;
 
-    private Limit login;
+    private LimitWindowConfig login;
 
-    private Limit register;
+    private LimitWindowConfig register;
 
-    private Limit forgotPassword;
+    private LimitWindowConfig forgotPassword;
 
-    private Limit resendVerification;
+    private LimitWindowConfig resendVerification;
 
-    private Limit kycUpload;
+    private LimitWindowConfig kycUpload;
 
-    private Limit user;
+    private LimitWindowConfig user;
 
     @Getter
     @Setter
-    public static class Limit {
+    public static class LimitWindowConfig {
 
         private int limit;
 

@@ -57,10 +57,10 @@ public class UserRateLimitFilter extends OncePerRequestFilter {
                         + ":"
                         + request.getRequestURI();
 
-        RateLimitProperties.Limit limit =
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
                 properties.getUser();
 
-        if (limit == null) {
+        if (limitWindowConfig == null) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,8 +68,8 @@ public class UserRateLimitFilter extends OncePerRequestFilter {
         boolean allowed =
                 rateLimitService.isAllowed(
                         key,
-                        limit.getLimit(),
-                        limit.getWindow()
+                        limitWindowConfig.getLimit(),
+                        limitWindowConfig.getWindow()
                 );
 
         if (!allowed) {
@@ -84,14 +84,14 @@ public class UserRateLimitFilter extends OncePerRequestFilter {
 
             response.setHeader(
                     "Retry-After",
-                    String.valueOf(limit.getWindow())
+                    String.valueOf(limitWindowConfig.getWindow())
             );
 
             response.getWriter().write("""
                     {
                       "status":429,
                       "error":"Too Many Requests",
-                      "message":"User request limit exceeded. Please try again later."
+                      "message":"User request limitWindowConfig exceeded. Please try again later."
                     }
                     """);
 

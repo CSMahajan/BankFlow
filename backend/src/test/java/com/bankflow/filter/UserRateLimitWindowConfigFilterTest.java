@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-class UserRateLimitFilterTest {
+class UserRateLimitWindowConfigFilterTest {
 
     private RateLimitService rateLimitService;
     private RateLimitProperties properties;
@@ -249,8 +249,8 @@ class UserRateLimitFilterTest {
     void doFilter_shouldAllowAuthenticatedUserWhenWithinLimit()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
 
@@ -268,12 +268,12 @@ class UserRateLimitFilterTest {
                 .setAuthentication(authentication);
 
         when(properties.getUser())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit())
+        when(limitWindowConfig.getLimit())
                 .thenReturn(20);
 
-        when(limit.getWindow())
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(1));
 
         when(rateLimitService.isAllowed(
@@ -306,8 +306,8 @@ class UserRateLimitFilterTest {
     void doFilter_shouldRejectAuthenticatedUserWhenLimitExceeded()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
 
@@ -325,12 +325,12 @@ class UserRateLimitFilterTest {
                 .setAuthentication(authentication);
 
         when(properties.getUser())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit())
+        when(limitWindowConfig.getLimit())
                 .thenReturn(20);
 
-        when(limit.getWindow())
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(1));
 
         when(rateLimitService.isAllowed(
@@ -382,7 +382,7 @@ class UserRateLimitFilterTest {
         assertTrue(
                 responseWriter.toString()
                         .contains(
-                                "\"message\":\"User request limit exceeded. Please try again later.\""
+                                "\"message\":\"User request limitWindowConfig exceeded. Please try again later.\""
                         )
         );
     }
@@ -391,8 +391,8 @@ class UserRateLimitFilterTest {
     void doFilter_shouldCreateRateLimitKeyUsingUsernameAndRequestPath()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
 
@@ -410,11 +410,11 @@ class UserRateLimitFilterTest {
                 .setAuthentication(authentication);
 
         when(properties.getUser())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(10);
+        when(limitWindowConfig.getLimit()).thenReturn(10);
 
-        when(limit.getWindow())
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(5));
 
         when(rateLimitService.isAllowed(

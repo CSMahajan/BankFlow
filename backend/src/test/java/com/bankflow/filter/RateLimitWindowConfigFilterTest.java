@@ -18,7 +18,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class RateLimitFilterTest {
+class RateLimitWindowConfigFilterTest {
 
     private RateLimitService rateLimitService;
     private RateLimitProperties properties;
@@ -74,8 +74,8 @@ class RateLimitFilterTest {
     void doFilter_shouldApplyLoginRateLimit()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -84,12 +84,12 @@ class RateLimitFilterTest {
                 .thenReturn("127.0.0.1");
 
         when(properties.getLogin())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit())
+        when(limitWindowConfig.getLimit())
                 .thenReturn(5);
 
-        when(limit.getWindow())
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(1));
 
         when(rateLimitService.isAllowed(
@@ -120,8 +120,8 @@ class RateLimitFilterTest {
     void doFilter_shouldApplyRegisterRateLimit()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -130,10 +130,10 @@ class RateLimitFilterTest {
                 .thenReturn("127.0.0.1");
 
         when(properties.getRegister())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(3);
-        when(limit.getWindow())
+        when(limitWindowConfig.getLimit()).thenReturn(3);
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(10));
 
         when(rateLimitService.isAllowed(
@@ -164,8 +164,8 @@ class RateLimitFilterTest {
     void doFilter_shouldApplyForgotPasswordRateLimit()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -174,10 +174,10 @@ class RateLimitFilterTest {
                 .thenReturn("10.0.0.1");
 
         when(properties.getForgotPassword())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(3);
-        when(limit.getWindow())
+        when(limitWindowConfig.getLimit()).thenReturn(3);
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(10));
 
         when(rateLimitService.isAllowed(
@@ -208,8 +208,8 @@ class RateLimitFilterTest {
     void doFilter_shouldApplyResendVerificationRateLimit()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -218,10 +218,10 @@ class RateLimitFilterTest {
                 .thenReturn("10.0.0.2");
 
         when(properties.getResendVerification())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(2);
-        when(limit.getWindow())
+        when(limitWindowConfig.getLimit()).thenReturn(2);
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(5));
 
         when(rateLimitService.isAllowed(
@@ -274,8 +274,8 @@ class RateLimitFilterTest {
     void doFilter_shouldStopRequestWhenRateLimitExceeded()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -284,10 +284,10 @@ class RateLimitFilterTest {
                 .thenReturn("127.0.0.1");
 
         when(properties.getLogin())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(5);
-        when(limit.getWindow())
+        when(limitWindowConfig.getLimit()).thenReturn(5);
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(1));
 
         when(rateLimitService.isAllowed(
@@ -341,8 +341,8 @@ class RateLimitFilterTest {
     void doFilter_shouldUseFirstForwardedIp()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -352,10 +352,10 @@ class RateLimitFilterTest {
                 .thenReturn("192.168.1.10, 10.0.0.1, 10.0.0.2");
 
         when(properties.getLogin())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(5);
-        when(limit.getWindow())
+        when(limitWindowConfig.getLimit()).thenReturn(5);
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(1));
 
         when(rateLimitService.isAllowed(
@@ -381,8 +381,8 @@ class RateLimitFilterTest {
     void doFilter_shouldUseRemoteAddressWhenForwardedHeaderIsMissing()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -395,10 +395,10 @@ class RateLimitFilterTest {
                 .thenReturn("192.168.1.50");
 
         when(properties.getLogin())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(5);
-        when(limit.getWindow())
+        when(limitWindowConfig.getLimit()).thenReturn(5);
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(1));
 
         when(rateLimitService.isAllowed(
@@ -424,8 +424,8 @@ class RateLimitFilterTest {
     void doFilter_shouldUseRemoteAddressWhenForwardedHeaderIsBlank()
             throws ServletException, IOException {
 
-        RateLimitProperties.Limit limit =
-                mock(RateLimitProperties.Limit.class);
+        RateLimitProperties.LimitWindowConfig limitWindowConfig =
+                mock(RateLimitProperties.LimitWindowConfig.class);
 
         when(properties.isEnabled()).thenReturn(true);
         when(request.getRequestURI())
@@ -438,10 +438,10 @@ class RateLimitFilterTest {
                 .thenReturn("192.168.1.50");
 
         when(properties.getLogin())
-                .thenReturn(limit);
+                .thenReturn(limitWindowConfig);
 
-        when(limit.getLimit()).thenReturn(5);
-        when(limit.getWindow())
+        when(limitWindowConfig.getLimit()).thenReturn(5);
+        when(limitWindowConfig.getWindow())
                 .thenReturn(Duration.ofMinutes(1));
 
         when(rateLimitService.isAllowed(

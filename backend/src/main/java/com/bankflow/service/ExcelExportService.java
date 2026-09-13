@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -73,7 +74,7 @@ public class ExcelExportService {
             labelStyle.setFont(labelFont);
             infoRow1.createCell(0).setCellValue("Generated On");
             infoRow1.createCell(1).setCellValue(
-                    LocalDateTime.now().format(
+                    LocalDateTime.now(ZoneId.systemDefault()).format(
                             DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
                     )
             );

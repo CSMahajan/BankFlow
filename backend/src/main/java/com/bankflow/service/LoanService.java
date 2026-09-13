@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -119,8 +120,8 @@ public class LoanService {
 
         // 3. Update loan status and dates
         loan.setStatus(LoanStatus.ACTIVE);
-        loan.setStartDate(LocalDate.now());
-        loan.setNextDueDate(LocalDate.now().plusMonths(1));
+        loan.setStartDate(LocalDate.now(ZoneId.systemDefault()));
+        loan.setNextDueDate(LocalDate.now(ZoneId.systemDefault()).plusMonths(1));
         Loan updatedLoan = loanRepository.save(loan);
         auditLogService.log(
                 AuditAction.LOAN_APPROVED,

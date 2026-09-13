@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -119,8 +120,8 @@ public class DashboardService {
             return new MonthlyAnalyticsResponse(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         }
 
-        LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-        LocalDateTime endOfMonth = LocalDate.now().atTime(LocalTime.MAX);
+        LocalDateTime startOfMonth = LocalDate.now(ZoneId.systemDefault()).withDayOfMonth(1).atStartOfDay();
+        LocalDateTime endOfMonth = LocalDate.now(ZoneId.systemDefault()).atTime(LocalTime.MAX);
 
         BigDecimal income = transactionRepository.sumAmountByAccountIdsAndTypeAndDateRange(
                 accountIds, TransactionType.CREDIT, startOfMonth, endOfMonth);

@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "loan_repayments")
@@ -43,6 +44,6 @@ public class LoanRepayment {
 
     @PrePersist
     protected void onCreate() {
-        this.paymentDate = LocalDateTime.now();
+        this.paymentDate = LocalDateTime.now(ZoneId.systemDefault());
     }
 }

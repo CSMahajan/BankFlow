@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -58,14 +59,14 @@ public class RefreshTokenService {
                         .user(user)
                         .tokenHash(hashToken(refreshToken))
                         .expiryDate(
-                                LocalDateTime.now()
+                                LocalDateTime.now(ZoneId.systemDefault())
                                         .plus(
                                                 jwtProperties
                                                         .getRefreshTokenExpiration()
                                         )
                         )
                         .revoked(false)
-                        .createdAt(LocalDateTime.now())
+                        .createdAt(LocalDateTime.now(ZoneId.systemDefault()))
                         .build();
 
         refreshTokenRepository.save(refreshTokenEntity);
@@ -92,7 +93,7 @@ public class RefreshTokenService {
         }
 
         if (refreshToken.getExpiryDate()
-                .isBefore(LocalDateTime.now())) {
+                .isBefore(LocalDateTime.now(ZoneId.systemDefault()))) {
 
             throw new InvalidRefreshTokenException(
                     "Refresh token expired"

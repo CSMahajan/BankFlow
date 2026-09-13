@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -105,7 +106,7 @@ public class FixedDepositService {
         // Save Fixed Deposit details
         BigDecimal interestRate = getInterestRateForTenure(request.tenureYears());
         BigDecimal maturityAmount = calculateCompoundInterest(request.depositAmount(), interestRate, request.tenureYears());
-        LocalDate depositDate = LocalDate.now();
+        LocalDate depositDate = LocalDate.now(ZoneId.systemDefault());
         String fdNumber = generateUniqueFdNumber();
 
         FixedDeposit fd = FixedDeposit.builder().fdNumber(fdNumber).user(currentUser).sourceAccount(sourceAccount).depositAmount(request.depositAmount()).interestRate(interestRate).tenureYears(request.tenureYears()).depositDate(depositDate).maturityDate(depositDate.plusYears(request.tenureYears())).maturityAmount(maturityAmount).status(FixedDeposit.FdStatus.ACTIVE).build();
@@ -159,12 +160,12 @@ public class FixedDepositService {
         creditClosureAmount(fd);
 
         fd.setStatus(
-                LocalDate.now().isBefore(fd.getMaturityDate())
+                LocalDate.now(ZoneId.systemDefault()).isBefore(fd.getMaturityDate())
                         ? FixedDeposit.FdStatus.PREMATURELY_CLOSED
                         : FixedDeposit.FdStatus.MATURED_CLOSED
         );
 
-        fd.setClosedDate(LocalDate.now());
+        fd.setClosedDate(LocalDate.now(ZoneId.systemDefault()));
         log.info("Closing Fixed Deposit [{}] requested by [{}]", fdNumber, currentUser.getEmail());
         FixedDeposit closedFd = fdRepository.save(fd);
         log.info("FD [{}] marked CLOSED", fd.getFdNumber());
@@ -188,7 +189,7 @@ public class FixedDepositService {
 
     private void creditClosureAmount(FixedDeposit fd) {
         Account account = fd.getSourceAccount();
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
 
         boolean premature = today.isBefore(fd.getMaturityDate());
         BigDecimal amountToCredit = premature ? fd.getDepositAmount() : fd.getMaturityAmount();

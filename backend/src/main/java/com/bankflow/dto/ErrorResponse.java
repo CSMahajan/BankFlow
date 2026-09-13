@@ -1,6 +1,7 @@
 package com.bankflow.dto;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 public record ErrorResponse(
@@ -11,10 +12,10 @@ public record ErrorResponse(
         LocalDateTime timestamp
 ) {
     public ErrorResponse(int status, String error, String message) {
-        this(status, error, message, List.of(), LocalDateTime.now());
+        this(status, error, message, List.of(), LocalDateTime.now(ZoneId.systemDefault()));
     }
 
     public ErrorResponse(int status, String error, String message, List<String> details) {
-        this(status, error, message, details, LocalDateTime.now());
+        this(status, error, message, details, LocalDateTime.now(ZoneId.systemDefault()));
     }
 }

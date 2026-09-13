@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
@@ -71,7 +72,7 @@ public class CardService {
 
         String cardNumber = generateUniqueCardNumber();
         String cvv = String.format("%03d", random.nextInt(1000));
-        LocalDate expiryDate = LocalDate.now().plusYears(5);
+        LocalDate expiryDate = LocalDate.now(ZoneId.systemDefault()).plusYears(5);
 
         Card card = Card.builder()
                 .cardNumber(cardNumber)

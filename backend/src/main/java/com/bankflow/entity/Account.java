@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "accounts", schema = "retail_banking")
@@ -45,7 +46,7 @@ public class Account {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(ZoneId.systemDefault());
         if (this.currentBalance == null) {
             this.currentBalance = BigDecimal.ZERO;
         }

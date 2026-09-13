@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -138,8 +139,12 @@ class RefreshTokenServiceTest {
 
         long secondsBetween =
                 Duration.between(
-                        savedToken.getCreatedAt(),
+                        savedToken.getCreatedAt()
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant(),
                         savedToken.getExpiryDate()
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant()
                 ).getSeconds();
 
         assertTrue(

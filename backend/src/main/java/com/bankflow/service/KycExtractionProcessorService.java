@@ -19,6 +19,7 @@ import software.amazon.awssdk.services.textract.TextractClient;
 import software.amazon.awssdk.services.textract.model.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,14 +56,14 @@ public class KycExtractionProcessorService {
                                 KycExtractedData.builder()
                                         .kycDocument(document)
                                         .extractionStatus(KycExtractedData.ExtractionStatus.PENDING)
-                                        .createdAt(LocalDateTime.now())
+                                        .createdAt(LocalDateTime.now(ZoneId.systemDefault()))
                                         .build()
                         );
 
 
         extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.PROCESSING);
 
-        extractedData.setUpdatedAt(LocalDateTime.now());
+        extractedData.setUpdatedAt(LocalDateTime.now(ZoneId.systemDefault()));
 
         extractedDataRepository.save(extractedData);
 
@@ -96,7 +97,7 @@ public class KycExtractionProcessorService {
             }
             extractedData.setExtractedText(extractedText);
             extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.SUCCESS);
-            extractedData.setUpdatedAt(LocalDateTime.now());
+            extractedData.setUpdatedAt(LocalDateTime.now(ZoneId.systemDefault()));
             extractedData.setFailureReason(null);
             log.info("OCR extraction successful. Document id: {}, Characters extracted: {}",
                     document.getId(), extractedText.length());
@@ -112,7 +113,7 @@ public class KycExtractionProcessorService {
                                     : "Unknown extraction failure"
                     )
             );
-            extractedData.setUpdatedAt(LocalDateTime.now());
+            extractedData.setUpdatedAt(LocalDateTime.now(ZoneId.systemDefault()));
         }
         extractedDataRepository.save(extractedData);
     }
@@ -130,7 +131,7 @@ public class KycExtractionProcessorService {
                         .orElse(
                                 KycPanData.builder()
                                         .kycDocument(document)
-                                        .createdAt(LocalDateTime.now())
+                                        .createdAt(LocalDateTime.now(ZoneId.systemDefault()))
                                         .build()
                         );
 
@@ -139,7 +140,7 @@ public class KycExtractionProcessorService {
         panEntity.setFullName(panData.fullName());
         panEntity.setFatherName(panData.fatherName());
         panEntity.setDateOfBirth(panData.dateOfBirth());
-        panEntity.setUpdatedAt(LocalDateTime.now());
+        panEntity.setUpdatedAt(LocalDateTime.now(ZoneId.systemDefault()));
 
 
         kycPanDataRepository.save(panEntity);
@@ -160,7 +161,7 @@ public class KycExtractionProcessorService {
                         .orElse(
                                 KycAadhaarData.builder()
                                         .kycDocument(document)
-                                        .createdAt(LocalDateTime.now())
+                                        .createdAt(LocalDateTime.now(ZoneId.systemDefault()))
                                         .build()
                         );
 
@@ -171,7 +172,7 @@ public class KycExtractionProcessorService {
         aadhaarEntity.setGender(aadhaarData.gender());
         aadhaarEntity.setAddress(aadhaarData.address());
         aadhaarEntity.setMobileNumber(aadhaarData.mobileNumber());
-        aadhaarEntity.setUpdatedAt(LocalDateTime.now());
+        aadhaarEntity.setUpdatedAt(LocalDateTime.now(ZoneId.systemDefault()));
 
 
         kycAadhaarDataRepository.save(aadhaarEntity);

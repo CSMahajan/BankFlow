@@ -13,6 +13,7 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -37,7 +38,7 @@ public class PdfExportService {
             subtitle.setAlignment(Element.ALIGN_CENTER);
             document.add(subtitle);
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("Generated On : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")), normalFont));
+            document.add(new Paragraph("Generated On : " + LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")), normalFont));
             document.add(new Paragraph("Total Transactions : " + transactions.size(), normalFont));
             document.add(new Paragraph(" "));
             PdfPTable table = new PdfPTable(6);

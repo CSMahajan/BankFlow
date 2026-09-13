@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
@@ -28,7 +29,7 @@ public class VerificationTokenService {
                 .token(UUID.randomUUID().toString())
                 .user(user)
                 .tokenType(TokenType.EMAIL_VERIFICATION)
-                .expiryDate(LocalDateTime.now().plusHours(24))
+                .expiryDate(LocalDateTime.now(ZoneId.systemDefault()).plusHours(24))
                 .used(false)
                 .build();
 
@@ -51,7 +52,7 @@ public class VerificationTokenService {
             );
         }
 
-        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now(ZoneId.systemDefault()))) {
             throw new EmailVerificationException(
                     "This verification link has expired."
             );
@@ -79,7 +80,7 @@ public class VerificationTokenService {
                         .token(UUID.randomUUID().toString())
                         .tokenType(TokenType.PASSWORD_RESET)
                         .user(user)
-                        .expiryDate(LocalDateTime.now().plusHours(1))
+                        .expiryDate(LocalDateTime.now(ZoneId.systemDefault()).plusHours(1))
                         .used(false)
                         .build();
 
@@ -100,7 +101,7 @@ public class VerificationTokenService {
                     "This password reset link has already been used.");
         }
 
-        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now(ZoneId.systemDefault()))) {
             throw new IllegalStateException(
                     "This password reset link has expired.");
         }

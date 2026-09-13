@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -107,7 +108,7 @@ public class KycService {
                     .kycDocument(saved)
                     .status(KycMalwareScan.MalwareStatus.SCANNING)
                     .provider("GUARDDUTY")
-                    .scanStartedAt(LocalDateTime.now())
+                    .scanStartedAt(LocalDateTime.now(ZoneId.systemDefault()))
                     .attemptNumber(1)
                     .build();
 
@@ -702,7 +703,7 @@ public class KycService {
 
         extractedData.setExtractionStatus(KycExtractedData.ExtractionStatus.PENDING);
         extractedData.setFailureReason(null);
-        extractedData.setUpdatedAt(LocalDateTime.now());
+        extractedData.setUpdatedAt(LocalDateTime.now(ZoneId.systemDefault()));
 
         kycExtractedDataRepository.save(extractedData);
 
@@ -737,7 +738,7 @@ public class KycService {
                         .kycDocument(document)
                         .status(KycMalwareScan.MalwareStatus.SCANNING)
                         .provider("GUARDDUTY")
-                        .scanStartedAt(LocalDateTime.now())
+                        .scanStartedAt(LocalDateTime.now(ZoneId.systemDefault()))
                         .attemptNumber(latestScan.getAttemptNumber() + 1)
                         .build();
 

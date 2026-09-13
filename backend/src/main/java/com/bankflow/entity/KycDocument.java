@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +86,7 @@ public class KycDocument {
 
     @PrePersist
     protected void onCreate() {
-        uploadedAt = LocalDateTime.now();
+        uploadedAt = LocalDateTime.now(ZoneId.systemDefault());
 
         if (kycVerificationStatus == null) {
             kycVerificationStatus = KycVerificationStatus.PENDING;

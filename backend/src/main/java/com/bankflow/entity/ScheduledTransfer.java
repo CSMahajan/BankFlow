@@ -6,6 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "scheduled_transfers", schema = "retail_banking")
@@ -52,9 +53,9 @@ public class ScheduledTransfer {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(ZoneId.systemDefault());
         if (this.nextExecutionDate == null) {
-            this.nextExecutionDate = LocalDate.now();
+            this.nextExecutionDate = LocalDate.now(ZoneId.systemDefault());
         }
     }
 

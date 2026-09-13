@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Slf4j
@@ -135,7 +136,7 @@ public class FundTransferService {
                 request.amount(),
                 newSourceBalance,
                 "SUCCESS",
-                LocalDateTime.now()
+                LocalDateTime.now(ZoneId.systemDefault())
         );
     }
 

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
@@ -56,7 +57,7 @@ public class ScheduledTransferService {
         accountRepository.findByAccountNumber(request.recipientAccountNumber())
                 .orElseThrow(() -> new IllegalArgumentException("Recipient account not found: " + request.recipientAccountNumber()));
 
-        if (request.startDate().isBefore(LocalDate.now())) {
+        if (request.startDate().isBefore(LocalDate.now(ZoneId.systemDefault()))) {
             throw new IllegalArgumentException("Scheduled transfer start date cannot be in the past.");
         }
 
@@ -119,7 +120,7 @@ public class ScheduledTransferService {
     @Scheduled(cron = "0 0 1 * * ?")
     @Transactional
     public void processDueTransfers() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
         log.info("Starting batch execution of scheduled transfers for date: [{}]", today);
 
         List<ScheduledTransfer> dueTransfers = scheduledTransferRepository

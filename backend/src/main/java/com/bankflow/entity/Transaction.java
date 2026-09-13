@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "transactions", schema = "retail_banking")
@@ -44,7 +45,7 @@ public class Transaction {
 
     @PrePersist
     protected void onCreate() {
-        this.transactionDate = LocalDateTime.now();
+        this.transactionDate = LocalDateTime.now(ZoneId.systemDefault());
     }
 
     public enum TransactionType {

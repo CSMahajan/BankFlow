@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
@@ -68,7 +69,7 @@ public class TransactionService {
         }
 
         if (startDate != null && endDate == null) {
-            endDate = LocalDate.now();
+            endDate = LocalDate.now(ZoneId.systemDefault());
         }
         if (startDate != null && startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Start date cannot be after end date");
@@ -92,7 +93,7 @@ public class TransactionService {
         User currentUser = getAuthenticatedUser();
 
         if (startDate != null && endDate == null) {
-            endDate = LocalDate.now();
+            endDate = LocalDate.now(ZoneId.systemDefault());
         }
 
         if (startDate != null && startDate.isAfter(endDate)) {
@@ -119,7 +120,7 @@ public class TransactionService {
         User currentUser = getAuthenticatedUser();
 
         if (startDate != null && endDate == null) {
-            endDate = LocalDate.now();
+            endDate = LocalDate.now(ZoneId.systemDefault());
         }
 
         if (startDate != null && startDate.isAfter(endDate)) {

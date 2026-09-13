@@ -70,6 +70,9 @@ class CardServiceTest {
     private Account mockAccount;
     private Card mockCard;
 
+    private static final BigDecimal NEW_DAILY_LIMIT =
+            new BigDecimal("25000.00");
+
     @BeforeEach
     void setUp() {
 
@@ -552,10 +555,7 @@ class CardServiceTest {
 
         assertThrows(
                 AccessDeniedException.class,
-                () -> cardService.updateDailyLimit(
-                        100L,
-                        new BigDecimal("25000.00")
-                )
+                () -> cardService.updateDailyLimit(100L, NEW_DAILY_LIMIT)
         );
 
         verify(cardRepository, never())
@@ -575,10 +575,7 @@ class CardServiceTest {
 
         assertThrows(
                 IllegalStateException.class,
-                () -> cardService.updateDailyLimit(
-                        100L,
-                        new BigDecimal("25000.00")
-                )
+                () -> cardService.updateDailyLimit(100L, NEW_DAILY_LIMIT)
         );
 
         verify(cardRepository, never())
@@ -600,10 +597,7 @@ class CardServiceTest {
 
         assertThrows(
                 IllegalStateException.class,
-                () -> cardService.updateDailyLimit(
-                        100L,
-                        new BigDecimal("25000.00")
-                )
+                () -> cardService.updateDailyLimit(100L, NEW_DAILY_LIMIT)
         );
 
         verify(cardRepository, never())

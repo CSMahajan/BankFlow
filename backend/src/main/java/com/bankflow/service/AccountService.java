@@ -34,6 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountService {
 
+    public static final String ACCOUNT = "Account ";
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
@@ -176,12 +177,12 @@ public class AccountService {
             account.setAccountStatus(Account.AccountStatus.FROZEN);
             log.info("Account [{}] has been FROZEN", accountNumber);
             auditLogService.log(AuditAction.ACCOUNT_FROZEN,
-                    "Account " + account.getAccountNumber() + " frozen");
+                    ACCOUNT + account.getAccountNumber() + " frozen");
         } else if (account.getAccountStatus() == Account.AccountStatus.FROZEN) {
             account.setAccountStatus(Account.AccountStatus.ACTIVE);
             log.info("Account [{}] has been ACTIVATED", accountNumber);
             auditLogService.log(AuditAction.ACCOUNT_ACTIVATED,
-                    "Account " + account.getAccountNumber() + " activated"
+                    ACCOUNT + account.getAccountNumber() + " activated"
             );
         }
 
@@ -292,7 +293,7 @@ public class AccountService {
         account.setAccountStatus(Account.AccountStatus.FROZEN);
         auditLogService.log(
                 AuditAction.ACCOUNT_FROZEN,
-                "Account " + account.getAccountNumber() + " frozen"
+                ACCOUNT + account.getAccountNumber() + " frozen"
         );
         Account updatedAccount = accountRepository.save(account);
         log.info("ADMIN successfully froze account [{}]", accountNumber);
@@ -314,7 +315,7 @@ public class AccountService {
         account.setAccountStatus(Account.AccountStatus.ACTIVE);
         auditLogService.log(
                 AuditAction.ACCOUNT_ACTIVATED,
-                "Account " + account.getAccountNumber() + " activated"
+                ACCOUNT + account.getAccountNumber() + " activated"
         );
         Account updatedAccount = accountRepository.save(account);
         log.info("ADMIN successfully unfroze account [{}]", accountNumber);

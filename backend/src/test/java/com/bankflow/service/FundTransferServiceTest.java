@@ -416,16 +416,16 @@ class FundTransferServiceTest {
         when(userRepository.findByEmail("unknown@example.com"))
                 .thenReturn(Optional.empty());
 
+        FundTransferRequest request = new FundTransferRequest(
+                "BF1000000001",
+                "BF2000000002",
+                new BigDecimal("1000.00"),
+                "Test"
+        );
+
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
-                () -> fundTransferService.transferFunds(
-                        new FundTransferRequest(
-                                "BF1000000001",
-                                "BF2000000002",
-                                new BigDecimal("1000.00"),
-                                "Test"
-                        )
-                )
+                () -> fundTransferService.transferFunds(request)
         );
 
         assertEquals("Authenticated user not found", ex.getMessage());

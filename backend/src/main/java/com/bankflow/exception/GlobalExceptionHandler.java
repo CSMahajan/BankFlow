@@ -20,6 +20,8 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    public static final String BAD_REQUEST_ERROR_MESSAGE = "Bad Request";
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
 
@@ -36,7 +38,7 @@ public class GlobalExceptionHandler {
         log.warn("Business Exception Handled: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST_ERROR_MESSAGE,
                 ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -85,7 +87,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error =
                 new ErrorResponse(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Bad Request",
+                        BAD_REQUEST_ERROR_MESSAGE,
                         "File size cannot exceed 5 MB"
                 );
 
@@ -102,7 +104,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error =
                 new ErrorResponse(
                         HttpStatus.BAD_REQUEST.value(),
-                        "Bad Request",
+                        BAD_REQUEST_ERROR_MESSAGE,
                         "Invalid document content type"
                 );
 
@@ -118,7 +120,7 @@ public class GlobalExceptionHandler {
         log.warn("Illegal State: {}", ex.getMessage());
 
         ErrorResponse error = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(), "Bad Request", ex.getMessage());
+                HttpStatus.BAD_REQUEST.value(), BAD_REQUEST_ERROR_MESSAGE, ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

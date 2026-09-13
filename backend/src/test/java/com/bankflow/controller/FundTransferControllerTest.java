@@ -8,6 +8,9 @@ import com.bankflow.filter.RateLimitFilter;
 import com.bankflow.filter.UserRateLimitFilter;
 import com.bankflow.service.FundTransferService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -96,72 +100,64 @@ class FundTransferControllerTest {
         verify(fundTransferService).transferFunds(any());
     }
 
-    @Test
-    void transferFunds_whenSourceAccountMissing_shouldReturn400() throws Exception {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("invalidTransferRequests")
+    void transferFunds_invalidRequest_shouldReturn400(
+            String testCase,
+            String requestBody
+    ) throws Exception {
 
         mockMvc.perform(post("/api/v1/transfers")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "targetAccountNumber": "0987654321",
-                                  "amount": 5000.00,
-                                  "remark": "Test transfer"
-                                }
-                                """))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(fundTransferService);
     }
 
-    @Test
-    void transferFunds_whenTargetAccountMissing_shouldReturn400() throws Exception {
-
-        mockMvc.perform(post("/api/v1/transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "amount": 5000.00,
-                                  "remark": "Test transfer"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(fundTransferService);
-    }
-
-    @Test
-    void transferFunds_whenAmountMissing_shouldReturn400() throws Exception {
-
-        mockMvc.perform(post("/api/v1/transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "targetAccountNumber": "0987654321",
-                                  "remark": "Test transfer"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(fundTransferService);
-    }
-
-    @Test
-    void transferFunds_whenAmountBelowMinimum_shouldReturn400() throws Exception {
-
-        mockMvc.perform(post("/api/v1/transfers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "sourceAccountNumber": "1234567890",
-                                  "targetAccountNumber": "0987654321",
-                                  "amount": 0.50,
-                                  "remark": "Test transfer"
-                                }
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(fundTransferService);
+    private static Stream<Arguments> invalidTransferRequests() {
+        return Stream.of(
+                Arguments.of(
+                        "Source account missing",
+                        """
+                        {
+                          "targetAccountNumber": "0987654321",
+                          "amount": 5000.00,
+                          "remark": "Test transfer"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Target account missing",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "amount": 5000.00,
+                          "remark": "Test transfer"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Amount missing",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "targetAccountNumber": "0987654321",
+                          "remark": "Test transfer"
+                        }
+                        """
+                ),
+                Arguments.of(
+                        "Amount below minimum",
+                        """
+                        {
+                          "sourceAccountNumber": "1234567890",
+                          "targetAccountNumber": "0987654321",
+                          "amount": 0.50,
+                          "remark": "Test transfer"
+                        }
+                        """
+                )
+        );
     }
 }

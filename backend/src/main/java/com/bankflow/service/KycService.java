@@ -601,16 +601,6 @@ public class KycService {
     @Transactional(readOnly = true)
     public PanDataResponse getAdminPanData(Long documentId) {
 
-
-        KycDocument document =
-                kycDocumentRepository.findById(documentId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        KYC_DOCUMENT_NOT_FOUND
-                                )
-                        );
-
-
         KycPanData panData =
                 kycPanDataRepository
                         .findByKycDocumentId(documentId)
@@ -633,16 +623,6 @@ public class KycService {
 
     @Transactional(readOnly = true)
     public AadhaarDataResponse getAdminAadhaarData(Long documentId) {
-
-
-        KycDocument document =
-                kycDocumentRepository.findById(documentId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        KYC_DOCUMENT_NOT_FOUND
-                                )
-                        );
-
 
         KycAadhaarData aadhaarData =
                 kycAadhaarDataRepository

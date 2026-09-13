@@ -26,6 +26,31 @@ public class RefreshTokenService {
     @Transactional
     public String createRefreshToken(User user) {
 
+        return createRefreshTokenInternal(user);
+    }
+
+    @Transactional(readOnly = true)
+    public RefreshToken validateRefreshToken(String token) {
+        return validateRefreshTokenInternal(token);
+    }
+
+    @Transactional
+    public void revokeToken(String token) {
+        RefreshToken refreshToken = validateRefreshTokenInternal(token);
+        refreshToken.setRevoked(true);
+        refreshTokenRepository.save(refreshToken);
+    }
+
+    @Transactional
+    public String rotateRefreshToken(String oldToken, User user) {
+        RefreshToken existingToken = validateRefreshTokenInternal(oldToken);
+        existingToken.setRevoked(true);
+        refreshTokenRepository.save(existingToken);
+        return createRefreshTokenInternal(user);
+    }
+
+    private String createRefreshTokenInternal(User user) {
+
         String refreshToken = generateToken();
 
         RefreshToken refreshTokenEntity =
@@ -34,63 +59,47 @@ public class RefreshTokenService {
                         .tokenHash(hashToken(refreshToken))
                         .expiryDate(
                                 LocalDateTime.now()
-                                        .plus(jwtProperties.getRefreshTokenExpiration())
+                                        .plus(
+                                                jwtProperties
+                                                        .getRefreshTokenExpiration()
+                                        )
                         )
                         .revoked(false)
                         .createdAt(LocalDateTime.now())
                         .build();
 
-
         refreshTokenRepository.save(refreshTokenEntity);
-
 
         return refreshToken;
     }
 
-    @Transactional(readOnly = true)
-    public RefreshToken validateRefreshToken(String token) {
+    private RefreshToken validateRefreshTokenInternal(String token) {
 
         String tokenHash = hashToken(token);
 
         RefreshToken refreshToken =
                 refreshTokenRepository.findByTokenHash(tokenHash)
-                        .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
-
+                        .orElseThrow(() ->
+                                new InvalidRefreshTokenException(
+                                        "Invalid refresh token"
+                                )
+                        );
 
         if (refreshToken.isRevoked()) {
-            throw new InvalidRefreshTokenException("Refresh token has been revoked");
+            throw new InvalidRefreshTokenException(
+                    "Refresh token has been revoked"
+            );
         }
 
-        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new InvalidRefreshTokenException("Refresh token expired");
+        if (refreshToken.getExpiryDate()
+                .isBefore(LocalDateTime.now())) {
+
+            throw new InvalidRefreshTokenException(
+                    "Refresh token expired"
+            );
         }
 
         return refreshToken;
-    }
-
-    @Transactional
-    public void revokeToken(String token) {
-
-        RefreshToken refreshToken =
-                validateRefreshToken(token);
-
-        refreshToken.setRevoked(true);
-
-        refreshTokenRepository.save(refreshToken);
-    }
-
-    @Transactional
-    public String rotateRefreshToken(String oldToken, User user) {
-
-        RefreshToken existingToken =
-                validateRefreshToken(oldToken);
-
-        existingToken.setRevoked(true);
-
-        refreshTokenRepository.save(existingToken);
-
-
-        return createRefreshToken(user);
     }
 
     private String generateToken() {
@@ -103,7 +112,6 @@ public class RefreshTokenService {
                                 .getBytes(StandardCharsets.UTF_8)
                 );
     }
-
 
     private String hashToken(String token) {
 
@@ -127,7 +135,6 @@ public class RefreshTokenService {
             );
         }
     }
-
 
     private String bytesToHex(byte[] bytes) {
 

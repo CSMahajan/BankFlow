@@ -69,13 +69,17 @@ public class KycExtractionProcessorService {
 
         try {
 
-            DetectDocumentTextRequest request = DetectDocumentTextRequest.builder()
-                    .document(Document.builder()
-                            .s3Object(S3Object.builder()
-                                    .bucket(document.getS3Bucket())
-                                    .name(document.getS3ObjectKey()).build())
-                            .build()).build();
-
+            DetectDocumentTextRequest request =
+                    DetectDocumentTextRequest.builder()
+                            .document(documentBuilder ->
+                                    documentBuilder.s3Object(
+                                            S3Object.builder()
+                                                    .bucket(document.getS3Bucket())
+                                                    .name(document.getS3ObjectKey())
+                                                    .build()
+                                    )
+                            )
+                            .build();
 
             DetectDocumentTextResponse response = textractClient.detectDocumentText(request);
 

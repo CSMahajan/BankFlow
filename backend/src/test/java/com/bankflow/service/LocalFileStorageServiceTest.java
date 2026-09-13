@@ -1,6 +1,7 @@
 package com.bankflow.service;
 
 import com.bankflow.dto.StoredFileMetadata;
+import com.bankflow.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -253,16 +254,16 @@ class LocalFileStorageServiceTest {
     @Test
     void load_shouldThrowExceptionWhenFileDoesNotExist() {
 
-        RuntimeException exception =
+        ResourceNotFoundException exception =
                 assertThrows(
-                        RuntimeException.class,
+                        ResourceNotFoundException.class,
                         () -> service.load(
                                 "user-123/missing.pdf"
                         )
                 );
 
         assertEquals(
-                "Unable to read file",
+                "File not found",
                 exception.getMessage()
         );
     }
@@ -270,27 +271,17 @@ class LocalFileStorageServiceTest {
     @Test
     void load_shouldRejectPathTraversal() {
 
-        RuntimeException exception =
+        IllegalArgumentException exception =
                 assertThrows(
-                        RuntimeException.class,
+                        IllegalArgumentException.class,
                         () -> service.load(
                                 "../outside.txt"
                         )
                 );
 
         assertEquals(
-                "Unable to read file",
-                exception.getMessage()
-        );
-
-        assertInstanceOf(
-                RuntimeException.class,
-                exception.getCause()
-        );
-
-        assertEquals(
                 "Invalid file path",
-                exception.getCause().getMessage()
+                exception.getMessage()
         );
     }
 

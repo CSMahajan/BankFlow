@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class PanTextExtractorService {
 
     private static final Pattern PAN_PATTERN =
-            Pattern.compile("[A-Z]{5}[0-9]{4}[A-Z]");
+            Pattern.compile("[A-Z]{5}\\d{4}[A-Z]");
 
     private static final Pattern DOB_PATTERN =
             Pattern.compile("\\d{2}/\\d{2}/\\d{4}");

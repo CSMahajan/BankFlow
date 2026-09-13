@@ -17,7 +17,6 @@
     import org.springframework.data.domain.Page;
     import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
     import org.springframework.security.core.Authentication;
-    import org.springframework.security.test.context.support.WithMockUser;
     import org.springframework.test.context.bean.override.mockito.MockitoBean;
     import org.springframework.test.web.servlet.MockMvc;
 

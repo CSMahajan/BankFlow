@@ -512,7 +512,7 @@ class KycServiceTest {
         assertEquals(1, result.size());
 
         KycDocumentResponse response =
-                result.get(0);
+                result.getFirst();
 
         assertEquals(10L, response.id());
         assertEquals("PAN", response.documentType());
@@ -1592,8 +1592,6 @@ class KycServiceTest {
                         .fatherName("Robert Doe")
                         .build();
 
-        when(kycDocumentRepository.findById(10L))
-                .thenReturn(Optional.of(document));
 
         when(kycPanDataRepository
                 .findByKycDocumentId(10L))
@@ -1608,14 +1606,6 @@ class KycServiceTest {
 
     @Test
     void getAdminAadhaarData_shouldThrowWhenDataDoesNotExist() {
-
-        KycDocument document =
-                KycDocument.builder()
-                        .id(10L)
-                        .build();
-
-        when(kycDocumentRepository.findById(10L))
-                .thenReturn(Optional.of(document));
 
         when(kycAadhaarDataRepository
                 .findByKycDocumentId(10L))

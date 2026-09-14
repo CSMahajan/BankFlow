@@ -232,6 +232,61 @@ Testing uses:
 - Spring testing utilities where required
 - JaCoCo for code coverage reporting
   The focus of testing is on meaningful application behavior, including business rules, validation, authorization-related logic, and service interactions.
+
+## 🔎 SonarQube Cloud — Code Quality Analysis
+
+BankFlow's backend is analyzed with [SonarQube Cloud](https://sonarcloud.io/) to continuously assess code quality, security-related findings, test coverage, and code duplication.
+
+### SonarQube Cloud Setup
+
+1. Create or sign in to a SonarQube Cloud account.
+2. Create/import the BankFlow backend project and connect it to the GitHub repository.
+3. Note the project's **Project Key** and the organization's **Organization Key**.
+4. Generate a SonarQube Cloud analysis token with permission to analyze the project.
+5. Configure the following environment variables locally or in the CI environment:
+
+```text
+SONAR_PROJECT_KEY
+SONAR_ORGANIZATION_KEY
+SONAR_TOKEN
+```
+
+> **Security:** Never commit `SONAR_TOKEN` or any other SonarQube credentials to the repository.
+
+### Manual Maven Analysis
+
+BankFlow uses Maven-based Sonar analysis for the Spring Boot backend. When using Maven/manual analysis, **Automatic Analysis must be disabled** for the SonarQube Cloud project to avoid running both analysis methods.
+
+From the `backend/` directory, run:
+
+```bash
+mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -Dsonar.projectKey="$SONAR_PROJECT_KEY" \
+  -Dsonar.organization="$SONAR_ORGANIZATION_KEY" \
+  -Dsonar.token="$SONAR_TOKEN"
+```
+
+The command first builds and verifies the backend and then uploads the SonarQube analysis results to the configured SonarQube Cloud project.
+
+### Analysis Results
+
+The SonarQube Cloud dashboard provides an overview of the analyzed backend, including the quality gate, open issues, code duplication, and test coverage.
+
+![SonarQube Cloud BankFlow Project](docs/quality/sonarqube_cloud_bankflow_project.png)
+
+The captured project analysis demonstrates:
+
+- **Quality Gate:** Passed — all configured quality-gate conditions passed.
+- **Open Issues:** 2
+- **Code Duplication:** 0.0%
+- **Test Coverage:** 89.8%
+- **Lines of Code:** 8.8k
+- **Analysis Warning:** 1
+
+This screenshot serves as evidence of the SonarQube Cloud analysis for the **BankFlow backend project**. The frontend is analyzed separately and may have different quality metrics.
+
+---
+
 ## 🔐 Security
 Security-related functionality implemented in BankFlow includes:
 - Spring Security
@@ -282,9 +337,12 @@ BankFlow/
 │   │   ├── bankflow_openapi.yml
 │   │   └── bankflow_openapi.json
 │   │
-│   └── screenshots/
-│       ├── customer/
-│       └── admin/
+│   ├── screenshots/
+│   │   ├── customer/
+│   │   └── admin/
+│   │
+│   └── quality/
+│       └── sonarqube_cloud_bankflow_project.png
 │
 └── README.md
 ```
@@ -548,6 +606,7 @@ The deployed application can be accessed through the project's configured Render
 | [KYC Workflow](docs/workflows/BankFlow_KYC_Workflow.drawio.png) | Asynchronous KYC malware scanning and extraction |
 | [OpenAPI YAML](docs/api/bankflow_openapi.yml) | API specification |
 | [OpenAPI JSON](docs/api/bankflow_openapi.json) | API specification in JSON format |
+| [SonarQube Cloud Analysis](docs/quality/sonarqube_cloud_bankflow_project.png) | Code quality, coverage, duplication, and quality-gate evidence |
 
 ## ⚠️ Disclaimer
 BankFlow is a portfolio and learning project intended to demonstrate full-stack development, backend architecture, security concepts, database design, testing, and cloud integration.

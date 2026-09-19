@@ -13,7 +13,7 @@ app:
     notification-enabled: false
 
   storage:
-    type: local
+    type: s3
 
 rate-limit:
   enabled: true

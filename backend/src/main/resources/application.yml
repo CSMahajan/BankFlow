@@ -49,6 +49,16 @@ springdoc:
   swagger-ui:
     path: /swagger-ui
 
+gemini:
+  api-key: ${GEMINI_API_KEY}
+  model: ${GEMINI_MODEL:gemini-3.5-flash-lite}
+  embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-2}
+
+rag:
+  ingestion:
+    enabled: ${RAG_INGESTION_ENABLED:false}
+    repository-root: ${RAG_REPOSITORY_ROOT:..}
+
 app:
   cors-origin: ${CORS_ORIGIN:http://localhost:5173}
 

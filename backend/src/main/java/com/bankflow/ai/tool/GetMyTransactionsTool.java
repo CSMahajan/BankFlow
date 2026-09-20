@@ -1,7 +1,6 @@
 package com.bankflow.ai.tool;
 
 import com.bankflow.dto.TransactionResponse;
-import com.bankflow.entity.Transaction;
 import com.bankflow.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

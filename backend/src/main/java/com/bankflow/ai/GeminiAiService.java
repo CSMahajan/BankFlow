@@ -1,5 +1,9 @@
 package com.bankflow.ai;
 
+import com.bankflow.ai.tool.GetMyAccountsTool;
+import com.bankflow.ai.tool.GetMyTransactionsTool;
+import com.bankflow.dto.AccountResponse;
+import com.bankflow.dto.TransactionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -18,6 +23,9 @@ public class GeminiAiService implements AiService {
     private final Client client;
     private final ObjectMapper objectMapper;
     private final RagRetrievalService ragRetrievalService;
+    private final GetMyAccountsTool getMyAccountsTool;
+    private final GetMyTransactionsTool getMyTransactionsTool;
+    private final AiAudienceResolver aiAudienceResolver;
 
     @Value("${gemini.model:gemini-3.5-flash-lite}")
     private String model;
@@ -25,7 +33,10 @@ public class GeminiAiService implements AiService {
     public GeminiAiService(
             @Value("${gemini.api-key}") String apiKey,
             ObjectMapper objectMapper,
-            RagRetrievalService ragRetrievalService) {
+            RagRetrievalService ragRetrievalService,
+            GetMyAccountsTool getMyAccountsTool,
+            GetMyTransactionsTool getMyTransactionsTool,
+            AiAudienceResolver aiAudienceResolver) {
 
         this.client = Client.builder()
                 .apiKey(apiKey)
@@ -33,15 +44,32 @@ public class GeminiAiService implements AiService {
 
         this.objectMapper = objectMapper;
         this.ragRetrievalService = ragRetrievalService;
+        this.getMyAccountsTool = getMyAccountsTool;
+        this.getMyTransactionsTool = getMyTransactionsTool;
+        this.aiAudienceResolver = aiAudienceResolver;
     }
 
     @Override
     public AiResponse ask(String question) {
 
+        AiAudience audience =
+                aiAudienceResolver.resolve();
+
+        RagAudience ragAudience =
+                audience == AiAudience.CUSTOMER
+                        ? RagAudience.CUSTOMER
+                        : RagAudience.ADMIN;
+
+        log.info(
+                "AI request audience: {}, RAG audience: {}",
+                audience,
+                ragAudience
+        );
+
         List<RagRetrievedChunk> retrievedChunks =
                 ragRetrievalService.retrieve(
                         question,
-                        RagAudience.SHARED
+                        ragAudience
                 );
 
         log.info(
@@ -67,28 +95,10 @@ public class GeminiAiService implements AiService {
                 buildRagContext(retrievedChunks);
 
         String systemInstruction =
-                BankFlowAiContext.CONTEXT
-                        + "\n\n"
-                        + """
-                        RAG INSTRUCTIONS:
-                        
-                        The following information was retrieved from
-                        BankFlow's project documentation.
-                        
-                        Use this retrieved information when answering
-                        BankFlow-specific questions.
-                        
-                        Do not invent implementation details.
-                        
-                        If the retrieved information does not contain
-                        enough information to answer a BankFlow-specific
-                        question, say that the available BankFlow
-                        documentation does not provide enough information.
-                        
-                        Retrieved documentation:
-                        """
-                        + "\n"
-                        + ragContext;
+                buildSystemInstruction(
+                        audience,
+                        ragContext
+                );
 
         Content systemContent = Content.fromParts(
                 Part.fromText(systemInstruction)
@@ -100,8 +110,16 @@ public class GeminiAiService implements AiService {
                         "answer", Schema.builder()
                                 .type("STRING")
                                 .build(),
+
                         "category", Schema.builder()
                                 .type("STRING")
+                                .enum_(List.of(
+                                        "BANKFLOW_FEATURE",
+                                        "BANKFLOW_TECHNOLOGY",
+                                        "BANKFLOW_SECURITY",
+                                        "GENERAL",
+                                        "UNKNOWN"
+                                ))
                                 .build()
                 ))
                 .required(List.of("answer", "category"))
@@ -112,6 +130,7 @@ public class GeminiAiService implements AiService {
                         .systemInstruction(systemContent)
                         .responseMimeType("application/json")
                         .responseSchema(responseSchema)
+                        .tools(getToolsForAudience(audience))
                         .build();
 
         GenerateContentResponse response =
@@ -120,6 +139,70 @@ public class GeminiAiService implements AiService {
                         question,
                         config
                 );
+
+        if (!Objects.requireNonNull(response.functionCalls()).isEmpty()) {
+
+            FunctionCall functionCall =
+                    response.functionCalls().getFirst();
+
+            String functionName =
+                    functionCall.name()
+                            .orElseThrow(
+                                    () -> new IllegalStateException(
+                                            "Gemini function call has no name"
+                                    )
+                            );
+
+            log.info(
+                    "Gemini requested tool: {}",
+                    functionName
+            );
+
+            if (GetMyAccountsTool.NAME.equals(functionName)) {
+
+                List<AccountResponse> accounts =
+                        getMyAccountsTool.execute();
+
+                log.info(
+                        "Tool [{}] returned {} accounts",
+                        GetMyAccountsTool.NAME,
+                        accounts.size()
+                );
+
+                return generateFinalResponseAfterToolCall(
+                        question,
+                        response,
+                        functionCall,
+                        accounts,
+                        config
+                );
+            }
+
+            if (GetMyTransactionsTool.NAME.equals(functionName)) {
+
+                List<TransactionResponse> transactions =
+                        getMyTransactionsTool.execute();
+
+                log.info(
+                        "Tool [{}] returned {} transactions",
+                        GetMyTransactionsTool.NAME,
+                        transactions.size()
+                );
+
+                return generateFinalResponseAfterToolCall(
+                        question,
+                        response,
+                        functionCall,
+                        transactions,
+                        config
+                );
+            }
+
+            throw new IllegalStateException(
+                    "Unknown Gemini tool requested: "
+                            + functionName
+            );
+        }
 
         log.info(
                 "Gemini raw response: {}",
@@ -181,5 +264,184 @@ public class GeminiAiService implements AiService {
         }
 
         return context.toString();
+    }
+
+    private FunctionDeclaration getMyAccountsFunction() {
+
+        return FunctionDeclaration.builder()
+                .name(GetMyAccountsTool.NAME)
+                .description("""
+                        Returns the authenticated customer's bank accounts.
+                        The customer is determined by the server-side
+                        authentication context. This function takes no parameters.
+                        """)
+                .build();
+    }
+
+    private FunctionDeclaration getMyTransactionsFunction() {
+
+        return FunctionDeclaration.builder()
+                .name(GetMyTransactionsTool.NAME)
+                .description("""
+                        Returns the authenticated customer's
+                        most recent transactions.
+                        
+                        The customer is determined by the server-side
+                        authentication context. This function takes
+                        no parameters.
+                        """)
+                .build();
+    }
+
+    private List<Tool> getToolsForAudience(AiAudience audience) {
+
+        if (audience == AiAudience.CUSTOMER) {
+            return List.of(
+                    Tool.builder()
+                            .functionDeclarations(
+                                    List.of(
+                                            getMyAccountsFunction(),
+                                            getMyTransactionsFunction()
+                                    )
+                            )
+                            .build()
+            );
+        }
+
+        return List.of();
+    }
+
+    private AiResponse generateFinalResponseAfterToolCall(
+            String question,
+            GenerateContentResponse response,
+            FunctionCall functionCall,
+            Object toolResult,
+            GenerateContentConfig config) {
+
+        try {
+            String toolResultJson =
+                    objectMapper.writeValueAsString(toolResult);
+
+            Content functionResponseContent =
+                    Content.fromParts(
+                            Part.fromFunctionResponse(
+                                    functionCall.name().orElseThrow(
+                                            () -> new IllegalStateException(
+                                                    "Gemini function call has no name"
+                                            )
+                                    ),
+                                    Map.of(
+                                            "result",
+                                            toolResultJson
+                                    )
+                            )
+                    );
+
+            GenerateContentResponse finalResponse =
+                    client.models.generateContent(
+                            model,
+                            List.of(
+                                    Content.fromParts(
+                                            Part.fromText(question)
+                                    ),
+                                    response.candidates()
+                                            .orElseThrow()
+                                            .getFirst()
+                                            .content()
+                                            .orElseThrow(),
+                                    functionResponseContent
+                            ),
+                            config
+                    );
+
+            log.info(
+                    "Gemini final response after tool call: {}",
+                    finalResponse.text()
+            );
+
+            return parseResponse(finalResponse.text());
+
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(
+                    "Failed to serialize tool result",
+                    e
+            );
+        }
+    }
+
+    private String buildSystemInstruction(
+            AiAudience audience,
+            String ragContext) {
+
+        if (audience == AiAudience.CUSTOMER) {
+            return """
+                    %s
+                    
+                    CUSTOMER ASSISTANT RULES:
+                    
+                    The user is an authenticated banking customer.
+                    
+                    Answer in simple, customer-friendly language.
+                    
+                    Never expose internal implementation details,
+                    administrative information, or another customer's data.
+                    
+                    For customer-specific live information, use the available
+                    backend tools instead of guessing.
+                    
+                    Never invent account balances, transactions, cards,
+                    loans, or other customer-specific information.
+                    
+                    When a backend tool returns a list of records requested
+                    by the customer, include every returned record unless
+                    the customer explicitly asks for a subset, summary, or limit.
+                    
+                    Do not silently omit records from tool results.
+                    
+                    Use the retrieved BankFlow documentation when answering
+                    questions about BankFlow functionality.
+                    
+                    If the requested information is unavailable,
+                    clearly say that it is unavailable.
+                    
+                    RETRIEVED BANKFLOW DOCUMENTATION:
+                    ---
+                    %s
+                    ---
+                    """.formatted(
+                    BankFlowAiContext.CONTEXT,
+                    ragContext
+            );
+        }
+
+        return """
+                %s
+                
+                ADMINISTRATOR ASSISTANT RULES:
+                
+                The user is an authenticated BankFlow administrator.
+                
+                You may explain BankFlow's technical architecture,
+                APIs, backend functionality, administrative functionality,
+                security implementation, database-related concepts,
+                and other technical documentation available through
+                the retrieved context.
+                
+                Never expose customer-specific information unless it is
+                explicitly provided by an authorized backend tool.
+                
+                Never invent system behavior, APIs, database information,
+                or administrative capabilities.
+                
+                Use retrieved BankFlow documentation as the source of truth.
+                
+                RETRIEVED BANKFLOW DOCUMENTATION:
+                ---
+                %s
+                ---
+                """.formatted(
+                BankFlowAiContext.CONTEXT,
+                ragContext
+        );
     }
 }

@@ -58,10 +58,7 @@ public class RagIngestionRunner {
                         .filter(candidate -> candidate.supports(file))
                         .findFirst()
                         .orElseThrow(() ->
-                                new IllegalStateException(
-                                        "No parser found for supported file: "
-                                                + file
-                                )
+                                new IllegalStateException("No parser found for supported file: " + file)
                         );
 
         RagDocument parsedDocument =

@@ -1,7 +1,7 @@
 package com.bankflow.ai;
 
-import com.bankflow.entity.RagChunkEntity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,9 +9,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RagRetrievalService {
 
+    private static final int CANDIDATE_LIMIT = 10;
     private static final int DEFAULT_TOP_K = 5;
+    public static final String SHARED_AUDIENCE = "SHARED";
 
     private final GeminiEmbeddingService embeddingService;
     private final RagChunkRepository ragChunkRepository;
@@ -39,19 +42,34 @@ public class RagRetrievalService {
         String pgVector =
                 toPgVector(embedding);
 
-        List<RagChunkEntity> chunks =
-                ragChunkRepository.findNearestChunks(
+        List<RagChunkSearchResult> results =
+                ragChunkRepository.findNearestChunksWithDistance(
                         pgVector,
                         allowedAudiences(audience),
-                        DEFAULT_TOP_K
+                        CANDIDATE_LIMIT
                 );
 
-        return chunks.stream()
-                .map(chunk -> new RagRetrievedChunk(
-                        chunk.getSource().getSourcePath(),
-                        chunk.getSection(),
-                        chunk.getContent(),
-                        chunk.getAudience()
+        for (int i = 0; i < results.size(); i++) {
+
+            RagChunkSearchResult result = results.get(i);
+
+            log.info(
+                    "RAG result {} | distance={} | source={} | section={} | content={}",
+                    i + 1,
+                    result.getDistance(),
+                    result.getSourcePath(),
+                    result.getSection(),
+                    preview(result.getContent())
+            );
+        }
+
+        return results.stream()
+                .limit(DEFAULT_TOP_K)
+                .map(result -> new RagRetrievedChunk(
+                        result.getSourcePath(),
+                        result.getSection(),
+                        result.getContent(),
+                        RagAudience.valueOf(result.getAudience())
                 ))
                 .toList();
     }
@@ -60,14 +78,11 @@ public class RagRetrievalService {
             RagAudience audience) {
 
         return switch (audience) {
-            case CUSTOMER ->
-                    List.of("SHARED", "CUSTOMER");
+            case CUSTOMER -> List.of(SHARED_AUDIENCE, "CUSTOMER");
 
-            case ADMIN ->
-                    List.of("SHARED", "ADMIN");
+            case ADMIN -> List.of(SHARED_AUDIENCE, "ADMIN");
 
-            case SHARED ->
-                    List.of("SHARED");
+            case SHARED -> List.of(SHARED_AUDIENCE);
         };
     }
 
@@ -94,5 +109,21 @@ public class RagRetrievalService {
         result.append("]");
 
         return result.toString();
+    }
+
+    private String preview(String content) {
+
+        if (content == null) {
+            return "";
+        }
+
+        String normalized =
+                content.replaceAll("\\s+", " ").trim();
+
+        if (normalized.length() <= 250) {
+            return normalized;
+        }
+
+        return normalized.substring(0, 250) + "...";
     }
 }

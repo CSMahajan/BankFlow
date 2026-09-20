@@ -59,11 +59,15 @@ public class RagIngestionService {
 
         for (RagChunk chunk : chunks) {
 
-            String chunkHash = sha256(chunk.content());
+            String chunkText =
+                    buildEmbeddingText(chunk);
+
+            String chunkHash =
+                    sha256(chunkText);
 
             List<Float> embedding =
                     embeddingService.generateEmbedding(
-                            chunk.content()
+                            chunkText
                     );
 
             RagChunkEntity entity =
@@ -121,5 +125,17 @@ public class RagIngestionService {
                     e
             );
         }
+    }
+
+    private String buildEmbeddingText(RagChunk chunk) {
+
+        if (chunk.section() == null
+                || chunk.section().isBlank()) {
+            return chunk.content();
+        }
+
+        return chunk.section()
+                + "\n\n"
+                + chunk.content();
     }
 }

@@ -29,4 +29,27 @@ public interface RagChunkRepository
             @Param("audiences") List<String> audiences,
             @Param("limit") int limit
     );
+
+    @Query(value = """
+            SELECT
+                rc.id AS id,
+                rs.source_path AS sourcePath,
+                rs.source_type AS sourceType,
+                rc.section AS section,
+                rc.content AS content,
+                rc.audience AS audience,
+                rc.embedding <=> CAST(:embedding AS vector) AS distance
+            FROM retail_banking.rag_chunks rc
+            JOIN retail_banking.rag_sources rs
+                ON rs.id = rc.source_id
+            WHERE rc.audience IN (:audiences)
+              AND rc.embedding IS NOT NULL
+            ORDER BY rc.embedding <=> CAST(:embedding AS vector)
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<RagChunkSearchResult> findNearestChunksWithDistance(
+            @Param("embedding") String embedding,
+            @Param("audiences") List<String> audiences,
+            @Param("limit") int limit
+    );
 }

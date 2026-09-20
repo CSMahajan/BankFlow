@@ -29,6 +29,7 @@ public class RagIngestionStartupRunner implements CommandLineRunner {
     public void run(String... args) {
 
         if (!enabled) {
+            log.info("Rag Ingestion has been disabled, skipping");
             return;
         }
 

@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class OpenApiDocumentParserTest {
 
@@ -25,11 +24,9 @@ class OpenApiDocumentParserTest {
     @Test
     void shouldNotSupportOpenApiJson() {
 
-        assertTrue(
-                !parser.supports(
-                        Path.of("docs/api/bankflow_openapi.json")
-                )
-        );
+        assertFalse(parser.supports(
+                Path.of("docs/api/bankflow_openapi.json")
+        ));
     }
 
     @Test
@@ -44,8 +41,8 @@ class OpenApiDocumentParserTest {
                 document.sourceType()
         );
 
-        assertTrue(document.title() != null);
-        assertTrue(!document.title().isBlank());
+        assertNotNull(document.title());
+        assertFalse(document.title().isBlank());
 
         assertTrue(document.content().contains("openapi"));
         assertTrue(document.content().contains("paths"));

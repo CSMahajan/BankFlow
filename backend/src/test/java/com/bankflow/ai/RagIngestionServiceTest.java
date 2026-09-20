@@ -69,8 +69,9 @@ class RagIngestionServiceTest {
                 0.3f
         );
 
-        when(embeddingService.generateEmbedding(chunk.content()))
-                .thenReturn(embedding);
+        when(embeddingService.generateEmbedding(
+                "Test\n\nBankFlow allows customers to transfer funds."
+        )).thenReturn(embedding);
 
         when(ragChunkRepository.save(any(RagChunkEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -84,7 +85,9 @@ class RagIngestionServiceTest {
         assertSame(savedSource, result);
 
         verify(embeddingService)
-                .generateEmbedding(chunk.content());
+                .generateEmbedding(
+                        "Test\n\nBankFlow allows customers to transfer funds."
+                );
 
         ArgumentCaptor<RagChunkEntity> captor =
                 ArgumentCaptor.forClass(RagChunkEntity.class);

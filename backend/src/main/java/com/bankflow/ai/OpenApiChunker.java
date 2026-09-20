@@ -41,6 +41,7 @@ public class OpenApiChunker {
             //Audit administration
             "GET /api/v1/admin/audit-logs"
     );
+    public static final String SCHEMA = "schema";
 
     private final Yaml yaml = new Yaml();
 
@@ -209,7 +210,7 @@ public class OpenApiChunker {
                         .append(required);
             }
 
-            Object schema = parameter.get("schema");
+            Object schema = parameter.get(SCHEMA);
 
             if (schema != null) {
                 content.append(", schema=")
@@ -254,7 +255,7 @@ public class OpenApiChunker {
 
             if (entry.getValue() instanceof Map<?, ?> mediaDefinition) {
 
-                Object schema = mediaDefinition.get("schema");
+                Object schema = mediaDefinition.get(SCHEMA);
 
                 if (schema != null) {
                     content.append("  schema: ")
@@ -312,7 +313,7 @@ public class OpenApiChunker {
                             instanceof Map<?, ?> mediaDefinition) {
 
                         Object schema =
-                                mediaDefinition.get("schema");
+                                mediaDefinition.get(SCHEMA);
 
                         if (schema != null) {
                             content.append("\n  schema: ")

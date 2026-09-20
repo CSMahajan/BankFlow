@@ -17,6 +17,8 @@ import java.nio.file.Path;
 @Component
 public class DrawioDocumentParser implements RagDocumentParser {
 
+    public static final String DRAWIO_XML = ".drawio.xml";
+
     @Override
     public boolean supports(Path path) {
 
@@ -27,7 +29,7 @@ public class DrawioDocumentParser implements RagDocumentParser {
         return path.getFileName()
                 .toString()
                 .toLowerCase()
-                .endsWith(".drawio.xml");
+                .endsWith(DRAWIO_XML);
     }
 
     @Override
@@ -133,7 +135,7 @@ public class DrawioDocumentParser implements RagDocumentParser {
 
             String name = diagram.getAttribute("name");
 
-            if (name != null && !name.isBlank()) {
+            if (!name.isBlank()) {
                 return name.trim();
             }
         }
@@ -141,10 +143,10 @@ public class DrawioDocumentParser implements RagDocumentParser {
         String fileName =
                 path.getFileName().toString();
 
-        if (fileName.toLowerCase().endsWith(".drawio.xml")) {
+        if (fileName.toLowerCase().endsWith(DRAWIO_XML)) {
             return fileName.substring(
                     0,
-                    fileName.length() - ".drawio.xml".length()
+                    fileName.length() - DRAWIO_XML.length()
             );
         }
 

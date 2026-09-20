@@ -308,7 +308,7 @@ class RagChunkEntityRepositoryTest {
         return ragChunkRepository.saveAndFlush(chunk);
     }
 
-    /**
+    /*
      * Creates a 1536-dimensional vector where only the first
      * two dimensions contain values.
      */

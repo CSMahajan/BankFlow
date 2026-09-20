@@ -1,5 +1,6 @@
 package com.bankflow.ai;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 
 @Component
+@Slf4j
 public class RagIngestionStartupRunner implements CommandLineRunner {
 
     private final RagIngestionRunner ragIngestionRunner;
@@ -35,13 +37,14 @@ public class RagIngestionStartupRunner implements CommandLineRunner {
                         .toAbsolutePath()
                         .normalize();
 
-        System.out.println(
-                "Starting BankFlow RAG ingestion from: " + root
+        log.info(
+                "Starting BankFlow RAG ingestion from: {}",
+                root
         );
 
         ragIngestionRunner.ingest(root);
 
-        System.out.println(
+        log.info(
                 "BankFlow RAG ingestion completed successfully."
         );
     }

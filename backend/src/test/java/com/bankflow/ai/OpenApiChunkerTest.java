@@ -137,22 +137,4 @@ class OpenApiChunkerTest {
                 .allMatch(chunk ->
                         chunk.audience() == RagAudience.ADMIN));
     }
-
-    @Test
-    void shouldPrintOpenApiChunks() {
-        Path path = Path.of("../docs/api/bankflow_openapi.yml");
-
-        RagDocument document = parser.parse(path);
-        List<RagChunk> chunks = chunker.chunk(document);
-
-        System.out.println("Total OpenAPI chunks: " + chunks.size());
-
-        for (RagChunk chunk : chunks) {
-            System.out.println("\n----------------------------------------");
-            System.out.println("Index: " + chunk.chunkIndex());
-            System.out.println("Section: " + chunk.section());
-            System.out.println("Audience: " + chunk.audience());
-            System.out.println("Content:\n" + chunk.content());
-        }
-    }
 }

@@ -1,9 +1,6 @@
 package com.bankflow.ai;
 
-import com.bankflow.ai.tool.GetMyAccountsTool;
-import com.bankflow.ai.tool.GetMyTransactionsTool;
-import com.bankflow.dto.AccountResponse;
-import com.bankflow.dto.TransactionResponse;
+import com.bankflow.ai.tool.AiToolRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
@@ -23,8 +20,7 @@ public class GeminiAiService implements AiService {
     private final Client client;
     private final ObjectMapper objectMapper;
     private final RagRetrievalService ragRetrievalService;
-    private final GetMyAccountsTool getMyAccountsTool;
-    private final GetMyTransactionsTool getMyTransactionsTool;
+    private final AiToolRegistry aiToolRegistry;
     private final AiAudienceResolver aiAudienceResolver;
 
     @Value("${gemini.model:gemini-3.5-flash-lite}")
@@ -34,9 +30,8 @@ public class GeminiAiService implements AiService {
             @Value("${gemini.api-key}") String apiKey,
             ObjectMapper objectMapper,
             RagRetrievalService ragRetrievalService,
-            GetMyAccountsTool getMyAccountsTool,
-            GetMyTransactionsTool getMyTransactionsTool,
-            AiAudienceResolver aiAudienceResolver) {
+            AiAudienceResolver aiAudienceResolver,
+            AiToolRegistry aiToolRegistry) {
 
         this.client = Client.builder()
                 .apiKey(apiKey)
@@ -44,9 +39,8 @@ public class GeminiAiService implements AiService {
 
         this.objectMapper = objectMapper;
         this.ragRetrievalService = ragRetrievalService;
-        this.getMyAccountsTool = getMyAccountsTool;
-        this.getMyTransactionsTool = getMyTransactionsTool;
         this.aiAudienceResolver = aiAudienceResolver;
+        this.aiToolRegistry = aiToolRegistry;
     }
 
     @Override
@@ -130,7 +124,7 @@ public class GeminiAiService implements AiService {
                         .systemInstruction(systemContent)
                         .responseMimeType("application/json")
                         .responseSchema(responseSchema)
-                        .tools(getToolsForAudience(audience))
+                        .tools(aiToolRegistry.getToolsForAudience(audience))
                         .build();
 
         GenerateContentResponse response =
@@ -145,62 +139,12 @@ public class GeminiAiService implements AiService {
             FunctionCall functionCall =
                     response.functionCalls().getFirst();
 
-            String functionName =
-                    functionCall.name()
-                            .orElseThrow(
-                                    () -> new IllegalStateException(
-                                            "Gemini function call has no name"
-                                    )
-                            );
-
-            log.info(
-                    "Gemini requested tool: {}",
-                    functionName
-            );
-
-            if (GetMyAccountsTool.NAME.equals(functionName)) {
-
-                List<AccountResponse> accounts =
-                        getMyAccountsTool.execute();
-
-                log.info(
-                        "Tool [{}] returned {} accounts",
-                        GetMyAccountsTool.NAME,
-                        accounts.size()
-                );
-
-                return generateFinalResponseAfterToolCall(
-                        question,
-                        response,
-                        functionCall,
-                        accounts,
-                        config
-                );
-            }
-
-            if (GetMyTransactionsTool.NAME.equals(functionName)) {
-
-                List<TransactionResponse> transactions =
-                        getMyTransactionsTool.execute();
-
-                log.info(
-                        "Tool [{}] returned {} transactions",
-                        GetMyTransactionsTool.NAME,
-                        transactions.size()
-                );
-
-                return generateFinalResponseAfterToolCall(
-                        question,
-                        response,
-                        functionCall,
-                        transactions,
-                        config
-                );
-            }
-
-            throw new IllegalStateException(
-                    "Unknown Gemini tool requested: "
-                            + functionName
+            return handleToolCall(
+                    question,
+                    response,
+                    functionCall,
+                    audience,
+                    config
             );
         }
 
@@ -266,49 +210,44 @@ public class GeminiAiService implements AiService {
         return context.toString();
     }
 
-    private FunctionDeclaration getMyAccountsFunction() {
+    private AiResponse handleToolCall(
+            String question,
+            GenerateContentResponse response,
+            FunctionCall functionCall,
+            AiAudience audience,
+            GenerateContentConfig config) {
 
-        return FunctionDeclaration.builder()
-                .name(GetMyAccountsTool.NAME)
-                .description("""
-                        Returns the authenticated customer's bank accounts.
-                        The customer is determined by the server-side
-                        authentication context. This function takes no parameters.
-                        """)
-                .build();
-    }
+        String functionName =
+                functionCall.name()
+                        .orElseThrow(
+                                () -> new IllegalStateException(
+                                        "Gemini function call has no name"
+                                )
+                        );
 
-    private FunctionDeclaration getMyTransactionsFunction() {
+        log.info(
+                "Gemini requested tool: {}",
+                functionName
+        );
 
-        return FunctionDeclaration.builder()
-                .name(GetMyTransactionsTool.NAME)
-                .description("""
-                        Returns the authenticated customer's
-                        most recent transactions.
-                        
-                        The customer is determined by the server-side
-                        authentication context. This function takes
-                        no parameters.
-                        """)
-                .build();
-    }
+        Object toolResult =
+                aiToolRegistry.execute(
+                        functionName,
+                        audience
+                );
 
-    private List<Tool> getToolsForAudience(AiAudience audience) {
+        log.info(
+                "Tool [{}] returned result",
+                functionName
+        );
 
-        if (audience == AiAudience.CUSTOMER) {
-            return List.of(
-                    Tool.builder()
-                            .functionDeclarations(
-                                    List.of(
-                                            getMyAccountsFunction(),
-                                            getMyTransactionsFunction()
-                                    )
-                            )
-                            .build()
-            );
-        }
-
-        return List.of();
+        return generateFinalResponseAfterToolCall(
+                question,
+                response,
+                functionCall,
+                toolResult,
+                config
+        );
     }
 
     private AiResponse generateFinalResponseAfterToolCall(

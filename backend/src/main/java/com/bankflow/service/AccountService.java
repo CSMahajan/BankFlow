@@ -322,6 +322,19 @@ public class AccountService {
         return mapToResponse(updatedAccount);
     }
 
+    @Transactional(readOnly = true)
+    public BigDecimal getMyTotalBalance() {
+
+        User currentUser = getAuthenticatedUser();
+
+        log.info(
+                "Fetching total balance for user [{}]",
+                currentUser.getEmail()
+        );
+
+        return accountRepository.getTotalBalance(currentUser.getId());
+    }
+
     private void validateAccountOwnership(Account account, User currentUser) {
         if (!account.getUser().getId().equals(currentUser.getId())) {
             log.warn("Security Alert: User [{}] attempted to modify account [{}] belonging to another user",

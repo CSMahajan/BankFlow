@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -91,10 +93,14 @@ public class GeminiAiService implements AiService {
         String ragContext =
                 buildRagContext(retrievedChunks);
 
+        String currentDate =
+                LocalDate.now(ZoneId.systemDefault()).toString();
+
         String systemInstruction =
                 buildSystemInstruction(
                         audience,
-                        ragContext
+                        ragContext,
+                        currentDate
                 );
 
         Content systemContent = Content.fromParts(
@@ -356,11 +362,30 @@ public class GeminiAiService implements AiService {
 
     private String buildSystemInstruction(
             AiAudience audience,
-            String ragContext) {
+            String ragContext,
+            String currentDate) {
 
         if (audience == AiAudience.CUSTOMER) {
             return """
                     %s
+                    
+                    CURRENT DATE:
+                    %s
+                    
+                    DATE INTERPRETATION:
+                    The current date is provided above as the temporal reference.
+                    
+                    When the user provides dates without a year, interpret them using
+                    natural calendar context relative to the current date.
+                    
+                    For a date range where the user clearly refers to dates within the
+                    current calendar year, use the current year.
+                    
+                    For relative expressions such as "today", "yesterday", "last week",
+                    "last month", or "this year", resolve them using the current date.
+                    
+                    Do not invent an unrelated historical year when the user has not
+                    specified one.
                     
                     CUSTOMER ASSISTANT RULES:
                     
@@ -395,12 +420,31 @@ public class GeminiAiService implements AiService {
                     ---
                     """.formatted(
                     BankFlowAiContext.CONTEXT,
+                    currentDate,
                     ragContext
             );
         }
 
         return """
                 %s
+                
+                CURRENT DATE:
+                %s
+                
+                DATE INTERPRETATION:
+                The current date is provided above as the temporal reference.
+                
+                When the user provides dates without a year, interpret them using
+                natural calendar context relative to the current date.
+                
+                For a date range where the user clearly refers to dates within the
+                current calendar year, use the current year.
+                
+                For relative expressions such as "today", "yesterday", "last week",
+                "last month", or "this year", resolve them using the current date.
+                
+                Do not invent an unrelated historical year when the user has not
+                specified one.
                 
                 ADMINISTRATOR ASSISTANT RULES:
                 
@@ -426,6 +470,7 @@ public class GeminiAiService implements AiService {
                 ---
                 """.formatted(
                 BankFlowAiContext.CONTEXT,
+                currentDate,
                 ragContext
         );
     }

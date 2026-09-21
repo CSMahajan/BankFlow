@@ -2,6 +2,7 @@ package com.bankflow.ai.tool;
 
 import com.bankflow.ai.AiAudience;
 import com.bankflow.dto.TransactionResponse;
+import com.bankflow.entity.Transaction;
 import com.bankflow.service.TransactionService;
 import com.google.genai.types.FunctionDeclaration;
 import com.google.genai.types.Schema;
@@ -34,21 +35,47 @@ public class GetMyTransactionsTool implements AiTool {
         return FunctionDeclaration.builder()
                 .name(NAME)
                 .description("""
-                    Returns the authenticated customer's transactions.
+                        Returns the authenticated customer's transactions.
 
-                    Optional startDate and endDate can be provided
-                    to retrieve transactions within a specific date range.
+                        Optional filters can be provided:
+                        - accountNumber to filter by a specific account
+                        - type to filter by CREDIT or DEBIT
+                        - startDate and endDate to filter by date range
+                        - search to search transaction ID or description
 
-                    Dates must use ISO format yyyy-MM-dd.
+                        Dates must use ISO format yyyy-MM-dd.
 
-                    The customer is determined by the server-side
-                    authentication context.
-                    """)
+                        If startDate is provided without endDate,
+                        the backend uses the current date as the end date.
+
+                        The customer is determined by the server-side
+                        authentication context.
+                        """)
                 .parameters(
                         Schema.builder()
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
+                                                "accountNumber",
+                                                Schema.builder()
+                                                        .type("STRING")
+                                                        .description(
+                                                                "The customer's bank account number to filter transactions by"
+                                                        )
+                                                        .build(),
+
+                                                "type",
+                                                Schema.builder()
+                                                        .type("STRING")
+                                                        .enum_(List.of(
+                                                                "CREDIT",
+                                                                "DEBIT"
+                                                        ))
+                                                        .description(
+                                                                "Transaction type to filter by"
+                                                        )
+                                                        .build(),
+
                                                 "startDate",
                                                 Schema.builder()
                                                         .type("STRING")
@@ -56,11 +83,20 @@ public class GetMyTransactionsTool implements AiTool {
                                                                 "Start date in ISO format yyyy-MM-dd"
                                                         )
                                                         .build(),
+
                                                 "endDate",
                                                 Schema.builder()
                                                         .type("STRING")
                                                         .description(
                                                                 "End date in ISO format yyyy-MM-dd"
+                                                        )
+                                                        .build(),
+
+                                                "search",
+                                                Schema.builder()
+                                                        .type("STRING")
+                                                        .description(
+                                                                "Text to search in transaction ID or transaction description"
                                                         )
                                                         .build()
                                         )
@@ -100,15 +136,27 @@ public class GetMyTransactionsTool implements AiTool {
     public List<TransactionResponse> execute(
             Map<String, Object> arguments) {
 
-        LocalDate startDate = parseDate(arguments.get("startDate"));
-        LocalDate endDate = parseDate(arguments.get("endDate"));
+        String accountNumber =
+                parseString(arguments.get("accountNumber"));
+
+        Transaction.TransactionType type =
+                parseTransactionType(arguments.get("type"));
+
+        LocalDate startDate =
+                parseDate(arguments.get("startDate"));
+
+        LocalDate endDate =
+                parseDate(arguments.get("endDate"));
+
+        String search =
+                parseString(arguments.get("search"));
 
         return transactionService.getMyTransactions(
-                        null,
-                        null,
+                        accountNumber,
+                        type,
                         startDate,
                         endDate,
-                        null,
+                        search,
                         PageRequest.of(
                                 0,
                                 20,
@@ -121,15 +169,38 @@ public class GetMyTransactionsTool implements AiTool {
                 .getContent();
     }
 
-    private LocalDate parseDate(Object value) {
+    private String parseString(Object value) {
 
         if (value == null) {
             return null;
         }
 
-        String date = value.toString().trim();
+        String valueAsString = value.toString().trim();
 
-        if (date.isBlank()) {
+        return valueAsString.isBlank()
+                ? null
+                : valueAsString;
+    }
+
+    private Transaction.TransactionType parseTransactionType(
+            Object value) {
+
+        String type = parseString(value);
+
+        if (type == null) {
+            return null;
+        }
+
+        return Transaction.TransactionType.valueOf(
+                type.toUpperCase()
+        );
+    }
+
+    private LocalDate parseDate(Object value) {
+
+        String date = parseString(value);
+
+        if (date == null) {
             return null;
         }
 

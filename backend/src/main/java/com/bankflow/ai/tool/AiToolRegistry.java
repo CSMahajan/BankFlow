@@ -39,7 +39,8 @@ public class AiToolRegistry {
 
     public Object execute(
             String toolName,
-            AiAudience audience) {
+            AiAudience audience,
+            Map<String, Object> arguments) {
 
         AiTool tool = tools.stream()
                 .filter(candidate ->
@@ -60,6 +61,6 @@ public class AiToolRegistry {
             );
         }
 
-        return tool.execute();
+        return tool.execute(arguments);
     }
 }

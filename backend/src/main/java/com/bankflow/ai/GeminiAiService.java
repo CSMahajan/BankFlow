@@ -230,10 +230,20 @@ public class GeminiAiService implements AiService {
                 functionName
         );
 
+        Map<String, Object> arguments =
+                functionCall.args()
+                        .orElseGet(Map::of);
+
+        log.info(
+                "Gemini tool arguments: {}",
+                arguments
+        );
+
         Object toolResult =
                 aiToolRegistry.execute(
                         functionName,
-                        audience
+                        audience,
+                        arguments
                 );
 
         log.info(

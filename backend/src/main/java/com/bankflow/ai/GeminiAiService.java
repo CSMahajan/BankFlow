@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +26,8 @@ public class GeminiAiService implements AiService {
 
     @Value("${gemini.model:gemini-3.5-flash-lite}")
     private String model;
+
+    private static final int MAX_TOOL_ROUNDS = 5;
 
     public GeminiAiService(
             @Value("${gemini.api-key}") String apiKey,
@@ -136,13 +139,9 @@ public class GeminiAiService implements AiService {
 
         if (!Objects.requireNonNull(response.functionCalls()).isEmpty()) {
 
-            FunctionCall functionCall =
-                    response.functionCalls().getFirst();
-
-            return handleToolCall(
+            return handleToolCalls(
                     question,
                     response,
-                    functionCall,
                     audience,
                     config
             );
@@ -210,112 +209,146 @@ public class GeminiAiService implements AiService {
         return context.toString();
     }
 
-    private AiResponse handleToolCall(
+    private AiResponse handleToolCalls(
             String question,
-            GenerateContentResponse response,
-            FunctionCall functionCall,
+            GenerateContentResponse initialResponse,
             AiAudience audience,
             GenerateContentConfig config) {
 
-        String functionName =
-                functionCall.name()
-                        .orElseThrow(
-                                () -> new IllegalStateException(
-                                        "Gemini function call has no name"
-                                )
-                        );
+        List<Content> conversation = new ArrayList<>();
 
-        log.info(
-                "Gemini requested tool: {}",
-                functionName
+        conversation.add(
+                Content.fromParts(
+                        Part.fromText(question)
+                )
         );
 
-        Map<String, Object> arguments =
-                functionCall.args()
-                        .orElseGet(Map::of);
+        GenerateContentResponse response = initialResponse;
 
-        log.info(
-                "Gemini tool arguments: {}",
-                arguments
-        );
+        for (int round = 1; round <= MAX_TOOL_ROUNDS; round++) {
 
-        Object toolResult =
-                aiToolRegistry.execute(
-                        functionName,
-                        audience,
+            List<FunctionCall> functionCalls =
+                    Objects.requireNonNull(
+                            response.functionCalls()
+                    );
+
+            if (functionCalls.isEmpty()) {
+
+                log.info(
+                        "Gemini completed tool loop after {} round(s)",
+                        round - 1
+                );
+
+                return parseResponse(response.text());
+            }
+
+            log.info(
+                    "Gemini requested {} tool call(s) in round {}",
+                    functionCalls.size(),
+                    round
+            );
+
+            Content modelResponse =
+                    response.candidates()
+                            .orElseThrow(
+                                    () -> new IllegalStateException(
+                                            "Gemini response contains no candidates"
+                                    )
+                            )
+                            .getFirst()
+                            .content()
+                            .orElseThrow(
+                                    () -> new IllegalStateException(
+                                            "Gemini response contains no content"
+                                    )
+                            );
+
+            conversation.add(modelResponse);
+
+            for (FunctionCall functionCall : functionCalls) {
+
+                String functionName =
+                        functionCall.name()
+                                .orElseThrow(
+                                        () -> new IllegalStateException(
+                                                "Gemini function call has no name"
+                                        )
+                                );
+
+                Map<String, Object> arguments =
+                        functionCall.args()
+                                .orElseGet(Map::of);
+
+                log.info(
+                        "Gemini requested tool: {}",
+                        functionName
+                );
+
+                log.info(
+                        "Gemini tool arguments: {}",
                         arguments
                 );
 
-        log.info(
-                "Tool [{}] returned result",
-                functionName
-        );
+                Object toolResult =
+                        aiToolRegistry.execute(
+                                functionName,
+                                audience,
+                                arguments
+                        );
 
-        return generateFinalResponseAfterToolCall(
-                question,
-                response,
-                functionCall,
-                toolResult,
-                config
-        );
-    }
+                log.info(
+                        "Tool [{}] returned result",
+                        functionName
+                );
 
-    private AiResponse generateFinalResponseAfterToolCall(
-            String question,
-            GenerateContentResponse response,
-            FunctionCall functionCall,
-            Object toolResult,
-            GenerateContentConfig config) {
+                try {
 
-        try {
-            String toolResultJson =
-                    objectMapper.writeValueAsString(toolResult);
+                    String toolResultJson =
+                            objectMapper.writeValueAsString(
+                                    toolResult
+                            );
 
-            Content functionResponseContent =
-                    Content.fromParts(
-                            Part.fromFunctionResponse(
-                                    functionCall.name().orElseThrow(
-                                            () -> new IllegalStateException(
-                                                    "Gemini function call has no name"
+                    Content functionResponseContent =
+                            Content.fromParts(
+                                    Part.fromFunctionResponse(
+                                            functionName,
+                                            Map.of(
+                                                    "result",
+                                                    toolResultJson
                                             )
-                                    ),
-                                    Map.of(
-                                            "result",
-                                            toolResultJson
                                     )
-                            )
+                            );
+
+                    conversation.add(
+                            functionResponseContent
                     );
 
-            GenerateContentResponse finalResponse =
+                } catch (JsonProcessingException e) {
+
+                    throw new IllegalStateException(
+                            "Failed to serialize tool result",
+                            e
+                    );
+                }
+            }
+
+            response =
                     client.models.generateContent(
                             model,
-                            List.of(
-                                    Content.fromParts(
-                                            Part.fromText(question)
-                                    ),
-                                    response.candidates()
-                                            .orElseThrow()
-                                            .getFirst()
-                                            .content()
-                                            .orElseThrow(),
-                                    functionResponseContent
-                            ),
+                            conversation,
                             config
                     );
 
             log.info(
-                    "Gemini final response after tool call: {}",
-                    finalResponse.text()
-            );
-
-            return parseResponse(finalResponse.text());
-
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(
-                    "Failed to serialize tool result",
-                    e
+                    "Gemini response received after tool round {}",
+                    round
             );
         }
+
+        throw new IllegalStateException(
+                "Maximum AI tool-calling rounds exceeded: "
+                        + MAX_TOOL_ROUNDS
+        );
     }
 
     private String buildSystemInstruction(

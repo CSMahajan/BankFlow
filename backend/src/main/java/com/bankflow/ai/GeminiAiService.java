@@ -265,6 +265,8 @@ public class GeminiAiService implements AiService {
 
             conversation.add(modelResponse);
 
+            List<Part> functionResponseParts = new ArrayList<>();
+
             for (FunctionCall functionCall : functionCalls) {
 
                 String functionName =
@@ -308,19 +310,14 @@ public class GeminiAiService implements AiService {
                                     toolResult
                             );
 
-                    Content functionResponseContent =
-                            Content.fromParts(
-                                    Part.fromFunctionResponse(
-                                            functionName,
-                                            Map.of(
-                                                    "result",
-                                                    toolResultJson
-                                            )
+                    functionResponseParts.add(
+                            Part.fromFunctionResponse(
+                                    functionName,
+                                    Map.of(
+                                            "result",
+                                            toolResultJson
                                     )
-                            );
-
-                    conversation.add(
-                            functionResponseContent
+                            )
                     );
 
                 } catch (JsonProcessingException e) {
@@ -331,6 +328,12 @@ public class GeminiAiService implements AiService {
                     );
                 }
             }
+
+            conversation.add(
+                    Content.fromParts(
+                            functionResponseParts.toArray(new Part[0])
+                    )
+            );
 
             response =
                     client.models.generateContent(

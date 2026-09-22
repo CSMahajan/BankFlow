@@ -420,6 +420,17 @@ public class GeminiAiService implements AiService {
                     For customer-specific live information, use the available backend
                     tools instead of guessing.
                     
+                    When a customer asks for their own live banking information,
+                    you MUST call the appropriate backend tool to obtain the information.
+                    
+                    Do not describe or simulate a tool call in the answer.
+                    
+                    Never write phrases such as "Calling tool: ..." or
+                    "Using tool: ..." as the answer.
+                    
+                    The tool must be invoked through the available function-calling
+                    mechanism before providing the final answer.
+                    
                     Never invent account balances, transactions, cards, loans, or other
                     customer-specific information.
                     

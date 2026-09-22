@@ -200,6 +200,63 @@ public class TransactionService {
         return mapToResponse(transaction);
     }
 
+    @Transactional(readOnly = true)
+    public BigDecimal getMyTransactionTotal(
+            TransactionType type,
+            LocalDate startDate,
+            LocalDate endDate) {
+
+        User currentUser = getAuthenticatedUser();
+
+        if (type == null) {
+            throw new IllegalArgumentException(
+                    "Transaction type is required"
+            );
+        }
+
+        if (startDate == null) {
+            throw new IllegalArgumentException(
+                    "Start date is required"
+            );
+        }
+
+        if (endDate == null) {
+            endDate = LocalDate.now(ZoneId.systemDefault());
+        }
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException(
+                    "Start date cannot be after end date"
+            );
+        }
+
+        List<Long> accountIds =
+                accountRepository.findByUserId(currentUser.getId())
+                        .stream()
+                        .map(Account::getId)
+                        .toList();
+
+        if (accountIds.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        log.info(
+                "Calculating transaction total for user [{}], type [{}], from [{}], to [{}]",
+                currentUser.getEmail(),
+                type,
+                startDate,
+                endDate
+        );
+
+        return transactionRepository
+                .sumAmountByAccountIdsAndTypeAndDateRange(
+                        accountIds,
+                        type,
+                        startDate.atStartOfDay(),
+                        endDate.atTime(java.time.LocalTime.MAX)
+                );
+    }
+
     private Specification<Transaction> buildTransactionSpecification(
             Long userId, String accountNumber, TransactionType type, LocalDate startDate, LocalDate endDate, String search) {
 

@@ -387,6 +387,46 @@ public class GeminiAiService implements AiService {
                     Do not invent an unrelated historical year when the user has not
                     specified one.
                     
+                    TOOL ELIGIBILITY:
+                    
+                    Customer data tools are ONLY for questions that explicitly require
+                    the authenticated customer's own live banking data.
+                    
+                    Use a customer data tool only when the answer depends on data that
+                    belongs specifically to the authenticated customer, such as:
+                    - their accounts
+                    - their account balances
+                    - their transactions
+                    - their cards
+                    - their loans
+                    - their fixed deposits
+                    - their scheduled transfers
+                    
+                    Do NOT call a customer data tool for questions about:
+                    - BankFlow features
+                    - BankFlow functionality
+                    - BankFlow technology
+                    - BankFlow architecture
+                    - BankFlow APIs
+                    - BankFlow security
+                    - BankFlow workflows
+                    - BankFlow documentation
+                    - BankFlow infrastructure
+                    - databases
+                    - deployment
+                    - implementation details
+                    
+                    For these questions, answer using the retrieved BankFlow
+                    documentation and the information available in the system
+                    instruction.
+                    
+                    The mere availability of a customer data tool does not mean that
+                    the tool should be called.
+                    
+                    Before calling a customer data tool, determine whether the question
+                    actually requires the authenticated customer's own live data.
+                    If it does not, do not call any customer data tool.
+                    
                     CUSTOMER ASSISTANT RULES:
                     
                     The user is an authenticated banking customer.
@@ -418,7 +458,9 @@ public class GeminiAiService implements AiService {
                     data tools.
                     
                     For customer-specific live information, use the available backend
-                    tools instead of guessing.
+                    tools instead of guessing. Customer data tools must only be used
+                    when the question requires the authenticated customer's own live
+                    data.
                     
                     When a customer asks for their own live banking information,
                     you MUST call the appropriate backend tool to obtain the information.

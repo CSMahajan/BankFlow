@@ -18,36 +18,15 @@ public class RagRetrievalService {
 
     private final GeminiEmbeddingService embeddingService;
     private final RagChunkRepository ragChunkRepository;
+    private final QueryTransformationService queryTransformationService;
 
     @Transactional(readOnly = true)
     public List<RagRetrievedChunk> retrieve(
             String question,
             RagAudience audience) {
 
-        if (question == null || question.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Question must not be blank"
-            );
-        }
-
-        if (audience == null) {
-            throw new IllegalArgumentException(
-                    "Audience must not be null"
-            );
-        }
-
-        List<Float> embedding =
-                embeddingService.generateEmbedding(question);
-
-        String pgVector =
-                toPgVector(embedding);
-
         List<RagChunkSearchResult> results =
-                ragChunkRepository.findNearestChunksWithDistance(
-                        pgVector,
-                        allowedAudiences(audience),
-                        CANDIDATE_LIMIT
-                );
+                retrieveCandidates(question, audience);
 
         for (int i = 0; i < results.size(); i++) {
 
@@ -72,6 +51,38 @@ public class RagRetrievalService {
                         RagAudience.valueOf(result.getAudience())
                 ))
                 .toList();
+    }
+
+    List<RagChunkSearchResult> retrieveCandidates(
+            String question,
+            RagAudience audience) {
+
+        if (question == null || question.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Question must not be blank"
+            );
+        }
+
+        if (audience == null) {
+            throw new IllegalArgumentException(
+                    "Audience must not be null"
+            );
+        }
+
+        String retrievalQuery =
+                queryTransformationService.transform(question);
+
+        List<Float> embedding =
+                embeddingService.generateEmbedding(retrievalQuery);
+
+        String pgVector =
+                toPgVector(embedding);
+
+        return ragChunkRepository.findNearestChunksWithDistance(
+                pgVector,
+                allowedAudiences(audience),
+                CANDIDATE_LIMIT
+        );
     }
 
     private List<String> allowedAudiences(

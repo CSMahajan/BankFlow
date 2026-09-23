@@ -59,6 +59,9 @@ rag:
     enabled: ${RAG_INGESTION_ENABLED:false}
     repository-root: ${RAG_REPOSITORY_ROOT:..}
 
+  evaluation:
+    enabled: ${RAG_EVALUATION_ENABLED:false}
+
 app:
   cors-origin: ${CORS_ORIGIN:http://localhost:5173}
 

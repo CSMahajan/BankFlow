@@ -626,3 +626,17 @@ export const retryAdminKycMalwareScan = async (documentId) => {
     `/admin/kyc/documents/${documentId}/malware-scan/retry`
   );
 };
+
+export const askAIAssistant = async (question) => {
+  const response = await API.post(
+    "/ai/ask",
+    question,
+    {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    }
+  );
+
+  return response.data;
+};

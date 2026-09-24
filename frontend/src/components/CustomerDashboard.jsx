@@ -11,6 +11,7 @@ import LoansView from './loans/LoansView';
 import CardsView from "./cards/CardsView";
 import ProfileView from './ProfileView';
 import KycView from './kyc/KycView';
+import AIAssistant from "./ai/AIAssistant";
 import { fetchMyAccounts, fetchDashboardSummary, fetchMonthlyAnalytics } from "../api/bankService";
 
 const CustomerDashboard = ({ userRole, onLogout }) => {
@@ -530,6 +531,8 @@ const CustomerDashboard = ({ userRole, onLogout }) => {
         onClose={() => setIsAccountModalOpen(false)}
         onAccountCreated={handleAccountCreated}
       />
+
+      <AIAssistant />
     </div>
   );
 };

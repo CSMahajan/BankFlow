@@ -1,5 +1,7 @@
 package com.bankflow.ai;
 
+import java.math.BigDecimal;
+
 public record AiIntent(
         Route route,
         java.util.List<Operation> operations
@@ -18,17 +20,25 @@ public record AiIntent(
             String startDate,
             String endDate,
             String accountNumber,
-            String search
+            String search,
+            String fdNumber,
+            String loanNumber,
+            BigDecimal depositAmount,
+            Integer tenureYears
     ) {}
 
     public enum Intent {
         ACCOUNTS,
+        ACCOUNT,
         ACCOUNT_BALANCE,
         TRANSACTIONS,
         TRANSACTION_TOTAL,
         CARDS,
         LOANS,
+        LOAN_REPAYMENT_HISTORY,
         FIXED_DEPOSITS,
+        FIXED_DEPOSIT,
+        CALCULATE_FD_MATURITY,
         SCHEDULED_TRANSFERS,
         BANKFLOW_DOCUMENTATION,
         GENERAL

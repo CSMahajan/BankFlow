@@ -56,103 +56,171 @@ public class AiIntentClassifier {
                                                         Schema.builder()
                                                                 .type("OBJECT")
                                                                 .properties(
-                                                                        Map.of(
-                                                                                "intent",
-                                                                                Schema.builder()
-                                                                                        .type("STRING")
-                                                                                        .enum_(List.of(
-                                                                                                "ACCOUNTS",
-                                                                                                "ACCOUNT_BALANCE",
-                                                                                                "TRANSACTIONS",
-                                                                                                "TRANSACTION_TOTAL",
-                                                                                                "CARDS",
-                                                                                                "LOANS",
-                                                                                                "FIXED_DEPOSITS",
-                                                                                                "SCHEDULED_TRANSFERS",
-                                                                                                "BANKFLOW_DOCUMENTATION",
-                                                                                                "GENERAL"
-                                                                                        ))
-                                                                                        .build(),
+                                                                        Map.ofEntries(
+                                                                                Map.entry(
+                                                                                        "intent",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .enum_(List.of(
+                                                                                                        "ACCOUNTS",
+                                                                                                        "ACCOUNT",
+                                                                                                        "ACCOUNT_BALANCE",
+                                                                                                        "TRANSACTIONS",
+                                                                                                        "TRANSACTION_TOTAL",
+                                                                                                        "CARDS",
+                                                                                                        "LOANS",
+                                                                                                        "LOAN_REPAYMENT_HISTORY",
+                                                                                                        "FIXED_DEPOSITS",
+                                                                                                        "FIXED_DEPOSIT",
+                                                                                                        "CALCULATE_FD_MATURITY",
+                                                                                                        "SCHEDULED_TRANSFERS",
+                                                                                                        "BANKFLOW_DOCUMENTATION",
+                                                                                                        "GENERAL"
+                                                                                                ))
+                                                                                                .build()
+                                                                                ),
 
-                                                                                "transactionType",
-                                                                                Schema.builder()
-                                                                                        .type("STRING")
-                                                                                        .enum_(List.of(
-                                                                                                "CREDIT",
-                                                                                                "DEBIT"
-                                                                                        ))
-                                                                                        .nullable(true)
-                                                                                        .build(),
+                                                                                Map.entry(
+                                                                                        "transactionType",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .enum_(List.of(
+                                                                                                        "CREDIT",
+                                                                                                        "DEBIT"
+                                                                                                ))
+                                                                                                .nullable(true)
+                                                                                                .build()
+                                                                                ),
 
-                                                                                "period",
-                                                                                Schema.builder()
-                                                                                        .type("STRING")
-                                                                                        .enum_(List.of(
-                                                                                                "CURRENT_CALENDAR_YEAR",
-                                                                                                "PREVIOUS_CALENDAR_YEAR",
-                                                                                                "CURRENT_FINANCIAL_YEAR",
-                                                                                                "PREVIOUS_FINANCIAL_YEAR",
-                                                                                                "CURRENT_MONTH",
-                                                                                                "PREVIOUS_MONTH",
-                                                                                                "CUSTOM_RANGE"
-                                                                                        ))
-                                                                                        .nullable(true)
-                                                                                        .build(),
-                                                                                "monthOffset",
-                                                                                Schema.builder()
-                                                                                        .type("INTEGER")
-                                                                                        .description("""
-                                                                                                Relative month offset for month-based periods.
-                                                                                                
-                                                                                                0 means the current month.
-                                                                                                -1 means the previous month.
-                                                                                                -2 means two months ago.
-                                                                                                -3 means three months ago.
-                                                                                                
-                                                                                                Use this for relative month expressions.
-                                                                                                Do not use CUSTOM_RANGE for relative month expressions.
-                                                                                                """)
-                                                                                        .build(),
+                                                                                Map.entry(
+                                                                                        "period",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .enum_(List.of(
+                                                                                                        "CURRENT_CALENDAR_YEAR",
+                                                                                                        "PREVIOUS_CALENDAR_YEAR",
+                                                                                                        "CURRENT_FINANCIAL_YEAR",
+                                                                                                        "PREVIOUS_FINANCIAL_YEAR",
+                                                                                                        "CURRENT_MONTH",
+                                                                                                        "PREVIOUS_MONTH",
+                                                                                                        "CUSTOM_RANGE"
+                                                                                                ))
+                                                                                                .nullable(true)
+                                                                                                .build()
+                                                                                ),
 
-                                                                                "startDate",
-                                                                                Schema.builder()
-                                                                                        .type("STRING")
-                                                                                        .nullable(true)
-                                                                                        .description(
-                                                                                                "Explicit start date in ISO format yyyy-MM-dd. "
-                                                                                                        + "Used when the user specifies a custom date range."
-                                                                                        )
-                                                                                        .build(),
+                                                                                Map.entry(
+                                                                                        "monthOffset",
+                                                                                        Schema.builder()
+                                                                                                .type("INTEGER")
+                                                                                                .description("""
+                                                                                                        Relative month offset for month-based periods.
+                                                                                                        
+                                                                                                        0 means the current month.
+                                                                                                        -1 means the previous month.
+                                                                                                        -2 means two months ago.
+                                                                                                        -3 means three months ago.
+                                                                                                        
+                                                                                                        Use this for relative month expressions.
+                                                                                                        Do not use CUSTOM_RANGE for relative month expressions.
+                                                                                                        """)
+                                                                                                .build()
+                                                                                ),
 
-                                                                                "endDate",
-                                                                                Schema.builder()
-                                                                                        .type("STRING")
-                                                                                        .nullable(true)
-                                                                                        .description(
-                                                                                                "Explicit end date in ISO format yyyy-MM-dd. "
-                                                                                                        + "Used when the user specifies a custom date range."
-                                                                                        )
-                                                                                        .build(),
+                                                                                Map.entry(
+                                                                                        "startDate",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "Explicit start date in ISO format yyyy-MM-dd. "
+                                                                                                                + "Used when the user specifies a custom date range."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
 
-                                                                                "accountNumber",
-                                                                                Schema.builder()
-                                                                                        .type("STRING")
-                                                                                        .nullable(true)
-                                                                                        .description(
-                                                                                                "Customer's bank account number when the user explicitly "
-                                                                                                        + "asks for transactions from a specific account."
-                                                                                        )
-                                                                                        .build(),
+                                                                                Map.entry(
+                                                                                        "endDate",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "Explicit end date in ISO format yyyy-MM-dd. "
+                                                                                                                + "Used when the user specifies a custom date range."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
 
-                                                                                "search",
-                                                                                Schema.builder()
-                                                                                        .type("STRING")
-                                                                                        .nullable(true)
-                                                                                        .description(
-                                                                                                "Text the user wants to search for in transaction ID "
-                                                                                                        + "or transaction description."
-                                                                                        )
-                                                                                        .build()
+                                                                                Map.entry(
+                                                                                        "accountNumber",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "Customer's bank account number when the user explicitly "
+                                                                                                                + "asks for transactions from a specific account."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
+                                                                                        "search",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "Text the user wants to search for in transaction ID "
+                                                                                                                + "or transaction description."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
+                                                                                        "fdNumber",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "The customer's fixed deposit number when the user explicitly "
+                                                                                                                + "identifies a specific fixed deposit."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
+                                                                                        "loanNumber",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "The customer's loan number when the user explicitly "
+                                                                                                                + "identifies a specific loan."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
+                                                                                        "depositAmount",
+                                                                                        Schema.builder()
+                                                                                                .type("NUMBER")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "FD deposit amount in INR when calculating FD maturity."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
+                                                                                        "tenureYears",
+                                                                                        Schema.builder()
+                                                                                                .type("INTEGER")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "FD tenure in years when calculating maturity. "
+                                                                                                                + "Supported values are 1, 3, or 5."
+                                                                                                )
+                                                                                                .build()
+                                                                                )
                                                                         )
                                                                 )
                                                                 .required(List.of(
@@ -163,7 +231,11 @@ public class AiIntentClassifier {
                                                                         "startDate",
                                                                         "endDate",
                                                                         "accountNumber",
-                                                                        "search"
+                                                                        "search",
+                                                                        "fdNumber",
+                                                                        "loanNumber",
+                                                                        "depositAmount",
+                                                                        "tenureYears"
                                                                 ))
                                                                 .build()
                                                 )
@@ -218,6 +290,9 @@ public class AiIntentClassifier {
                 ACCOUNTS:
                 The customer's own accounts.
                 
+                ACCOUNT:
+                Details of one specific customer account identified by account number.
+                
                 ACCOUNT_BALANCE:
                 The customer's own current account balance.
                 
@@ -234,8 +309,18 @@ public class AiIntentClassifier {
                 LOANS:
                 The customer's own loans or loan information.
                 
+                LOAN_REPAYMENT_HISTORY:
+                The repayment history for one specific loan identified by loan number.
+                
                 FIXED_DEPOSITS:
                 The customer's own fixed deposits.
+                
+                FIXED_DEPOSIT:
+                Details of one specific fixed deposit identified by FD number.
+                
+                CALCULATE_FD_MATURITY:
+                Calculates the maturity amount and interest for a hypothetical
+                fixed deposit.
                 
                 SCHEDULED_TRANSFERS:
                 The customer's own scheduled transfers.
@@ -368,6 +453,22 @@ public class AiIntentClassifier {
                 
                 There is no fixed maximum number of relative months.
                 
+                For CALCULATE_FD_MATURITY:
+                - depositAmount is required.
+                - tenureYears is required.
+                - Supported tenure values are 1, 3, or 5.
+                - Use this intent when the user asks to calculate or estimate
+                  FD maturity based on an amount and tenure.
+                - Do not use FIXED_DEPOSIT unless the user identifies an
+                  existing FD by FD number.
+                
+                For ACCOUNT:
+                - accountNumber is required.
+                - Populate accountNumber only when the user explicitly identifies
+                  a specific bank account.
+                - Do not invent or infer an account number.
+                - Use ACCOUNTS when the user asks for their accounts generally.
+                
                 startDate:
                 Populate only when the user explicitly provides a start date
                 for a custom range.
@@ -432,8 +533,22 @@ public class AiIntentClassifier {
                 period = PREVIOUS_MONTH
                 
                 For intents other than TRANSACTIONS and TRANSACTION_TOTAL,
-                leave transaction-list-specific fields such as accountNumber
+                leave transaction-list-specific fields such as accountNumber, fdNumber
                 and search null unless the intent specifically requires them.
+                
+                FIXED DEPOSIT:
+                
+                For FIXED_DEPOSIT:
+                - fdNumber is required.
+                - Populate fdNumber only when the user explicitly identifies a fixed deposit number.
+                - Do not invent or infer an fdNumber.
+                - Use FIXED_DEPOSITS when the user asks for their fixed deposits generally.
+                
+                For LOAN_REPAYMENT_HISTORY:
+                - loanNumber is required.
+                - Populate loanNumber only when the user explicitly identifies a loan number.
+                - Do not invent or infer a loan number.
+                - Use LOANS when the user asks about their loans generally.
                 
                 Important:
                 

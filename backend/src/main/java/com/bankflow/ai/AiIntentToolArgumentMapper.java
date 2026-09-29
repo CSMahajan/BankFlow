@@ -23,7 +23,16 @@ public class AiIntentToolArgumentMapper {
 
             case TRANSACTION_TOTAL -> mapTransactionTotal(operation);
 
-            case ACCOUNTS, ACCOUNT_BALANCE -> Map.of();
+            case ACCOUNTS, ACCOUNT_BALANCE, CARDS, LOANS,
+                 FIXED_DEPOSITS, SCHEDULED_TRANSFERS -> Map.of();
+
+            case ACCOUNT -> mapAccount(operation);
+
+            case FIXED_DEPOSIT -> mapFixedDeposit(operation);
+
+            case CALCULATE_FD_MATURITY -> mapCalculateFdMaturity(operation);
+
+            case LOAN_REPAYMENT_HISTORY -> mapLoanRepaymentHistory(operation);
 
             case TRANSACTIONS -> mapTransactions(operation);
 
@@ -48,9 +57,25 @@ public class AiIntentToolArgumentMapper {
 
             case ACCOUNTS -> "get_my_accounts";
 
+            case ACCOUNT -> "get_my_account_by_number";
+
             case ACCOUNT_BALANCE -> "get_my_total_balance";
 
             case TRANSACTIONS -> "get_my_transactions";
+
+            case CARDS -> "get_my_cards";
+
+            case LOANS -> "get_my_loans";
+
+            case FIXED_DEPOSITS -> "get_my_fixed_deposits";
+
+            case FIXED_DEPOSIT -> "get_fd_by_number";
+
+            case CALCULATE_FD_MATURITY -> "calculate_fd_maturity";
+
+            case SCHEDULED_TRANSFERS -> "get_my_scheduled_transfers";
+
+            case LOAN_REPAYMENT_HISTORY -> "get_loan_repayment_history";
 
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "
@@ -210,6 +235,76 @@ public class AiIntentToolArgumentMapper {
         }
 
         return Map.copyOf(arguments);
+    }
+
+    private Map<String, Object> mapAccount(
+            AiIntent.Operation operation) {
+
+        if (operation.accountNumber() == null
+                || operation.accountNumber().isBlank()) {
+            throw new IllegalArgumentException(
+                    "accountNumber is required for ACCOUNT"
+            );
+        }
+
+        return Map.of(
+                "accountNumber",
+                operation.accountNumber().trim()
+        );
+    }
+
+    private Map<String, Object> mapFixedDeposit(
+            AiIntent.Operation operation) {
+
+        if (operation.fdNumber() == null
+                || operation.fdNumber().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "fdNumber is required for FIXED_DEPOSIT"
+            );
+        }
+
+        return Map.of(
+                "fdNumber",
+                operation.fdNumber().trim()
+        );
+    }
+
+    private Map<String, Object> mapCalculateFdMaturity(
+            AiIntent.Operation operation) {
+
+        if (operation.depositAmount() == null) {
+            throw new IllegalArgumentException(
+                    "depositAmount is required for CALCULATE_FD_MATURITY"
+            );
+        }
+
+        if (operation.tenureYears() == null) {
+            throw new IllegalArgumentException(
+                    "tenureYears is required for CALCULATE_FD_MATURITY"
+            );
+        }
+
+        return Map.of(
+                "depositAmount", operation.depositAmount(),
+                "tenureYears", operation.tenureYears()
+        );
+    }
+
+    private Map<String, Object> mapLoanRepaymentHistory(
+            AiIntent.Operation operation) {
+
+        if (operation.loanNumber() == null
+                || operation.loanNumber().isBlank()) {
+            throw new IllegalArgumentException(
+                    "loanNumber is required for LOAN_REPAYMENT_HISTORY"
+            );
+        }
+
+        return Map.of(
+                "loanNumber",
+                operation.loanNumber().trim()
+        );
     }
 
     private LocalDate parseRequiredDate(

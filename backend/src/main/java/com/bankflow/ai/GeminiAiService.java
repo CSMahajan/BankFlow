@@ -25,6 +25,8 @@ public class GeminiAiService implements AiService {
     private final RagRetrievalService ragRetrievalService;
     private final AiToolRegistry aiToolRegistry;
     private final AiAudienceResolver aiAudienceResolver;
+    private final AiIntentClassifier aiIntentClassifier;
+    private final AiIntentToolArgumentMapper aiIntentToolArgumentMapper;
 
     @Value("${gemini.model:gemini-3.5-flash-lite}")
     private String model;
@@ -36,7 +38,9 @@ public class GeminiAiService implements AiService {
             ObjectMapper objectMapper,
             RagRetrievalService ragRetrievalService,
             AiAudienceResolver aiAudienceResolver,
-            AiToolRegistry aiToolRegistry) {
+            AiToolRegistry aiToolRegistry,
+            AiIntentClassifier aiIntentClassifier,
+            AiIntentToolArgumentMapper aiIntentToolArgumentMapper) {
 
         this.client = Client.builder()
                 .apiKey(apiKey)
@@ -46,6 +50,8 @@ public class GeminiAiService implements AiService {
         this.ragRetrievalService = ragRetrievalService;
         this.aiAudienceResolver = aiAudienceResolver;
         this.aiToolRegistry = aiToolRegistry;
+        this.aiIntentClassifier = aiIntentClassifier;
+        this.aiIntentToolArgumentMapper = aiIntentToolArgumentMapper;
     }
 
     @Override
@@ -54,13 +60,58 @@ public class GeminiAiService implements AiService {
         AiAudience audience =
                 aiAudienceResolver.resolve();
 
+        AiIntent intent =
+                aiIntentClassifier.classify(question);
+
+        log.info(
+                "AI intent resolved | route={} | operations={}",
+                intent.route(),
+                intent.operations()
+        );
+
+        if (intent.route() == AiIntent.Route.LIVE_DATA) {
+
+            if (intent.operations() == null
+                    || intent.operations().isEmpty()) {
+
+                throw new IllegalArgumentException(
+                        "LIVE_DATA intent must contain at least one operation"
+                );
+            }
+
+            if (intent.operations().size() == 1) {
+
+                return executeSingleLiveDataOperation(
+                        question,
+                        audience,
+                        intent.operations().getFirst()
+                );
+            }
+
+            return executeMultipleLiveDataOperations(
+                    question,
+                    audience,
+                    intent.operations()
+            );
+        }
+
+        return answerKnowledgeQuestion(
+                question,
+                audience
+        );
+    }
+
+    private AiResponse answerKnowledgeQuestion(
+            String question,
+            AiAudience audience) {
+
         RagAudience ragAudience =
                 audience == AiAudience.CUSTOMER
                         ? RagAudience.CUSTOMER
                         : RagAudience.ADMIN;
 
         log.info(
-                "AI request audience: {}, RAG audience: {}",
+                "AI knowledge request | audience={}, RAG audience={}",
                 audience,
                 ragAudience
         );
@@ -103,37 +154,40 @@ public class GeminiAiService implements AiService {
                         currentDate
                 );
 
-        Content systemContent = Content.fromParts(
-                Part.fromText(systemInstruction)
-        );
+        Content systemContent =
+                Content.fromParts(
+                        Part.fromText(systemInstruction)
+                );
 
-        Schema responseSchema = Schema.builder()
-                .type("OBJECT")
-                .properties(Map.of(
-                        "answer", Schema.builder()
-                                .type("STRING")
-                                .build(),
+        Schema responseSchema =
+                Schema.builder()
+                        .type("OBJECT")
+                        .properties(Map.of(
+                                "answer",
+                                Schema.builder()
+                                        .type("STRING")
+                                        .build(),
 
-                        "category", Schema.builder()
-                                .type("STRING")
-                                .enum_(List.of(
-                                        "BANKFLOW_FEATURE",
-                                        "BANKFLOW_TECHNOLOGY",
-                                        "BANKFLOW_SECURITY",
-                                        "GENERAL",
-                                        "UNKNOWN"
-                                ))
-                                .build()
-                ))
-                .required(List.of("answer", "category"))
-                .build();
+                                "category",
+                                Schema.builder()
+                                        .type("STRING")
+                                        .enum_(List.of(
+                                                "BANKFLOW_FEATURE",
+                                                "BANKFLOW_TECHNOLOGY",
+                                                "BANKFLOW_SECURITY",
+                                                "GENERAL",
+                                                "UNKNOWN"
+                                        ))
+                                        .build()
+                        ))
+                        .required(List.of("answer", "category"))
+                        .build();
 
         GenerateContentConfig config =
                 GenerateContentConfig.builder()
                         .systemInstruction(systemContent)
                         .responseMimeType("application/json")
                         .responseSchema(responseSchema)
-                        .tools(aiToolRegistry.getToolsForAudience(audience))
                         .build();
 
         GenerateContentResponse response =
@@ -143,22 +197,316 @@ public class GeminiAiService implements AiService {
                         config
                 );
 
-        if (!Objects.requireNonNull(response.functionCalls()).isEmpty()) {
-
-            return handleToolCalls(
-                    question,
-                    response,
-                    audience,
-                    config
-            );
-        }
-
         log.info(
                 "Gemini raw response: {}",
                 response.text()
         );
 
         return parseResponse(response.text());
+    }
+
+    private AiResponse executeSingleLiveDataOperation(
+            String question,
+            AiAudience audience,
+            AiIntent.Operation operation) {
+
+        String toolName =
+                aiIntentToolArgumentMapper.mapToolName(
+                        operation
+                );
+
+        Map<String, Object> arguments =
+                aiIntentToolArgumentMapper.map(
+                        operation
+                );
+
+        log.info(
+                "Deterministic AI tool route | intent={} | tool={} | arguments={}",
+                operation.intent(),
+                toolName,
+                arguments
+        );
+
+        Object toolResult =
+                aiToolRegistry.execute(
+                        toolName,
+                        audience,
+                        arguments
+                );
+
+        log.info(
+                "Deterministic tool result | tool={} | result={}",
+                toolName,
+                toolResult
+        );
+
+        return generateLiveDataResponse(
+                question,
+                audience,
+                toolResult
+        );
+    }
+
+    private AiResponse executeMultipleLiveDataOperations(
+            String question,
+            AiAudience audience,
+            List<AiIntent.Operation> operations) {
+
+        List<LiveDataOperationResult> results =
+                new ArrayList<>();
+
+        for (int i = 0; i < operations.size(); i++) {
+
+            AiIntent.Operation operation =
+                    operations.get(i);
+
+            String toolName =
+                    aiIntentToolArgumentMapper.mapToolName(
+                            operation
+                    );
+
+            Map<String, Object> arguments =
+                    aiIntentToolArgumentMapper.map(
+                            operation
+                    );
+
+            log.info(
+                    "Deterministic multi-operation route | operation={} | intent={} | tool={} | arguments={}",
+                    i + 1,
+                    operation.intent(),
+                    toolName,
+                    arguments
+            );
+
+            Object toolResult =
+                    aiToolRegistry.execute(
+                            toolName,
+                            audience,
+                            arguments
+                    );
+
+            log.info(
+                    "Deterministic multi-operation result | operation={} | tool={} | result={}",
+                    i + 1,
+                    toolName,
+                    toolResult
+            );
+
+            results.add(
+                    new LiveDataOperationResult(
+                            operation,
+                            toolName,
+                            toolResult
+                    )
+            );
+        }
+
+        return generateMultipleLiveDataResponse(
+                question,
+                audience,
+                results
+        );
+    }
+
+    private AiResponse generateMultipleLiveDataResponse(
+            String question,
+            AiAudience audience,
+            List<LiveDataOperationResult> results) {
+
+        if (results == null || results.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Multiple-operation response requires at least one result"
+            );
+        }
+
+        String audienceInstruction =
+                audience == AiAudience.CUSTOMER
+                        ? """
+                        Answer for a BankFlow customer.
+
+                        Use simple, clear, customer-friendly language.
+                        Do not expose internal implementation details,
+                        service names, database details, APIs, or infrastructure.
+
+                        All monetary amounts are in Indian Rupees (INR).
+                        Use the ₹ symbol when displaying monetary amounts.
+                        Never use $, USD, or any other currency symbol.
+
+                        Do not convert or change numeric values.
+                        """
+                        : """
+                        Answer for a BankFlow administrator.
+
+                        You may provide deeper technical or operational context
+                        when relevant and appropriate.
+
+                        All monetary amounts are in Indian Rupees (INR).
+                        Use the ₹ symbol when displaying monetary amounts.
+                        Never use $, USD, or any other currency symbol.
+
+                        Use backend results as authoritative.
+                        Never invent additional data.
+                        """;
+
+        StringBuilder backendResults =
+                new StringBuilder();
+
+        for (int i = 0; i < results.size(); i++) {
+
+            LiveDataOperationResult result =
+                    results.get(i);
+
+            backendResults
+                    .append("Operation ")
+                    .append(i + 1)
+                    .append(":\n")
+                    .append("Intent: ")
+                    .append(result.operation().intent())
+                    .append("\n")
+                    .append("Tool: ")
+                    .append(result.toolName())
+                    .append("\n")
+                    .append("Result: ")
+                    .append(result.result())
+                    .append("\n\n");
+        }
+
+        StringBuilder deterministicCalculations =
+                new StringBuilder();
+
+        /*
+         * Calculate deterministic comparisons for every adjacent pair
+         * of numeric backend results.
+         *
+         * There is intentionally no fixed operation-count limit.
+         */
+        for (int i = 0; i < results.size() - 1; i++) {
+
+            Object firstResult =
+                    results.get(i).result();
+
+            Object secondResult =
+                    results.get(i + 1).result();
+
+            if (firstResult instanceof java.math.BigDecimal firstAmount
+                    && secondResult instanceof java.math.BigDecimal secondAmount) {
+
+                java.math.BigDecimal difference =
+                        firstAmount.subtract(secondAmount);
+
+                java.math.BigDecimal percentageChange = null;
+
+                if (secondAmount.compareTo(java.math.BigDecimal.ZERO) != 0) {
+                    percentageChange =
+                            difference
+                                    .divide(
+                                            secondAmount,
+                                            4,
+                                            java.math.RoundingMode.HALF_UP
+                                    )
+                                    .multiply(
+                                            java.math.BigDecimal.valueOf(100)
+                                    );
+                }
+
+                deterministicCalculations
+                        .append("Comparison ")
+                        .append(i + 1)
+                        .append(" (Operation ")
+                        .append(i + 1)
+                        .append(" vs Operation ")
+                        .append(i + 2)
+                        .append("):\n")
+                        .append("Difference = ")
+                        .append(difference)
+                        .append("\n")
+                        .append("Percentage change = ")
+                        .append(
+                                percentageChange == null
+                                        ? "not available because the comparison baseline is zero"
+                                        : percentageChange + "%"
+                        )
+                        .append("\n\n");
+            }
+        }
+
+        String prompt = """
+            Answer the user's question using the authoritative backend
+            results and deterministic calculations provided below.
+
+            %s
+
+            User question:
+            %s
+
+            Backend results:
+            %s
+
+            Deterministic calculations:
+            %s
+
+            Interpret the operations according to the user's question
+            and preserve their order.
+
+            Use the backend results as authoritative.
+
+            Do not perform arithmetic yourself when a deterministic
+            calculation is provided.
+
+            Do not invent missing values or additional data.
+
+            If the user only asked for multiple values, clearly present
+            those values without unnecessarily emphasizing comparisons.
+
+            If the user asked for a comparison, use the relevant
+            deterministic comparison provided above.
+
+            Do not mention tools, function calls, internal routing,
+            operation classification, or this instruction.
+
+            Return only the answer text.
+            """.formatted(
+                audienceInstruction,
+                question,
+                backendResults,
+                deterministicCalculations.isEmpty()
+                        ? "No deterministic numeric comparisons were generated."
+                        : deterministicCalculations.toString()
+        );
+
+        GenerateContentConfig config =
+                GenerateContentConfig.builder()
+                        .responseMimeType("text/plain")
+                        .build();
+
+        long startTime =
+                System.currentTimeMillis();
+
+        GenerateContentResponse response =
+                client.models.generateContent(
+                        model,
+                        prompt,
+                        config
+                );
+
+        log.info(
+                "AI TIMING | multi-operation live-data Gemini call = {} ms",
+                System.currentTimeMillis() - startTime
+        );
+
+        String answer =
+                response.text();
+
+        if (answer == null || answer.isBlank()) {
+            throw new IllegalStateException(
+                    "Gemini returned an empty multi-operation live-data answer"
+            );
+        }
+
+        return new AiResponse(
+                answer.trim(),
+                AiResponse.Category.BANKFLOW_FEATURE
+        );
     }
 
     private AiResponse parseResponse(String json) {
@@ -305,8 +653,9 @@ public class GeminiAiService implements AiService {
                         );
 
                 log.info(
-                        "Tool [{}] returned result",
-                        functionName
+                        "Tool [{}] returned result: {}",
+                        functionName,
+                        toolResult
                 );
 
                 try {
@@ -357,6 +706,92 @@ public class GeminiAiService implements AiService {
         throw new IllegalStateException(
                 "Maximum AI tool-calling rounds exceeded: "
                         + MAX_TOOL_ROUNDS
+        );
+    }
+
+    private AiResponse generateLiveDataResponse(
+            String question,
+            AiAudience audience,
+            Object toolResult) {
+
+        String audienceInstruction =
+                audience == AiAudience.CUSTOMER
+                        ? """
+                        Answer for a BankFlow customer.
+                        
+                        Use simple, clear, customer-friendly language.
+                        Do not expose internal implementation details,
+                        service names, database details, APIs, or infrastructure.
+                        
+                        Use the backend result as the authoritative source
+                        for the customer's live banking data.
+                        
+                        All monetary amounts are in Indian Rupees (INR).
+                        Use the ₹ symbol when displaying monetary amounts.
+                        Never use $, USD, or any other currency symbol.
+                        Do not convert or change the numeric value.
+                        """
+                        : """
+                        Answer for a BankFlow administrator.
+                        
+                        You may provide deeper technical or operational context
+                        when relevant and appropriate.
+                        
+                        Use the backend result as the authoritative source.
+                        Never invent additional customer or system data.
+                        """;
+
+        String prompt = """
+                Answer the user's question using the authoritative backend result below.
+                
+                %s
+                
+                User question:
+                %s
+                
+                Backend result:
+                %s
+                
+                Do not mention tools, function calls, internal routing,
+                or this instruction.
+                
+                Return only the answer text.
+                """.formatted(
+                audienceInstruction,
+                question,
+                toolResult
+        );
+
+        GenerateContentConfig config =
+                GenerateContentConfig.builder()
+                        .responseMimeType("text/plain")
+                        .build();
+
+        long startTime = System.currentTimeMillis();
+
+        GenerateContentResponse response =
+                client.models.generateContent(
+                        model,
+                        prompt,
+                        config
+                );
+
+        log.info(
+                "AI TIMING | live-data Gemini call = {} ms",
+                System.currentTimeMillis() - startTime
+        );
+
+        String answer = response.text();
+
+        if (answer == null || answer.isBlank()) {
+            throw new IllegalStateException(
+                    "Gemini returned an empty live-data answer"
+            );
+        }
+
+        return new AiResponse(
+                answer.trim(),
+                AiResponse.Category.BANKFLOW_FEATURE
         );
     }
 
@@ -535,5 +970,12 @@ public class GeminiAiService implements AiService {
                 currentDate,
                 ragContext
         );
+    }
+
+    private record LiveDataOperationResult(
+            AiIntent.Operation operation,
+            String toolName,
+            Object result
+    ) {
     }
 }

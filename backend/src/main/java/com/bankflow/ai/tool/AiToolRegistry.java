@@ -4,11 +4,13 @@ import com.bankflow.ai.AiAudience;
 import com.google.genai.types.FunctionDeclaration;
 import com.google.genai.types.Tool;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AiToolRegistry {
@@ -23,6 +25,14 @@ public class AiToolRegistry {
                 )
                 .map(AiTool::functionDeclaration)
                 .toList();
+
+        log.info(
+                "AI tools available for audience [{}]: {}",
+                audience,
+                declarations.stream()
+                        .map(declaration -> declaration.name().orElse("unknown"))
+                        .toList()
+        );
 
         if (declarations.isEmpty()) {
             return List.of();

@@ -137,7 +137,29 @@ public class AiIntentToolArgumentMapper {
 
             DateRange dateRange;
 
-            if (operation.period()
+            if (operation.monthOffset() != null) {
+
+                int monthOffset = operation.monthOffset();
+
+                YearMonth targetMonth =
+                        YearMonth.from(today)
+                                .plusMonths(monthOffset);
+
+                LocalDate startDate =
+                        targetMonth.atDay(1);
+
+                LocalDate endDate =
+                        monthOffset == 0
+                                ? today
+                                : targetMonth.atEndOfMonth();
+
+                dateRange =
+                        new DateRange(
+                                startDate,
+                                endDate
+                        );
+
+            } else if (operation.period()
                     == AiIntent.Period.CUSTOM_RANGE) {
 
                 LocalDate startDate =

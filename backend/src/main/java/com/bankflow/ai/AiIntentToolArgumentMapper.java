@@ -26,6 +26,8 @@ public class AiIntentToolArgumentMapper {
             case ACCOUNTS, ACCOUNT_BALANCE, CARDS, LOANS,
                  FIXED_DEPOSITS, SCHEDULED_TRANSFERS, ADMIN_DASHBOARD_SUMMARY -> Map.of();
 
+            case ADMIN_USERS -> mapAdminUsers(operation);
+
             case ACCOUNT -> mapAccount(operation);
 
             case FIXED_DEPOSIT -> mapFixedDeposit(operation);
@@ -79,11 +81,37 @@ public class AiIntentToolArgumentMapper {
 
             case ADMIN_DASHBOARD_SUMMARY -> "get_admin_dashboard_summary";
 
+            case ADMIN_USERS -> "get_admin_users";
+
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "
                             + operation.intent()
             );
         };
+    }
+
+    private Map<String, Object> mapAdminUsers(
+            AiIntent.Operation operation) {
+
+        Map<String, Object> arguments = new HashMap<>();
+
+        if (operation.search() != null
+                && !operation.search().isBlank()) {
+
+            arguments.put(
+                    "search",
+                    operation.search().trim()
+            );
+        }
+
+        if (operation.role() != null) {
+            arguments.put(
+                    "role",
+                    operation.role()
+            );
+        }
+
+        return arguments;
     }
 
     private Map<String, Object> mapTransactionTotal(

@@ -75,6 +75,7 @@ public class AiIntentClassifier {
                                                                                                         "CALCULATE_FD_MATURITY",
                                                                                                         "SCHEDULED_TRANSFERS",
                                                                                                         "ADMIN_DASHBOARD_SUMMARY",
+                                                                                                        "ADMIN_USERS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -177,6 +178,23 @@ public class AiIntentClassifier {
                                                                                 ),
 
                                                                                 Map.entry(
+                                                                                        "role",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .enum_(List.of(
+                                                                                                        "CUSTOMER",
+                                                                                                        "ADMIN"
+                                                                                                ))
+                                                                                                .description(
+                                                                                                        "Optional user role filter for ADMIN_USERS. "
+                                                                                                                + "Use CUSTOMER to filter customers, "
+                                                                                                                + "ADMIN to filter administrators."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
                                                                                         "fdNumber",
                                                                                         Schema.builder()
                                                                                                 .type("STRING")
@@ -236,7 +254,8 @@ public class AiIntentClassifier {
                                                                         "fdNumber",
                                                                         "loanNumber",
                                                                         "depositAmount",
-                                                                        "tenureYears"
+                                                                        "tenureYears",
+                                                                        "role"
                                                                 ))
                                                                 .build()
                                                 )
@@ -336,6 +355,24 @@ public class AiIntentClassifier {
                 This intent takes no parameters.
                 
                 ADMIN_DASHBOARD_SUMMARY is available only for ADMIN users.
+                
+                ADMIN_USERS:
+                Use this intent when an administrator asks to list, search, find,
+                or view users/customers in the BankFlow system.
+                
+                Optional filters:
+                - search: text to match against the user's full name or email
+                - role: CUSTOMER or ADMIN
+                
+                Examples:
+                - "Show me all users"
+                - "Show me all customers"
+                - "Find user Amit"
+                - "Find users with gmail.com"
+                - "Show me all admins"
+                - "Find customers named Rahul"
+                
+                This intent is available only to administrators.
                 
                 BANKFLOW_DOCUMENTATION:
                 Questions about how BankFlow works, its features,
@@ -480,6 +517,13 @@ public class AiIntentClassifier {
                   a specific bank account.
                 - Do not invent or infer an account number.
                 - Use ACCOUNTS when the user asks for their accounts generally.
+                
+                For ADMIN_USERS:
+                - Use role=CUSTOMER when the administrator asks for customers.
+                - Use role=ADMIN when the administrator asks for administrators/admins.
+                - Use role=null when no role filter is requested.
+                - Use search when the user provides a name, email, or other text
+                  intended to match users.
                 
                 startDate:
                 Populate only when the user explicitly provides a start date

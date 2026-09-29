@@ -21,6 +21,7 @@ public record AiIntent(
             String endDate,
             String accountNumber,
             String search,
+            String role,
             String fdNumber,
             String loanNumber,
             BigDecimal depositAmount,
@@ -41,6 +42,7 @@ public record AiIntent(
         CALCULATE_FD_MATURITY,
         SCHEDULED_TRANSFERS,
         ADMIN_DASHBOARD_SUMMARY,
+        ADMIN_USERS,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

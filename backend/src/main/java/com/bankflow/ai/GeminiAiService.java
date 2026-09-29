@@ -323,27 +323,27 @@ public class GeminiAiService implements AiService {
                 audience == AiAudience.CUSTOMER
                         ? """
                         Answer for a BankFlow customer.
-
+                        
                         Use simple, clear, customer-friendly language.
                         Do not expose internal implementation details,
                         service names, database details, APIs, or infrastructure.
-
+                        
                         All monetary amounts are in Indian Rupees (INR).
                         Use the ₹ symbol when displaying monetary amounts.
                         Never use $, USD, or any other currency symbol.
-
+                        
                         Do not convert or change numeric values.
                         """
                         : """
                         Answer for a BankFlow administrator.
-
+                        
                         You may provide deeper technical or operational context
                         when relevant and appropriate.
-
+                        
                         All monetary amounts are in Indian Rupees (INR).
                         Use the ₹ symbol when displaying monetary amounts.
                         Never use $, USD, or any other currency symbol.
-
+                        
                         Use backend results as authoritative.
                         Never invent additional data.
                         """;
@@ -431,41 +431,41 @@ public class GeminiAiService implements AiService {
         }
 
         String prompt = """
-            Answer the user's question using the authoritative backend
-            results and deterministic calculations provided below.
-
-            %s
-
-            User question:
-            %s
-
-            Backend results:
-            %s
-
-            Deterministic calculations:
-            %s
-
-            Interpret the operations according to the user's question
-            and preserve their order.
-
-            Use the backend results as authoritative.
-
-            Do not perform arithmetic yourself when a deterministic
-            calculation is provided.
-
-            Do not invent missing values or additional data.
-
-            If the user only asked for multiple values, clearly present
-            those values without unnecessarily emphasizing comparisons.
-
-            If the user asked for a comparison, use the relevant
-            deterministic comparison provided above.
-
-            Do not mention tools, function calls, internal routing,
-            operation classification, or this instruction.
-
-            Return only the answer text.
-            """.formatted(
+                Answer the user's question using the authoritative backend
+                results and deterministic calculations provided below.
+                
+                %s
+                
+                User question:
+                %s
+                
+                Backend results:
+                %s
+                
+                Deterministic calculations:
+                %s
+                
+                Interpret the operations according to the user's question
+                and preserve their order.
+                
+                Use the backend results as authoritative.
+                
+                Do not perform arithmetic yourself when a deterministic
+                calculation is provided.
+                
+                Do not invent missing values or additional data.
+                
+                If the user only asked for multiple values, clearly present
+                those values without unnecessarily emphasizing comparisons.
+                
+                If the user asked for a comparison, use the relevant
+                deterministic comparison provided above.
+                
+                Do not mention tools, function calls, internal routing,
+                operation classification, or this instruction.
+                
+                Return only the answer text.
+                """.formatted(
                 audienceInstruction,
                 question,
                 backendResults,
@@ -741,6 +741,18 @@ public class GeminiAiService implements AiService {
                         Never invent additional customer or system data.
                         """;
 
+        String toolResultJson;
+
+        try {
+            toolResultJson =
+                    objectMapper.writeValueAsString(toolResult);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(
+                    "Failed to serialize live-data tool result",
+                    e
+            );
+        }
+
         String prompt = """
                 Answer the user's question using the authoritative backend result below.
                 
@@ -759,7 +771,7 @@ public class GeminiAiService implements AiService {
                 """.formatted(
                 audienceInstruction,
                 question,
-                toolResult
+                toolResultJson
         );
 
         GenerateContentConfig config =

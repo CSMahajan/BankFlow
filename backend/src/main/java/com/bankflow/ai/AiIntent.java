@@ -40,6 +40,7 @@ public record AiIntent(
         FIXED_DEPOSIT,
         CALCULATE_FD_MATURITY,
         SCHEDULED_TRANSFERS,
+        ADMIN_DASHBOARD_SUMMARY,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

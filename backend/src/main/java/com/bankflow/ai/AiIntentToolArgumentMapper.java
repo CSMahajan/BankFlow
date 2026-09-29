@@ -24,7 +24,7 @@ public class AiIntentToolArgumentMapper {
             case TRANSACTION_TOTAL -> mapTransactionTotal(operation);
 
             case ACCOUNTS, ACCOUNT_BALANCE, CARDS, LOANS,
-                 FIXED_DEPOSITS, SCHEDULED_TRANSFERS -> Map.of();
+                 FIXED_DEPOSITS, SCHEDULED_TRANSFERS, ADMIN_DASHBOARD_SUMMARY -> Map.of();
 
             case ACCOUNT -> mapAccount(operation);
 
@@ -76,6 +76,8 @@ public class AiIntentToolArgumentMapper {
             case SCHEDULED_TRANSFERS -> "get_my_scheduled_transfers";
 
             case LOAN_REPAYMENT_HISTORY -> "get_loan_repayment_history";
+
+            case ADMIN_DASHBOARD_SUMMARY -> "get_admin_dashboard_summary";
 
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "

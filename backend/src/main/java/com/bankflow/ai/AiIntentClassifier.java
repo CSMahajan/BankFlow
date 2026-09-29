@@ -74,6 +74,7 @@ public class AiIntentClassifier {
                                                                                                         "FIXED_DEPOSIT",
                                                                                                         "CALCULATE_FD_MATURITY",
                                                                                                         "SCHEDULED_TRANSFERS",
+                                                                                                        "ADMIN_DASHBOARD_SUMMARY",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -324,6 +325,17 @@ public class AiIntentClassifier {
                 
                 SCHEDULED_TRANSFERS:
                 The customer's own scheduled transfers.
+                
+                ADMIN_DASHBOARD_SUMMARY:
+                Use this intent when an administrator asks for the overall
+                current BankFlow administrative dashboard/operational summary,
+                such as total customers, total accounts, active loans, pending
+                loans, active fixed deposits, total deposits, or pending KYC
+                documents.
+                
+                This intent takes no parameters.
+                
+                ADMIN_DASHBOARD_SUMMARY is available only for ADMIN users.
                 
                 BANKFLOW_DOCUMENTATION:
                 Questions about how BankFlow works, its features,

@@ -78,6 +78,7 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_USERS",
                                                                                                         "ADMIN_USER_DETAILS",
                                                                                                         "ADMIN_ACCOUNTS",
+                                                                                                        "ADMIN_USER_ACCOUNTS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -480,6 +481,22 @@ public class AiIntentClassifier {
                   belonging to one specific user.
                 - This intent is available only to administrators.
                 - Do not use ADMIN_ACCOUNTS for accounts belonging to one specific user.
+                
+                ADMIN_USER_ACCOUNTS:
+                - Use this intent when an administrator asks for accounts belonging to
+                  one specific BankFlow user.
+                - The user ID must be provided or extracted from the question.
+                - This is different from ADMIN_ACCOUNTS:
+                  - ADMIN_ACCOUNTS = accounts across the entire BankFlow system
+                  - ADMIN_USER_ACCOUNTS = accounts belonging to one specific user
+                - This intent is available only to administrators.
+                
+                Examples:
+                - "Show me accounts of user 10" → ADMIN_USER_ACCOUNTS, userId=10
+                - "Show me the accounts belonging to user 10" → ADMIN_USER_ACCOUNTS, userId=10
+                - "List user 10's accounts" → ADMIN_USER_ACCOUNTS, userId=10
+                - "Show me all accounts" → ADMIN_ACCOUNTS
+                - "Show me accounts of user 10" → ADMIN_USER_ACCOUNTS
                 
                 AUDIENCE RULE:
                 - The authenticated user's audience is provided separately.

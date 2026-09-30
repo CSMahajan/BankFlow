@@ -47,6 +47,7 @@ public record AiIntent(
         ADMIN_USERS,
         ADMIN_USER_DETAILS,
         ADMIN_ACCOUNTS,
+        ADMIN_USER_ACCOUNTS,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

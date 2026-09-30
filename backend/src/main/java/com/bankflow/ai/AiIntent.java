@@ -22,6 +22,7 @@ public record AiIntent(
             String accountNumber,
             String search,
             String role,
+            Long userId,
             String fdNumber,
             String loanNumber,
             BigDecimal depositAmount,
@@ -43,6 +44,7 @@ public record AiIntent(
         SCHEDULED_TRANSFERS,
         ADMIN_DASHBOARD_SUMMARY,
         ADMIN_USERS,
+        ADMIN_USER_DETAILS,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

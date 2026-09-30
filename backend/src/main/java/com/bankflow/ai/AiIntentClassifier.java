@@ -76,6 +76,7 @@ public class AiIntentClassifier {
                                                                                                         "SCHEDULED_TRANSFERS",
                                                                                                         "ADMIN_DASHBOARD_SUMMARY",
                                                                                                         "ADMIN_USERS",
+                                                                                                        "ADMIN_USER_DETAILS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -195,6 +196,18 @@ public class AiIntentClassifier {
                                                                                 ),
 
                                                                                 Map.entry(
+                                                                                        "userId",
+                                                                                        Schema.builder()
+                                                                                                .type("INTEGER")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "User ID for ADMIN_USER_DETAILS. "
+                                                                                                                + "Use the numeric BankFlow user ID."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
                                                                                         "fdNumber",
                                                                                         Schema.builder()
                                                                                                 .type("STRING")
@@ -251,11 +264,12 @@ public class AiIntentClassifier {
                                                                         "endDate",
                                                                         "accountNumber",
                                                                         "search",
+                                                                        "role",
+                                                                        "userId",
                                                                         "fdNumber",
                                                                         "loanNumber",
                                                                         "depositAmount",
-                                                                        "tenureYears",
-                                                                        "role"
+                                                                        "tenureYears"
                                                                 ))
                                                                 .build()
                                                 )
@@ -357,8 +371,14 @@ public class AiIntentClassifier {
                 ADMIN_DASHBOARD_SUMMARY is available only for ADMIN users.
                 
                 ADMIN_USERS:
-                Use this intent when an administrator asks to list, search, find,
-                or view users/customers in the BankFlow system.
+                - Use ONLY when the administrator wants a list of multiple users.
+                - This includes:
+                  - all users
+                  - all customers
+                  - all administrators
+                  - users matching a search/filter
+                - ADMIN_USERS must NOT be used when the administrator asks about
+                  one specific user.
                 
                 Optional filters:
                 - search: text to match against the user's full name or email
@@ -373,6 +393,59 @@ public class AiIntentClassifier {
                 - "Find customers named Rahul"
                 
                 This intent is available only to administrators.
+                
+                ADMIN_USER_DETAILS:
+                - Use when the administrator wants information about ONE specific user.
+                - A specific numeric userId must be provided.
+                - This intent takes precedence over ADMIN_USERS whenever the question
+                  identifies one specific user and asks for that user's details,
+                  information, profile, summary, or data.
+                - Examples:
+                  - "Show me details of user 10"
+                  - "Show me user 4 details"
+                  - "Get details for user 9"
+                
+                ADMIN USER INTENT EXAMPLES:
+                
+                "Show me all users"
+                → ADMIN_USERS
+                
+                "Show me all customers"
+                → ADMIN_USERS
+                
+                "Show me all administrators"
+                → ADMIN_USERS
+                
+                "Find customers with gmail"
+                → ADMIN_USERS
+                
+                "Show me details of user 10"
+                → ADMIN_USER_DETAILS, userId=10
+                
+                "Show me user 10"
+                → ADMIN_USER_DETAILS, userId=10
+                
+                "Get information about user 10"
+                → ADMIN_USER_DETAILS, userId=10
+                
+                "Show me the profile of user 10"
+                → ADMIN_USER_DETAILS, userId=10
+                
+                "Give me a summary of user 10"
+                → ADMIN_USER_DETAILS, userId=10
+                
+                IMPORTANT:
+                ADMIN_USERS is for LISTING users.
+                ADMIN_USER_DETAILS is for inspecting ONE specific user.
+                If a specific userId is present and the request concerns that one user,
+                choose ADMIN_USER_DETAILS.
+                
+                IMPORTANT DISTINCTION:
+                - A request for a list → ADMIN_USERS
+                - A request for details of one identified user → ADMIN_USER_DETAILS
+                - If userId is provided and the question asks for information/details
+                  about that specific user, intent MUST be ADMIN_USER_DETAILS.
+                - Do not classify such requests as ADMIN_USERS.
                 
                 BANKFLOW_DOCUMENTATION:
                 Questions about how BankFlow works, its features,

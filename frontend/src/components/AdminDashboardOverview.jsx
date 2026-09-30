@@ -1,5 +1,6 @@
 import React from 'react';
 import SummaryCard from './SummaryCard';
+import AIAssistant from './ai/AIAssistant';
 
 const AdminDashboardOverview = ({
     summary,
@@ -69,6 +70,8 @@ const AdminDashboardOverview = ({
                 value={`₹${Number(summary.totalDeposits).toLocaleString('en-IN')}`}
                 subtitle="Across All Accounts"
             />
+
+            <AIAssistant />
         </div>
     );
 };

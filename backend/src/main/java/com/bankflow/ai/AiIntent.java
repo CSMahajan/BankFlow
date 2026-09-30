@@ -1,6 +1,7 @@
 package com.bankflow.ai;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record AiIntent(
         Route route,
@@ -29,6 +30,8 @@ public record AiIntent(
             String loanNumber,
             String loanType,
             String transactionId,
+            String auditAction,
+            List<String> auditActions,
             BigDecimal depositAmount,
             Integer tenureYears
     ) {}
@@ -57,6 +60,7 @@ public record AiIntent(
         ADMIN_USER_LOANS,
         ADMIN_ACCOUNT_TRANSACTIONS,
         ADMIN_TRANSACTION_DETAILS,
+        ADMIN_AUDIT_LOGS,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

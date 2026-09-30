@@ -85,6 +85,7 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_USER_LOANS",
                                                                                                         "ADMIN_ACCOUNT_TRANSACTIONS",
                                                                                                         "ADMIN_TRANSACTION_DETAILS",
+                                                                                                        "ADMIN_AUDIT_LOGS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -298,6 +299,91 @@ public class AiIntentClassifier {
                                                                                                 .description(
                                                                                                         "Transaction ID for ADMIN_TRANSACTION_DETAILS"
                                                                                                 )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
+                                                                                        "auditAction",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .enum_(List.of(
+                                                                                                        "LOGIN",
+                                                                                                        "USER_REGISTERED",
+                                                                                                        "VERIFICATION_EMAIL_RESENT",
+                                                                                                        "PASSWORD_RESET",
+                                                                                                        "PASSWORD_CHANGED",
+                                                                                                        "EMAIL_VERIFIED",
+                                                                                                        "KYC_DOCUMENT_UPLOADED",
+                                                                                                        "KYC_DOCUMENT_VERIFIED",
+                                                                                                        "KYC_DOCUMENT_REJECTED",
+                                                                                                        "PROFILE_UPDATED",
+                                                                                                        "ACCOUNT_CREATED",
+                                                                                                        "ACCOUNT_ACTIVATED",
+                                                                                                        "ACCOUNT_FROZEN",
+                                                                                                        "MONEY_TRANSFER",
+                                                                                                        "SCHEDULED_TRANSFER_CREATED",
+                                                                                                        "SCHEDULED_TRANSFER_CANCELLED",
+                                                                                                        "SCHEDULED_TRANSFER_EXECUTED",
+                                                                                                        "FD_CREATED",
+                                                                                                        "FD_CLOSED",
+                                                                                                        "LOAN_APPLIED",
+                                                                                                        "LOAN_APPROVED",
+                                                                                                        "LOAN_REJECTED",
+                                                                                                        "EMI_PAID",
+                                                                                                        "CARD_ISSUED",
+                                                                                                        "CARD_FROZEN",
+                                                                                                        "CARD_ACTIVATED",
+                                                                                                        "CARD_BLOCKED",
+                                                                                                        "CARD_UNBLOCKED",
+                                                                                                        "CARD_LIMIT_UPDATED"
+                                                                                                ))
+                                                                                                .description("Optional single audit action filter")
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
+                                                                                        "auditActions",
+                                                                                        Schema.builder()
+                                                                                                .type("ARRAY")
+                                                                                                .nullable(true)
+                                                                                                .items(
+                                                                                                        Schema.builder()
+                                                                                                                .type("STRING")
+                                                                                                                .enum_(List.of(
+                                                                                                                        "LOGIN",
+                                                                                                                        "USER_REGISTERED",
+                                                                                                                        "VERIFICATION_EMAIL_RESENT",
+                                                                                                                        "PASSWORD_RESET",
+                                                                                                                        "PASSWORD_CHANGED",
+                                                                                                                        "EMAIL_VERIFIED",
+                                                                                                                        "KYC_DOCUMENT_UPLOADED",
+                                                                                                                        "KYC_DOCUMENT_VERIFIED",
+                                                                                                                        "KYC_DOCUMENT_REJECTED",
+                                                                                                                        "PROFILE_UPDATED",
+                                                                                                                        "ACCOUNT_CREATED",
+                                                                                                                        "ACCOUNT_ACTIVATED",
+                                                                                                                        "ACCOUNT_FROZEN",
+                                                                                                                        "MONEY_TRANSFER",
+                                                                                                                        "SCHEDULED_TRANSFER_CREATED",
+                                                                                                                        "SCHEDULED_TRANSFER_CANCELLED",
+                                                                                                                        "SCHEDULED_TRANSFER_EXECUTED",
+                                                                                                                        "FD_CREATED",
+                                                                                                                        "FD_CLOSED",
+                                                                                                                        "LOAN_APPLIED",
+                                                                                                                        "LOAN_APPROVED",
+                                                                                                                        "LOAN_REJECTED",
+                                                                                                                        "EMI_PAID",
+                                                                                                                        "CARD_ISSUED",
+                                                                                                                        "CARD_FROZEN",
+                                                                                                                        "CARD_ACTIVATED",
+                                                                                                                        "CARD_BLOCKED",
+                                                                                                                        "CARD_UNBLOCKED",
+                                                                                                                        "CARD_LIMIT_UPDATED"
+                                                                                                                ))
+                                                                                                                .build()
+                                                                                                )
+                                                                                                .description("Optional list of audit action filters")
                                                                                                 .build()
                                                                                 ),
 
@@ -653,6 +739,42 @@ public class AiIntentClassifier {
                 - "Show me all frozen accounts" → ADMIN_ACCOUNTS, accountStatus=FROZEN
                 - "Show me all active accounts" → ADMIN_ACCOUNTS, accountStatus=ACTIVE
                 - "Find account BF123" → ADMIN_ACCOUNTS, search=BF123
+                
+                ADMIN_AUDIT_LOGS = audit logs for administrators.
+                
+                Use ADMIN_AUDIT_LOGS when the administrator asks to:
+                - view audit logs
+                - search audit logs
+                - find logs performed by a user
+                - find logs by role
+                - find logs for a specific audit action
+                - find logs matching multiple audit actions
+                
+                For audit-log filters:
+                - use auditAction for one specific action
+                - use auditActions for multiple actions
+                - use search for text such as a user's name/email or description
+                - use role for CUSTOMER or ADMIN
+                
+                Examples:
+                "Show me audit logs"
+                -> ADMIN_AUDIT_LOGS
+                
+                "Show me audit logs for LOGIN"
+                -> ADMIN_AUDIT_LOGS
+                auditAction=LOGIN
+                
+                "Show me audit logs for account creation"
+                -> ADMIN_AUDIT_LOGS
+                auditAction=ACCOUNT_CREATED
+                
+                "Show me customer audit logs"
+                -> ADMIN_AUDIT_LOGS
+                role=CUSTOMER
+                
+                "Search audit logs for John"
+                -> ADMIN_AUDIT_LOGS
+                search=John
                 
                 BANKFLOW_DOCUMENTATION:
                 Questions about how BankFlow works, its features,

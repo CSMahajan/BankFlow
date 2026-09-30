@@ -46,6 +46,8 @@ public class AiIntentToolArgumentMapper {
 
             case ADMIN_TRANSACTION_DETAILS -> mapAdminTransactionDetails(operation);
 
+            case ADMIN_AUDIT_LOGS -> mapAdminAuditLogs(operation);
+
             case ACCOUNT -> mapAccount(operation);
 
             case FIXED_DEPOSIT -> mapFixedDeposit(operation);
@@ -118,6 +120,8 @@ public class AiIntentToolArgumentMapper {
             case ADMIN_ACCOUNT_TRANSACTIONS -> "get_admin_account_transactions";
 
             case ADMIN_TRANSACTION_DETAILS -> "get_admin_transaction_details";
+
+            case ADMIN_AUDIT_LOGS -> "get_admin_audit_logs";
 
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "
@@ -320,6 +324,45 @@ public class AiIntentToolArgumentMapper {
                 "transactionId",
                 operation.transactionId().trim()
         );
+    }
+
+    private Map<String, Object> mapAdminAuditLogs(
+            AiIntent.Operation operation) {
+
+        Map<String, Object> arguments = new HashMap<>();
+
+        if (operation.search() != null &&
+                !operation.search().isBlank()) {
+            arguments.put("search", operation.search().trim());
+        }
+
+        if (operation.role() != null &&
+                !operation.role().isBlank()) {
+            arguments.put("role", operation.role().trim().toUpperCase());
+        }
+
+        if (operation.auditAction() != null &&
+                !operation.auditAction().isBlank()) {
+            arguments.put(
+                    "action",
+                    operation.auditAction().trim().toUpperCase()
+            );
+        }
+
+        if (operation.auditActions() != null &&
+                !operation.auditActions().isEmpty()) {
+
+            arguments.put(
+                    "actions",
+                    operation.auditActions()
+                            .stream()
+                            .map(String::trim)
+                            .map(String::toUpperCase)
+                            .toList()
+            );
+        }
+
+        return arguments;
     }
 
     private Map<String, Object> mapTransactionTotal(

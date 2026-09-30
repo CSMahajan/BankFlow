@@ -21,6 +21,7 @@ public record AiIntent(
             String endDate,
             String accountNumber,
             String search,
+            String accountStatus,
             String role,
             Long userId,
             String fdNumber,
@@ -45,6 +46,7 @@ public record AiIntent(
         ADMIN_DASHBOARD_SUMMARY,
         ADMIN_USERS,
         ADMIN_USER_DETAILS,
+        ADMIN_ACCOUNTS,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

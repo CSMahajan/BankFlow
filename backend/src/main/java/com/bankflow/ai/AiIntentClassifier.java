@@ -77,6 +77,7 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_DASHBOARD_SUMMARY",
                                                                                                         "ADMIN_USERS",
                                                                                                         "ADMIN_USER_DETAILS",
+                                                                                                        "ADMIN_ACCOUNTS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -179,6 +180,23 @@ public class AiIntentClassifier {
                                                                                 ),
 
                                                                                 Map.entry(
+                                                                                        "accountStatus",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .enum_(List.of(
+                                                                                                        "ACTIVE",
+                                                                                                        "FROZEN",
+                                                                                                        "INACTIVE"
+                                                                                                ))
+                                                                                                .description(
+                                                                                                        "Optional account status filter for ADMIN_ACCOUNTS. "
+                                                                                                                + "Use ACTIVE, FROZEN, or INACTIVE."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
                                                                                         "role",
                                                                                         Schema.builder()
                                                                                                 .type("STRING")
@@ -264,6 +282,7 @@ public class AiIntentClassifier {
                                                                         "endDate",
                                                                         "accountNumber",
                                                                         "search",
+                                                                        "accountStatus",
                                                                         "role",
                                                                         "userId",
                                                                         "fdNumber",
@@ -446,6 +465,36 @@ public class AiIntentClassifier {
                 - If userId is provided and the question asks for information/details
                   about that specific user, intent MUST be ADMIN_USER_DETAILS.
                 - Do not classify such requests as ADMIN_USERS.
+                
+                ADMIN_ACCOUNTS:
+                - Use when an administrator asks for a list of BankFlow accounts.
+                - This means accounts across the BankFlow system, not accounts belonging
+                  to one specific user.
+                - Optional filters:
+                  - search: text to search account number or customer full name
+                  - accountStatus: ACTIVE, FROZEN, or INACTIVE
+                - Use accountStatus when the administrator explicitly asks for accounts
+                  with a particular status.
+                - Leave accountStatus null when no status filter is requested.
+                - Use ADMIN_USER_ACCOUNTS when the administrator asks for accounts
+                  belonging to one specific user.
+                - This intent is available only to administrators.
+                - Do not use ADMIN_ACCOUNTS for accounts belonging to one specific user.
+                
+                AUDIENCE RULE:
+                - The authenticated user's audience is provided separately.
+                - When audience is ADMIN, administrative intents must be used for
+                  administrative/system-wide requests.
+                - When audience is CUSTOMER, customer intents must be used for
+                  authenticated customer's own data.
+                - Never use CUSTOMER-only intents for an ADMIN request when an
+                  ADMIN-specific intent exists.
+                
+                Examples:
+                - "Show me all accounts" → ADMIN_ACCOUNTS
+                - "Show me all frozen accounts" → ADMIN_ACCOUNTS, accountStatus=FROZEN
+                - "Show me all active accounts" → ADMIN_ACCOUNTS, accountStatus=ACTIVE
+                - "Find account BF123" → ADMIN_ACCOUNTS, search=BF123
                 
                 BANKFLOW_DOCUMENTATION:
                 Questions about how BankFlow works, its features,

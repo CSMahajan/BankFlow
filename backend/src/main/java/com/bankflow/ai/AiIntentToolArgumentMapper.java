@@ -42,6 +42,10 @@ public class AiIntentToolArgumentMapper {
 
             case ADMIN_USER_LOANS -> mapAdminUserLoans(operation);
 
+            case ADMIN_ACCOUNT_TRANSACTIONS -> mapAdminAccountTransactions(operation);
+
+            case ADMIN_TRANSACTION_DETAILS -> mapAdminTransactionDetails(operation);
+
             case ACCOUNT -> mapAccount(operation);
 
             case FIXED_DEPOSIT -> mapFixedDeposit(operation);
@@ -110,6 +114,10 @@ public class AiIntentToolArgumentMapper {
             case ADMIN_LOANS -> "get_admin_loans";
 
             case ADMIN_USER_LOANS -> "get_admin_user_loans";
+
+            case ADMIN_ACCOUNT_TRANSACTIONS -> "get_admin_account_transactions";
+
+            case ADMIN_TRANSACTION_DETAILS -> "get_admin_transaction_details";
 
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "
@@ -277,6 +285,40 @@ public class AiIntentToolArgumentMapper {
         return Map.of(
                 "userId",
                 operation.userId()
+        );
+    }
+
+    private Map<String, Object> mapAdminAccountTransactions(
+            AiIntent.Operation operation) {
+
+        if (operation.accountNumber() == null ||
+                operation.accountNumber().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "accountNumber is required for ADMIN_ACCOUNT_TRANSACTIONS"
+            );
+        }
+
+        return Map.of(
+                "accountNumber",
+                operation.accountNumber().trim()
+        );
+    }
+
+    private Map<String, Object> mapAdminTransactionDetails(
+            AiIntent.Operation operation) {
+
+        if (operation.transactionId() == null ||
+                operation.transactionId().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "transactionId is required for ADMIN_TRANSACTION_DETAILS"
+            );
+        }
+
+        return Map.of(
+                "transactionId",
+                operation.transactionId().trim()
         );
     }
 

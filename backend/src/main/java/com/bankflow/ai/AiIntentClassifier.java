@@ -83,6 +83,8 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_USER_CARDS",
                                                                                                         "ADMIN_LOANS",
                                                                                                         "ADMIN_USER_LOANS",
+                                                                                                        "ADMIN_ACCOUNT_TRANSACTIONS",
+                                                                                                        "ADMIN_TRANSACTION_DETAILS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -289,6 +291,17 @@ public class AiIntentClassifier {
                                                                                 ),
 
                                                                                 Map.entry(
+                                                                                        "transactionId",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .description(
+                                                                                                        "Transaction ID for ADMIN_TRANSACTION_DETAILS"
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
                                                                                         "depositAmount",
                                                                                         Schema.builder()
                                                                                                 .type("NUMBER")
@@ -328,6 +341,7 @@ public class AiIntentClassifier {
                                                                         "fdNumber",
                                                                         "loanNumber",
                                                                         "loanType",
+                                                                        "transactionId",
                                                                         "depositAmount",
                                                                         "tenureYears"
                                                                 ))
@@ -596,6 +610,30 @@ public class AiIntentClassifier {
                 - Use ADMIN_LOANS for the global pending-loans listing.
                 - Use ADMIN_USER_LOANS for loans belonging to a specific user.
                 - Do not use the customer LOANS intent for administrator requests.
+                
+                ADMIN_ACCOUNT_TRANSACTIONS:
+                - Use when an ADMIN asks for transactions belonging to a specific account.
+                - accountNumber is required.
+                - This intent must be used even when the request could also match the
+                  customer TRANSACTIONS intent.
+                - Do NOT use TRANSACTIONS for an ADMIN request when an account number
+                  is explicitly provided.
+                - Examples:
+                  - "Show me transactions for account BF4848505212"
+                  - "Show me the transaction history of account BF4848505212"
+                  - "Find transactions for account BF4848505212"
+                
+                ADMIN_TRANSACTION_DETAILS:
+                - Use when an ADMIN asks for details of one specific transaction.
+                - transactionId is required.
+                - Examples:
+                  - "Show me transaction TRF-B8100D0D-C"
+                  - "Give me details of transaction TRF-B8100D0D-C"
+                
+                For ADMIN:
+                - Specific transaction ID -> ADMIN_TRANSACTION_DETAILS
+                - Specific account number -> ADMIN_ACCOUNT_TRANSACTIONS
+                - Never use customer TRANSACTIONS for these requests.
                 
                 AUDIENCE RULE:
                 - The authenticated user's audience is provided separately.

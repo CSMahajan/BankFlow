@@ -79,6 +79,8 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_USER_DETAILS",
                                                                                                         "ADMIN_ACCOUNTS",
                                                                                                         "ADMIN_USER_ACCOUNTS",
+                                                                                                        "ADMIN_CARDS",
+                                                                                                        "ADMIN_USER_CARDS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -198,6 +200,23 @@ public class AiIntentClassifier {
                                                                                 ),
 
                                                                                 Map.entry(
+                                                                                        "cardStatus",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .enum_(List.of(
+                                                                                                        "ACTIVE",
+                                                                                                        "FROZEN",
+                                                                                                        "BLOCKED"
+                                                                                                ))
+                                                                                                .description(
+                                                                                                        "Optional card status filter for ADMIN_CARDS. "
+                                                                                                                + "Use ACTIVE, FROZEN, or BLOCKED."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
                                                                                         "role",
                                                                                         Schema.builder()
                                                                                                 .type("STRING")
@@ -284,6 +303,7 @@ public class AiIntentClassifier {
                                                                         "accountNumber",
                                                                         "search",
                                                                         "accountStatus",
+                                                                        "cardStatus",
                                                                         "role",
                                                                         "userId",
                                                                         "fdNumber",
@@ -498,6 +518,38 @@ public class AiIntentClassifier {
                 - "Show me all accounts" → ADMIN_ACCOUNTS
                 - "Show me accounts of user 10" → ADMIN_USER_ACCOUNTS
                 
+                ADMIN_CARDS:
+                - Use this intent when an administrator asks for cards across the
+                  entire BankFlow system.
+                - Optional filters:
+                  - search: searches card number, account number, or customer full name
+                  - cardStatus: ACTIVE, FROZEN, or BLOCKED
+                - Leave search and cardStatus null when no filter is requested.
+                - Do not use accountStatus for card filtering.
+                
+                Examples:
+                - "Show me all cards" → ADMIN_CARDS
+                - "Show me all active cards" → ADMIN_CARDS, cardStatus=ACTIVE
+                - "Show me all frozen cards" → ADMIN_CARDS, cardStatus=FROZEN
+                - "Show me all blocked cards" → ADMIN_CARDS, cardStatus=BLOCKED
+                - "Find cards for account BF123" → ADMIN_CARDS, search=BF123
+                
+                ADMIN_USER_CARDS:
+                - Use this intent when an administrator asks for cards belonging to
+                  one specific BankFlow user.
+                - The user ID must be provided or extracted from the question.
+                - This is different from ADMIN_CARDS:
+                  - ADMIN_CARDS = cards across the entire BankFlow system
+                  - ADMIN_USER_CARDS = cards belonging to one specific user
+                - This intent is available only to administrators.
+                
+                Examples:
+                - "Show me cards of user 10" → ADMIN_USER_CARDS, userId=10
+                - "Show me the cards belonging to user 10" → ADMIN_USER_CARDS, userId=10
+                - "List user 10's cards" → ADMIN_USER_CARDS, userId=10
+                - "Show me all cards" → ADMIN_CARDS
+                - "Show me cards of user 10" → ADMIN_USER_CARDS
+                
                 AUDIENCE RULE:
                 - The authenticated user's audience is provided separately.
                 - When audience is ADMIN, administrative intents must be used for
@@ -506,6 +558,10 @@ public class AiIntentClassifier {
                   authenticated customer's own data.
                 - Never use CUSTOMER-only intents for an ADMIN request when an
                   ADMIN-specific intent exists.
+                - When audience is ADMIN, use ADMIN_* intents for administrative/system-wide
+                  or administrator-requested user data.
+                - Do not use customer-only intents such as CARDS for ADMIN requests when
+                  an ADMIN-specific intent exists.
                 
                 Examples:
                 - "Show me all accounts" → ADMIN_ACCOUNTS

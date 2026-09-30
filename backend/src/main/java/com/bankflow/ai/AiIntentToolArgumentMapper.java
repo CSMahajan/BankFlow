@@ -34,6 +34,10 @@ public class AiIntentToolArgumentMapper {
 
             case ADMIN_USER_ACCOUNTS -> mapAdminUserAccounts(operation);
 
+            case ADMIN_CARDS -> mapAdminCards(operation);
+
+            case ADMIN_USER_CARDS -> mapAdminUserCards(operation);
+
             case ACCOUNT -> mapAccount(operation);
 
             case FIXED_DEPOSIT -> mapFixedDeposit(operation);
@@ -94,6 +98,10 @@ public class AiIntentToolArgumentMapper {
             case ADMIN_ACCOUNTS -> "get_admin_accounts";
 
             case ADMIN_USER_ACCOUNTS -> "get_admin_user_accounts";
+
+            case ADMIN_CARDS -> "get_admin_cards";
+
+            case ADMIN_USER_CARDS -> "get_admin_user_cards";
 
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "
@@ -173,6 +181,47 @@ public class AiIntentToolArgumentMapper {
         if (operation.userId() == null) {
             throw new IllegalArgumentException(
                     "userId is required for ADMIN_USER_ACCOUNTS"
+            );
+        }
+
+        return Map.of(
+                "userId",
+                operation.userId()
+        );
+    }
+
+    private Map<String, Object> mapAdminCards(
+            AiIntent.Operation operation) {
+
+        Map<String, Object> arguments = new HashMap<>();
+
+        if (operation.search() != null
+                && !operation.search().isBlank()) {
+
+            arguments.put(
+                    "search",
+                    operation.search().trim()
+            );
+        }
+
+        if (operation.cardStatus() != null
+                && !operation.cardStatus().isBlank()) {
+
+            arguments.put(
+                    "status",
+                    operation.cardStatus().trim().toUpperCase()
+            );
+        }
+
+        return arguments;
+    }
+
+    private Map<String, Object> mapAdminUserCards(
+            AiIntent.Operation operation) {
+
+        if (operation.userId() == null) {
+            throw new IllegalArgumentException(
+                    "userId is required for ADMIN_USER_CARDS"
             );
         }
 

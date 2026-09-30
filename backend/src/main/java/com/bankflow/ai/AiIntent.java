@@ -22,6 +22,7 @@ public record AiIntent(
             String accountNumber,
             String search,
             String accountStatus,
+            String cardStatus,
             String role,
             Long userId,
             String fdNumber,
@@ -48,6 +49,8 @@ public record AiIntent(
         ADMIN_USER_DETAILS,
         ADMIN_ACCOUNTS,
         ADMIN_USER_ACCOUNTS,
+        ADMIN_CARDS,
+        ADMIN_USER_CARDS,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

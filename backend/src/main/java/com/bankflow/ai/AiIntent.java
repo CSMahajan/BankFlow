@@ -27,6 +27,7 @@ public record AiIntent(
             Long userId,
             String fdNumber,
             String loanNumber,
+            String loanType,
             BigDecimal depositAmount,
             Integer tenureYears
     ) {}
@@ -51,6 +52,8 @@ public record AiIntent(
         ADMIN_USER_ACCOUNTS,
         ADMIN_CARDS,
         ADMIN_USER_CARDS,
+        ADMIN_LOANS,
+        ADMIN_USER_LOANS,
         BANKFLOW_DOCUMENTATION,
         GENERAL
     }

@@ -81,6 +81,8 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_USER_ACCOUNTS",
                                                                                                         "ADMIN_CARDS",
                                                                                                         "ADMIN_USER_CARDS",
+                                                                                                        "ADMIN_LOANS",
+                                                                                                        "ADMIN_USER_LOANS",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -270,6 +272,23 @@ public class AiIntentClassifier {
                                                                                 ),
 
                                                                                 Map.entry(
+                                                                                        "loanType",
+                                                                                        Schema.builder()
+                                                                                                .type("STRING")
+                                                                                                .nullable(true)
+                                                                                                .enum_(List.of(
+                                                                                                        "PERSONAL",
+                                                                                                        "VEHICLE",
+                                                                                                        "HOME"
+                                                                                                ))
+                                                                                                .description(
+                                                                                                        "Loan type filter for ADMIN_LOANS. " +
+                                                                                                                "Use only PERSONAL, VEHICLE, or HOME."
+                                                                                                )
+                                                                                                .build()
+                                                                                ),
+
+                                                                                Map.entry(
                                                                                         "depositAmount",
                                                                                         Schema.builder()
                                                                                                 .type("NUMBER")
@@ -308,6 +327,7 @@ public class AiIntentClassifier {
                                                                         "userId",
                                                                         "fdNumber",
                                                                         "loanNumber",
+                                                                        "loanType",
                                                                         "depositAmount",
                                                                         "tenureYears"
                                                                 ))
@@ -549,6 +569,33 @@ public class AiIntentClassifier {
                 - "List user 10's cards" → ADMIN_USER_CARDS, userId=10
                 - "Show me all cards" → ADMIN_CARDS
                 - "Show me cards of user 10" → ADMIN_USER_CARDS
+                
+                ADMIN_LOANS:
+                - Use when an administrator asks for pending loan applications.
+                - This represents the global pending-loans listing.
+                - Optional filters:
+                  - search: customer name, loan number, or disbursement account number
+                  - loanType: PERSONAL, VEHICLE, or HOME
+                - Examples:
+                  - "Show me pending loans"
+                  - "Show me pending home loans"
+                  - "Find pending personal loans"
+                  - "Show pending loans for Kar Gh"
+                
+                ADMIN_USER_LOANS:
+                - Use when an administrator asks for loans belonging to one specific user.
+                - userId is required.
+                - Examples:
+                  - "Show me loans of user 10"
+                  - "Show user 10's loans"
+                
+                Do not use ADMIN_USER_LOANS for global pending-loan requests.
+                Do not use ADMIN_LOANS when a specific user ID is requested.
+                
+                For administrator requests about loans:
+                - Use ADMIN_LOANS for the global pending-loans listing.
+                - Use ADMIN_USER_LOANS for loans belonging to a specific user.
+                - Do not use the customer LOANS intent for administrator requests.
                 
                 AUDIENCE RULE:
                 - The authenticated user's audience is provided separately.

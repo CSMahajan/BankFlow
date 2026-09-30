@@ -38,6 +38,10 @@ public class AiIntentToolArgumentMapper {
 
             case ADMIN_USER_CARDS -> mapAdminUserCards(operation);
 
+            case ADMIN_LOANS -> mapAdminLoans(operation);
+
+            case ADMIN_USER_LOANS -> mapAdminUserLoans(operation);
+
             case ACCOUNT -> mapAccount(operation);
 
             case FIXED_DEPOSIT -> mapFixedDeposit(operation);
@@ -102,6 +106,10 @@ public class AiIntentToolArgumentMapper {
             case ADMIN_CARDS -> "get_admin_cards";
 
             case ADMIN_USER_CARDS -> "get_admin_user_cards";
+
+            case ADMIN_LOANS -> "get_admin_loans";
+
+            case ADMIN_USER_LOANS -> "get_admin_user_loans";
 
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "
@@ -222,6 +230,47 @@ public class AiIntentToolArgumentMapper {
         if (operation.userId() == null) {
             throw new IllegalArgumentException(
                     "userId is required for ADMIN_USER_CARDS"
+            );
+        }
+
+        return Map.of(
+                "userId",
+                operation.userId()
+        );
+    }
+
+    private Map<String, Object> mapAdminLoans(
+            AiIntent.Operation operation) {
+
+        Map<String, Object> arguments = new HashMap<>();
+
+        if (operation.search() != null &&
+                !operation.search().isBlank()) {
+
+            arguments.put(
+                    "search",
+                    operation.search().trim()
+            );
+        }
+
+        if (operation.loanType() != null &&
+                !operation.loanType().isBlank()) {
+
+            arguments.put(
+                    "loanType",
+                    operation.loanType().trim().toUpperCase()
+            );
+        }
+
+        return arguments;
+    }
+
+    private Map<String, Object> mapAdminUserLoans(
+            AiIntent.Operation operation) {
+
+        if (operation.userId() == null) {
+            throw new IllegalArgumentException(
+                    "userId is required for ADMIN_USER_LOANS"
             );
         }
 

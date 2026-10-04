@@ -10,137 +10,248 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class BankFlowMcpClient {
+public final class BankFlowMcpClient {
 
-    private static final Logger log =
+    private static final Logger LOG =
             LoggerFactory.getLogger(BankFlowMcpClient.class);
 
+    private static final String DEFAULT_BANKFLOW_BASE_URL =
+            "http://localhost:8080";
+
+    private static final String MCP_ENDPOINT = "/mcp";
+
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
+
+    private static final String ACCOUNTS_TOOL = "get_my_accounts";
+    private static final String TRANSACTIONS_TOOL = "get_my_transactions";
+
+    private static final String TRANSACTION_TYPE_ENV =
+            "BANKFLOW_TRANSACTION_TYPE";
+
+    private static final String TRANSACTION_SIZE_ENV =
+            "BANKFLOW_TRANSACTION_SIZE";
+
+    private static final String DEFAULT_TRANSACTION_TYPE = "DEBIT";
+    private static final int DEFAULT_TRANSACTION_SIZE = 5;
+
     private static final String BANKFLOW_BASE_URL =
-            System.getenv().getOrDefault(
-                    "BANKFLOW_BASE_URL",
-                    "http://localhost:8080"
+            System.getenv()
+                    .getOrDefault(
+                            "BANKFLOW_BASE_URL",
+                            DEFAULT_BANKFLOW_BASE_URL
+                    );
+
+    private BankFlowMcpClient() {
+        // Utility class
+    }
+
+    public static void main(String[] args) {
+
+        LOG.info("Starting BankFlow OAuth flow...");
+        LOG.info("BankFlow base URL: {}", BANKFLOW_BASE_URL);
+
+        try {
+            run();
+        } catch (Exception exception) {
+            LOG.error(
+                    "BankFlow MCP client failed.",
+                    exception
             );
+        }
+    }
 
-    public static void main(String[] args) throws Exception {
+    private static void run() {
 
-        log.info("Starting BankFlow OAuth flow...");
-        log.info("BankFlow base URL: {}", BANKFLOW_BASE_URL);
+        OAuthClient oauthClient = new OAuthClient();
 
-        OAuthClient oauthClient =
-                new OAuthClient();
+        String accessToken = oauthClient.authorize();
 
-        String accessToken =
-                oauthClient.authorize();
-
-        log.info("OAuth authorization successful.");
+        LOG.info("OAuth authorization successful.");
 
         HttpClientStreamableHttpTransport transport =
-                HttpClientStreamableHttpTransport
-                        .builder(BANKFLOW_BASE_URL + "/mcp")
-                        .jsonMapper(McpJsonDefaults.getMapper())
-                        .httpRequestCustomizer(
-                                (request, method, uri, requestId, context) ->
-                                        request.header(
-                                                "Authorization",
-                                                "Bearer " + accessToken
-                                        )
-                        )
-                        .build();
+                createTransport(accessToken);
 
         McpSyncClient client =
                 McpClient.sync(transport)
                         .build();
 
         try {
-
-            log.info("Connecting to BankFlow MCP server...");
-
-            McpSchema.InitializeResult initializeResult =
-                    client.initialize();
-
-            log.info("=== MCP INITIALIZED ===");
-            log.info("{}", initializeResult);
-
-            log.info("=== AVAILABLE TOOLS ===");
-
-            McpSchema.ListToolsResult tools =
-                    client.listTools();
-
-            tools.tools().forEach(tool -> {
-
-                log.info(
-                        "Tool: {}\nDescription: {}\nInput schema: {}\nProperties: {}\nRequired: {}\n",
-                        tool.name(),
-                        tool.description(),
-                        tool.inputSchema(),
-                        tool.inputSchema().get("properties"),
-                        tool.inputSchema().get("required")
-                );
-            });
-
-            McpSchema.Tool accountsTool =
-                    tools.tools().stream()
-                            .filter(tool ->
-                                    tool.name()
-                                            .equals("get_my_accounts"))
-                            .findFirst()
-                            .orElseThrow(() ->
-                                    new IllegalStateException(
-                                            "get_my_accounts tool was not discovered"
-                                    )
-                            );
-
-            McpSchema.Tool transactionsTool =
-                    tools.tools().stream()
-                            .filter(tool ->
-                                    tool.name()
-                                            .equals("get_my_transactions"))
-                            .findFirst()
-                            .orElseThrow(() ->
-                                    new IllegalStateException(
-                                            "get_my_transactions tool was not discovered"
-                                    )
-                            );
-
-            log.info("=== CALLING get_my_accounts ===");
-
-            McpSchema.CallToolResult result =
-                    client.callTool(
-                            new McpSchema.CallToolRequest(
-                                    accountsTool.name(),
-                                    Map.of()
-                            )
-                    );
-
-            log.info("get_my_accounts result: {}", result);
-
-            log.info("=== CALLING get_my_transactions ===");
-
-            McpSchema.CallToolResult transactionsResult =
-                    client.callTool(
-                            new McpSchema.CallToolRequest(
-                                    transactionsTool.name(),
-                                    Map.of(
-                                            "accountNumber",
-                                            "BF7441043591",
-                                            "type",
-                                            "DEBIT",
-                                            "size",
-                                            5
-                                    )
-                            )
-                    );
-
-            log.info(
-                    "get_my_transactions result: {}",
-                    transactionsResult
-            );
-
+            executeMcpOperations(client);
         } finally {
-
             client.closeGracefully();
+            LOG.info("BankFlow MCP client closed.");
+        }
+    }
 
-            log.info("BankFlow MCP client closed.");
+    private static HttpClientStreamableHttpTransport createTransport(
+            String accessToken) {
+
+        return HttpClientStreamableHttpTransport
+                .builder(BANKFLOW_BASE_URL + MCP_ENDPOINT)
+                .jsonMapper(McpJsonDefaults.getMapper())
+                .httpRequestCustomizer(
+                        (request, method, uri, requestId, context) ->
+                                request.header(
+                                        AUTHORIZATION_HEADER,
+                                        BEARER_PREFIX + accessToken
+                                )
+                )
+                .build();
+    }
+
+    private static void executeMcpOperations(McpSyncClient client) {
+
+        LOG.info("Connecting to BankFlow MCP server...");
+
+        client.initialize();
+
+        LOG.info("=== MCP INITIALIZED ===");
+        LOG.info("MCP server initialized successfully.");
+
+        McpSchema.ListToolsResult toolsResult =
+                client.listTools();
+
+        logAvailableTools(toolsResult);
+
+        McpSchema.Tool accountsTool =
+                findTool(toolsResult, ACCOUNTS_TOOL);
+
+        McpSchema.Tool transactionsTool =
+                findTool(toolsResult, TRANSACTIONS_TOOL);
+
+        callAccountsTool(client, accountsTool);
+        callTransactionsTool(client, transactionsTool);
+    }
+
+    private static void logAvailableTools(
+            McpSchema.ListToolsResult toolsResult) {
+
+        LOG.info("=== AVAILABLE TOOLS ===");
+
+        toolsResult.tools().forEach(tool ->
+                LOG.info(
+                        "Tool discovered: {} - {}",
+                        tool.name(),
+                        tool.description()
+                )
+        );
+    }
+
+    private static McpSchema.Tool findTool(
+            McpSchema.ListToolsResult toolsResult,
+            String toolName) {
+
+        return toolsResult.tools()
+                .stream()
+                .filter(tool -> toolName.equals(tool.name()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Required MCP tool was not discovered: "
+                                        + toolName
+                        )
+                );
+    }
+
+    private static void callAccountsTool(
+            McpSyncClient client,
+            McpSchema.Tool accountsTool) {
+
+        LOG.info("=== CALLING {} ===", accountsTool.name());
+
+        McpSchema.CallToolResult result =
+                client.callTool(
+                        new McpSchema.CallToolRequest(
+                                accountsTool.name(),
+                                Map.of()
+                        )
+                );
+
+        LOG.info(
+                "{} completed successfully.",
+                accountsTool.name()
+        );
+
+        LOG.debug(
+                "{} response: {}",
+                accountsTool.name(),
+                result
+        );
+    }
+
+    private static void callTransactionsTool(
+            McpSyncClient client,
+            McpSchema.Tool transactionsTool) {
+
+        String transactionType =
+                System.getenv()
+                        .getOrDefault(
+                                TRANSACTION_TYPE_ENV,
+                                DEFAULT_TRANSACTION_TYPE
+                        );
+
+        int transactionSize = getTransactionSize();
+
+        LOG.info("=== CALLING {} ===", transactionsTool.name());
+        LOG.info(
+                "Transaction query: type={}, size={}",
+                transactionType,
+                transactionSize
+        );
+
+        McpSchema.CallToolResult result =
+                client.callTool(
+                        new McpSchema.CallToolRequest(
+                                transactionsTool.name(),
+                                Map.of(
+                                        "type",
+                                        transactionType,
+                                        "size",
+                                        transactionSize
+                                )
+                        )
+                );
+
+        LOG.info(
+                "{} completed successfully.",
+                transactionsTool.name()
+        );
+
+        LOG.debug(
+                "{} response: {}",
+                transactionsTool.name(),
+                result
+        );
+    }
+
+    private static int getTransactionSize() {
+
+        String configuredSize =
+                System.getenv(TRANSACTION_SIZE_ENV);
+
+        if (configuredSize == null || configuredSize.isBlank()) {
+            return DEFAULT_TRANSACTION_SIZE;
+        }
+
+        try {
+            int size = Integer.parseInt(configuredSize);
+
+            if (size <= 0) {
+                throw new IllegalStateException(
+                        TRANSACTION_SIZE_ENV
+                                + " must be greater than zero"
+                );
+            }
+
+            return size;
+
+        } catch (NumberFormatException exception) {
+            throw new IllegalStateException(
+                    TRANSACTION_SIZE_ENV
+                            + " must contain a valid integer",
+                    exception
+            );
         }
     }
 }

@@ -125,7 +125,7 @@ management:
       show-details: never
 
 rate-limit:
-  enabled: true
+  enabled: ${RATE_LIMIT_ENABLED:false}
 
   login:
     limit: 5

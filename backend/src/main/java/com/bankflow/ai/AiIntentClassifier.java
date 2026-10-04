@@ -13,6 +13,8 @@ import java.util.Map;
 @Slf4j
 public class AiIntentClassifier {
 
+    public static final String SCHEMA_TYPE_INTEGER = "INTEGER";
+    public static final String SCHEMA_TYPE_STRING = "STRING";
     private final Client client;
     private final String model;
 
@@ -42,7 +44,7 @@ public class AiIntentClassifier {
                                 Map.of(
                                         "route",
                                         Schema.builder()
-                                                .type("STRING")
+                                                .type(SCHEMA_TYPE_STRING)
                                                 .enum_(List.of(
                                                         "LIVE_DATA",
                                                         "KNOWLEDGE"
@@ -60,7 +62,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "intent",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .enum_(List.of(
                                                                                                         "ACCOUNTS",
                                                                                                         "ACCOUNT",
@@ -95,7 +97,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "transactionType",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .enum_(List.of(
                                                                                                         "CREDIT",
                                                                                                         "DEBIT"
@@ -107,7 +109,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "period",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .enum_(List.of(
                                                                                                         "CURRENT_CALENDAR_YEAR",
                                                                                                         "PREVIOUS_CALENDAR_YEAR",
@@ -124,7 +126,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "monthOffset",
                                                                                         Schema.builder()
-                                                                                                .type("INTEGER")
+                                                                                                .type(SCHEMA_TYPE_INTEGER)
                                                                                                 .description("""
                                                                                                         Relative month offset for month-based periods.
                                                                                                         
@@ -142,7 +144,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "startDate",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "Explicit start date in ISO format yyyy-MM-dd. "
@@ -154,7 +156,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "endDate",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "Explicit end date in ISO format yyyy-MM-dd. "
@@ -166,7 +168,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "accountNumber",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "Customer's bank account number when the user explicitly "
@@ -178,7 +180,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "search",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "Text the user wants to search for in transaction ID "
@@ -190,7 +192,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "accountStatus",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .enum_(List.of(
                                                                                                         "ACTIVE",
@@ -207,7 +209,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "cardStatus",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .enum_(List.of(
                                                                                                         "ACTIVE",
@@ -224,7 +226,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "role",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .enum_(List.of(
                                                                                                         "CUSTOMER",
@@ -241,7 +243,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "userId",
                                                                                         Schema.builder()
-                                                                                                .type("INTEGER")
+                                                                                                .type(SCHEMA_TYPE_INTEGER)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "User ID for ADMIN_USER_DETAILS. "
@@ -253,7 +255,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "fdNumber",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "The customer's fixed deposit number when the user explicitly "
@@ -265,7 +267,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "loanNumber",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "The customer's loan number when the user explicitly "
@@ -277,7 +279,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "loanType",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .enum_(List.of(
                                                                                                         "PERSONAL",
@@ -294,7 +296,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "transactionId",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "Transaction ID for ADMIN_TRANSACTION_DETAILS"
@@ -305,7 +307,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "auditAction",
                                                                                         Schema.builder()
-                                                                                                .type("STRING")
+                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                 .nullable(true)
                                                                                                 .enum_(List.of(
                                                                                                         "LOGIN",
@@ -349,7 +351,7 @@ public class AiIntentClassifier {
                                                                                                 .nullable(true)
                                                                                                 .items(
                                                                                                         Schema.builder()
-                                                                                                                .type("STRING")
+                                                                                                                .type(SCHEMA_TYPE_STRING)
                                                                                                                 .enum_(List.of(
                                                                                                                         "LOGIN",
                                                                                                                         "USER_REGISTERED",
@@ -401,7 +403,7 @@ public class AiIntentClassifier {
                                                                                 Map.entry(
                                                                                         "tenureYears",
                                                                                         Schema.builder()
-                                                                                                .type("INTEGER")
+                                                                                                .type(SCHEMA_TYPE_INTEGER)
                                                                                                 .nullable(true)
                                                                                                 .description(
                                                                                                         "FD tenure in years when calculating maturity. "

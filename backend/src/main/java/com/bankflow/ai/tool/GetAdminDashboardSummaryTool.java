@@ -4,7 +4,6 @@ import com.bankflow.ai.AiAudience;
 import com.bankflow.dto.AdminDashboardSummaryResponse;
 import com.bankflow.service.DashboardService;
 import com.google.genai.types.FunctionDeclaration;
-import com.google.genai.types.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

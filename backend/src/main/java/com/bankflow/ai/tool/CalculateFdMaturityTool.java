@@ -17,6 +17,8 @@ import java.util.Set;
 public class CalculateFdMaturityTool implements AiTool {
 
     public static final String NAME = "calculate_fd_maturity";
+    public static final String TENURE_YEARS = "tenureYears";
+    public static final String DEPOSIT_AMOUNT = "depositAmount";
 
     private final FixedDepositService fixedDepositService;
 
@@ -44,14 +46,14 @@ public class CalculateFdMaturityTool implements AiTool {
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
-                                                "depositAmount",
+                                                DEPOSIT_AMOUNT,
                                                 Schema.builder()
                                                         .type("NUMBER")
                                                         .description(
                                                                 "The FD deposit amount in INR. Must be greater than Rs. 10,000."
                                                         )
                                                         .build(),
-                                                "tenureYears",
+                                                TENURE_YEARS,
                                                 Schema.builder()
                                                         .type("INTEGER")
                                                         .description(
@@ -61,8 +63,8 @@ public class CalculateFdMaturityTool implements AiTool {
                                         )
                                 )
                                 .required(List.of(
-                                        "depositAmount",
-                                        "tenureYears"
+                                        DEPOSIT_AMOUNT,
+                                        TENURE_YEARS
                                 ))
                                 .build()
                 )
@@ -79,7 +81,7 @@ public class CalculateFdMaturityTool implements AiTool {
             Map<String, Object> arguments) {
 
         Object depositAmountValue =
-                arguments.get("depositAmount");
+                arguments.get(DEPOSIT_AMOUNT);
 
         if (depositAmountValue == null) {
             throw new IllegalArgumentException(
@@ -88,7 +90,7 @@ public class CalculateFdMaturityTool implements AiTool {
         }
 
         Object tenureYearsValue =
-                arguments.get("tenureYears");
+                arguments.get(TENURE_YEARS);
 
         if (tenureYearsValue == null) {
             throw new IllegalArgumentException(

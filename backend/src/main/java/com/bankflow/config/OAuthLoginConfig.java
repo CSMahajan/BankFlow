@@ -15,6 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class OAuthLoginConfig {
 
+    public static final String OAUTH_LOGIN_ENDPOINT = "/oauth/login";
     private final BankFlowUserDetailsService bankFlowUserDetailsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -38,17 +39,17 @@ public class OAuthLoginConfig {
     ) throws Exception {
 
         http
-                .securityMatcher("/oauth/login")
+                .securityMatcher(OAUTH_LOGIN_ENDPOINT)
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/oauth/login").permitAll()
+                                .requestMatchers(OAUTH_LOGIN_ENDPOINT).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .authenticationManager(oauthAuthenticationManager)
                 .formLogin(form ->
                         form
-                                .loginPage("/oauth/login")
-                                .loginProcessingUrl("/oauth/login")
+                                .loginPage(OAUTH_LOGIN_ENDPOINT)
+                                .loginProcessingUrl(OAUTH_LOGIN_ENDPOINT)
                                 .permitAll()
                 );
 

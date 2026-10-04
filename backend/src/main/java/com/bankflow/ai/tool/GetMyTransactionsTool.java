@@ -21,6 +21,7 @@ import java.util.Set;
 public class GetMyTransactionsTool implements AiTool {
 
     public static final String NAME = "get_my_transactions";
+    public static final String SCHEMA_TYPE_STRING = "STRING";
 
     private final TransactionService transactionService;
 
@@ -58,7 +59,7 @@ public class GetMyTransactionsTool implements AiTool {
                                         Map.of(
                                                 "accountNumber",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "The customer's bank account number to filter transactions by"
                                                         )
@@ -66,7 +67,7 @@ public class GetMyTransactionsTool implements AiTool {
 
                                                 "type",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .enum_(List.of(
                                                                 "CREDIT",
                                                                 "DEBIT"
@@ -78,7 +79,7 @@ public class GetMyTransactionsTool implements AiTool {
 
                                                 "startDate",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "Start date in ISO format yyyy-MM-dd"
                                                         )
@@ -86,7 +87,7 @@ public class GetMyTransactionsTool implements AiTool {
 
                                                 "endDate",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "End date in ISO format yyyy-MM-dd"
                                                         )
@@ -94,7 +95,7 @@ public class GetMyTransactionsTool implements AiTool {
 
                                                 "search",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "Text to search in transaction ID or transaction description"
                                                         )

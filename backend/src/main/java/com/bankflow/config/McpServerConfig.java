@@ -35,6 +35,10 @@ import java.util.Map;
 @Configuration
 public class McpServerConfig {
 
+    public static final String AUTHENTICATION = "authentication";
+    public static final String STRING = "string";
+    public static final String DESCRIPTION = "description";
+
     @Bean
     public HttpServletStreamableServerTransportProvider mcpTransportProvider() {
 
@@ -47,7 +51,7 @@ public class McpServerConfig {
                             SecurityContextHolder.getContext().getAuthentication();
 
                     return McpTransportContext.create(
-                            Map.of("authentication", authentication)
+                            Map.of(AUTHENTICATION, authentication)
                     );
                 })
                 .build();
@@ -80,7 +84,7 @@ public class McpServerConfig {
 
                     Authentication authentication =
                             (Authentication) exchange.transportContext()
-                                    .get("authentication");
+                                    .get(AUTHENTICATION);
 
                     SecurityContext previousContext =
                             SecurityContextHolder.getContext();
@@ -128,32 +132,32 @@ public class McpServerConfig {
                                                         "type", "object",
                                                         "properties", Map.of(
                                                                 "accountNumber", Map.of(
-                                                                        "type", "string",
-                                                                        "description", "Optional bank account number"
+                                                                        "type", STRING,
+                                                                        DESCRIPTION, "Optional bank account number"
                                                                 ),
                                                                 "type", Map.of(
-                                                                        "type", "string",
-                                                                        "description", "Optional transaction type: CREDIT or DEBIT"
+                                                                        "type", STRING,
+                                                                        DESCRIPTION, "Optional transaction type: CREDIT or DEBIT"
                                                                 ),
                                                                 "startDate", Map.of(
-                                                                        "type", "string",
-                                                                        "description", "Optional start date in yyyy-MM-dd format"
+                                                                        "type", STRING,
+                                                                        DESCRIPTION, "Optional start date in yyyy-MM-dd format"
                                                                 ),
                                                                 "endDate", Map.of(
-                                                                        "type", "string",
-                                                                        "description", "Optional end date in yyyy-MM-dd format"
+                                                                        "type", STRING,
+                                                                        DESCRIPTION, "Optional end date in yyyy-MM-dd format"
                                                                 ),
                                                                 "search", Map.of(
-                                                                        "type", "string",
-                                                                        "description", "Optional search text for transaction description"
+                                                                        "type", STRING,
+                                                                        DESCRIPTION, "Optional search text for transaction description"
                                                                 ),
                                                                 "page", Map.of(
                                                                         "type", "integer",
-                                                                        "description", "Optional zero-based page number"
+                                                                        DESCRIPTION, "Optional zero-based page number"
                                                                 ),
                                                                 "size", Map.of(
                                                                         "type", "integer",
-                                                                        "description", "Optional page size, maximum 100"
+                                                                        DESCRIPTION, "Optional page size, maximum 100"
                                                                 )
                                                         )
                                                 )
@@ -173,7 +177,7 @@ public class McpServerConfig {
                         .callHandler((exchange, request) -> {
 
                             Authentication authentication =
-                                    (Authentication) exchange.transportContext().get("authentication");
+                                    (Authentication) exchange.transportContext().get(AUTHENTICATION);
 
                             SecurityContext previousContext =
                                     SecurityContextHolder.getContext();

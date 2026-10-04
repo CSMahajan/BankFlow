@@ -11,6 +11,12 @@ import java.util.Map;
 @Component
 public class AiIntentToolArgumentMapper {
 
+    public static final String ACCOUNT_NUMBER = "accountNumber";
+    public static final String USER_ID = "userId";
+    public static final String SEARCH = "search";
+    public static final String END_DATE = "endDate";
+    public static final String START_DATE = "startDate";
+
     public Map<String, Object> map(AiIntent.Operation operation) {
 
         if (operation == null) {
@@ -139,7 +145,7 @@ public class AiIntentToolArgumentMapper {
                 && !operation.search().isBlank()) {
 
             arguments.put(
-                    "search",
+                    SEARCH,
                     operation.search().trim()
             );
         }
@@ -164,7 +170,7 @@ public class AiIntentToolArgumentMapper {
         }
 
         return Map.of(
-                "userId",
+                USER_ID,
                 operation.userId()
         );
     }
@@ -178,7 +184,7 @@ public class AiIntentToolArgumentMapper {
                 && !operation.search().isBlank()) {
 
             arguments.put(
-                    "search",
+                    SEARCH,
                     operation.search().trim()
             );
         }
@@ -205,7 +211,7 @@ public class AiIntentToolArgumentMapper {
         }
 
         return Map.of(
-                "userId",
+                USER_ID,
                 operation.userId()
         );
     }
@@ -219,7 +225,7 @@ public class AiIntentToolArgumentMapper {
                 && !operation.search().isBlank()) {
 
             arguments.put(
-                    "search",
+                    SEARCH,
                     operation.search().trim()
             );
         }
@@ -246,7 +252,7 @@ public class AiIntentToolArgumentMapper {
         }
 
         return Map.of(
-                "userId",
+                USER_ID,
                 operation.userId()
         );
     }
@@ -260,7 +266,7 @@ public class AiIntentToolArgumentMapper {
                 !operation.search().isBlank()) {
 
             arguments.put(
-                    "search",
+                    SEARCH,
                     operation.search().trim()
             );
         }
@@ -287,7 +293,7 @@ public class AiIntentToolArgumentMapper {
         }
 
         return Map.of(
-                "userId",
+                USER_ID,
                 operation.userId()
         );
     }
@@ -304,7 +310,7 @@ public class AiIntentToolArgumentMapper {
         }
 
         return Map.of(
-                "accountNumber",
+                ACCOUNT_NUMBER,
                 operation.accountNumber().trim()
         );
     }
@@ -333,7 +339,7 @@ public class AiIntentToolArgumentMapper {
 
         if (operation.search() != null &&
                 !operation.search().isBlank()) {
-            arguments.put("search", operation.search().trim());
+            arguments.put(SEARCH, operation.search().trim());
         }
 
         if (operation.role() != null &&
@@ -397,10 +403,10 @@ public class AiIntentToolArgumentMapper {
                 "type",
                 operation.transactionType().name(),
 
-                "startDate",
+                START_DATE,
                 dateRange.startDate().toString(),
 
-                "endDate",
+                END_DATE,
                 dateRange.endDate().toString()
         );
     }
@@ -422,7 +428,7 @@ public class AiIntentToolArgumentMapper {
                 && !operation.accountNumber().isBlank()) {
 
             arguments.put(
-                    "accountNumber",
+                    ACCOUNT_NUMBER,
                     operation.accountNumber().trim()
             );
         }
@@ -431,7 +437,7 @@ public class AiIntentToolArgumentMapper {
                 && !operation.search().isBlank()) {
 
             arguments.put(
-                    "search",
+                    SEARCH,
                     operation.search().trim()
             );
         }
@@ -471,7 +477,7 @@ public class AiIntentToolArgumentMapper {
                 LocalDate startDate =
                         parseRequiredDate(
                                 operation.startDate(),
-                                "startDate"
+                                START_DATE
                         );
 
                 LocalDate endDate =
@@ -505,12 +511,12 @@ public class AiIntentToolArgumentMapper {
             }
 
             arguments.put(
-                    "startDate",
+                    START_DATE,
                     dateRange.startDate().toString()
             );
 
             arguments.put(
-                    "endDate",
+                    END_DATE,
                     dateRange.endDate().toString()
             );
         }
@@ -529,7 +535,7 @@ public class AiIntentToolArgumentMapper {
         }
 
         return Map.of(
-                "accountNumber",
+                ACCOUNT_NUMBER,
                 operation.accountNumber().trim()
         );
     }
@@ -699,8 +705,8 @@ public class AiIntentToolArgumentMapper {
 
         return Map.of(
                 "type", operation.transactionType().name(),
-                "startDate", startDate.toString(),
-                "endDate", endDate.toString()
+                START_DATE, startDate.toString(),
+                END_DATE, endDate.toString()
         );
     }
 

@@ -17,6 +17,7 @@ import java.util.Set;
 public class GetLoanRepaymentHistoryTool implements AiTool {
 
     public static final String NAME = "get_loan_repayment_history";
+    public static final String LOAN_NUMBER = "loanNumber";
 
     private final LoanService loanService;
 
@@ -43,7 +44,7 @@ public class GetLoanRepaymentHistoryTool implements AiTool {
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
-                                                "loanNumber",
+                                                LOAN_NUMBER,
                                                 Schema.builder()
                                                         .type("STRING")
                                                         .description(
@@ -52,7 +53,7 @@ public class GetLoanRepaymentHistoryTool implements AiTool {
                                                         .build()
                                         )
                                 )
-                                .required(List.of("loanNumber"))
+                                .required(List.of(LOAN_NUMBER))
                                 .build()
                 )
                 .build();
@@ -67,7 +68,7 @@ public class GetLoanRepaymentHistoryTool implements AiTool {
     public List<RepaymentResponse> execute(
             Map<String, Object> arguments) {
 
-        Object loanNumberValue = arguments.get("loanNumber");
+        Object loanNumberValue = arguments.get(LOAN_NUMBER);
 
         if (loanNumberValue == null) {
             throw new IllegalArgumentException(

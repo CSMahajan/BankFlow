@@ -19,6 +19,8 @@ import java.util.Set;
 public class GetMyTransactionTotalTool implements AiTool {
 
     public static final String NAME = "get_my_transaction_total";
+    public static final String START_DATE = "startDate";
+    public static final String SCHEMA_TYPE_STRING = "STRING";
 
     private final TransactionService transactionService;
 
@@ -53,7 +55,7 @@ public class GetMyTransactionTotalTool implements AiTool {
                                         Map.of(
                                                 "type",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .enum_(List.of(
                                                                 "CREDIT",
                                                                 "DEBIT"
@@ -62,16 +64,16 @@ public class GetMyTransactionTotalTool implements AiTool {
                                                                 "Transaction type to aggregate"
                                                         )
                                                         .build(),
-                                                "startDate",
+                                                START_DATE,
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "Start date in ISO format yyyy-MM-dd"
                                                         )
                                                         .build(),
                                                 "endDate",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "End date in ISO format yyyy-MM-dd"
                                                         )
@@ -80,7 +82,7 @@ public class GetMyTransactionTotalTool implements AiTool {
                                 )
                                 .required(List.of(
                                         "type",
-                                        "startDate"
+                                        START_DATE
                                 ))
                                 .build()
                 )
@@ -96,7 +98,7 @@ public class GetMyTransactionTotalTool implements AiTool {
     public BigDecimal execute(Map<String, Object> arguments) {
 
         Object typeValue = arguments.get("type");
-        Object startDateValue = arguments.get("startDate");
+        Object startDateValue = arguments.get(START_DATE);
 
         if (typeValue == null) {
             throw new IllegalArgumentException(

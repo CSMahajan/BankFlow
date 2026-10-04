@@ -31,8 +31,6 @@ public class GeminiAiService implements AiService {
     @Value("${gemini.model:gemini-3.5-flash-lite}")
     private String model;
 
-    private static final int MAX_TOOL_ROUNDS = 5;
-
     public GeminiAiService(
             @Value("${gemini.api-key}") String apiKey,
             ObjectMapper objectMapper,

@@ -23,6 +23,7 @@ public class GetAdminAuditLogsTool implements AiTool {
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_SIZE = 20;
+    public static final String SCHEMA_TYPE_STRING = "STRING";
 
     private final AuditLogService auditLogService;
 
@@ -55,7 +56,7 @@ public class GetAdminAuditLogsTool implements AiTool {
                                         Map.of(
                                                 "search",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "Optional text used to search the person who performed the action or the audit description"
                                                         )
@@ -63,7 +64,7 @@ public class GetAdminAuditLogsTool implements AiTool {
 
                                                 "role",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .enum_(List.of(
                                                                 "CUSTOMER",
                                                                 "ADMIN"
@@ -75,7 +76,7 @@ public class GetAdminAuditLogsTool implements AiTool {
 
                                                 "action",
                                                 Schema.builder()
-                                                        .type("STRING")
+                                                        .type(SCHEMA_TYPE_STRING)
                                                         .description(
                                                                 "Optional single audit action"
                                                         )
@@ -86,7 +87,7 @@ public class GetAdminAuditLogsTool implements AiTool {
                                                         .type("ARRAY")
                                                         .items(
                                                                 Schema.builder()
-                                                                        .type("STRING")
+                                                                        .type(SCHEMA_TYPE_STRING)
                                                                         .build()
                                                         )
                                                         .description(

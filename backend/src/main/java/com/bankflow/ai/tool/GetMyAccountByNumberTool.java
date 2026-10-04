@@ -17,6 +17,7 @@ import java.util.Set;
 public class GetMyAccountByNumberTool implements AiTool {
 
     public static final String NAME = "get_my_account_by_number";
+    public static final String ACCOUNT_NUMBER = "accountNumber";
 
     private final AccountService accountService;
 
@@ -43,7 +44,7 @@ public class GetMyAccountByNumberTool implements AiTool {
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
-                                                "accountNumber",
+                                                ACCOUNT_NUMBER,
                                                 Schema.builder()
                                                         .type("STRING")
                                                         .description(
@@ -52,7 +53,7 @@ public class GetMyAccountByNumberTool implements AiTool {
                                                         .build()
                                         )
                                 )
-                                .required(List.of("accountNumber"))
+                                .required(List.of(ACCOUNT_NUMBER))
                                 .build()
                 )
                 .build();
@@ -68,7 +69,7 @@ public class GetMyAccountByNumberTool implements AiTool {
             Map<String, Object> arguments) {
 
         Object accountNumberValue =
-                arguments.get("accountNumber");
+                arguments.get(ACCOUNT_NUMBER);
 
         if (accountNumberValue == null) {
             throw new IllegalArgumentException(

@@ -17,6 +17,7 @@ import java.util.Set;
 public class GetAdminUserAccountsTool implements AiTool {
 
     public static final String NAME = "get_admin_user_accounts";
+    public static final String USER_ID = "userId";
 
     private final UserService userService;
 
@@ -46,7 +47,7 @@ public class GetAdminUserAccountsTool implements AiTool {
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
-                                                "userId",
+                                                USER_ID,
                                                 Schema.builder()
                                                         .type("INTEGER")
                                                         .description(
@@ -55,7 +56,7 @@ public class GetAdminUserAccountsTool implements AiTool {
                                                         .build()
                                         )
                                 )
-                                .required(List.of("userId"))
+                                .required(List.of(USER_ID))
                                 .build()
                 )
                 .build();
@@ -70,7 +71,7 @@ public class GetAdminUserAccountsTool implements AiTool {
     public List<AdminUserAccountResponse> execute(
             Map<String, Object> arguments) {
 
-        Object userIdValue = arguments.get("userId");
+        Object userIdValue = arguments.get(USER_ID);
 
         if (userIdValue == null) {
             throw new IllegalArgumentException(

@@ -23,6 +23,7 @@ public class GetAdminAccountTransactionsTool implements AiTool {
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_SIZE = 20;
+    public static final String ACCOUNT_NUMBER = "accountNumber";
 
     private final TransactionService transactionService;
 
@@ -51,7 +52,7 @@ public class GetAdminAccountTransactionsTool implements AiTool {
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
-                                                "accountNumber",
+                                                ACCOUNT_NUMBER,
                                                 Schema.builder()
                                                         .type("STRING")
                                                         .description(
@@ -60,7 +61,7 @@ public class GetAdminAccountTransactionsTool implements AiTool {
                                                         .build()
                                 )
                                 )
-                                .required(List.of("accountNumber"))
+                                .required(List.of(ACCOUNT_NUMBER))
                                 .build()
                 )
                 .build();
@@ -76,7 +77,7 @@ public class GetAdminAccountTransactionsTool implements AiTool {
             Map<String, Object> arguments) {
 
         Object accountNumberValue =
-                arguments.get("accountNumber");
+                arguments.get(ACCOUNT_NUMBER);
 
         if (accountNumberValue == null) {
             throw new IllegalArgumentException(

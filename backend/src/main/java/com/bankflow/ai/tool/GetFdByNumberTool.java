@@ -17,6 +17,7 @@ import java.util.Set;
 public class GetFdByNumberTool implements AiTool {
 
     public static final String NAME = "get_fd_by_number";
+    public static final String FD_NUMBER = "fdNumber";
 
     private final FixedDepositService fixedDepositService;
 
@@ -43,7 +44,7 @@ public class GetFdByNumberTool implements AiTool {
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
-                                                "fdNumber",
+                                                FD_NUMBER,
                                                 Schema.builder()
                                                         .type("STRING")
                                                         .description(
@@ -52,7 +53,7 @@ public class GetFdByNumberTool implements AiTool {
                                                         .build()
                                         )
                                 )
-                                .required(List.of("fdNumber"))
+                                .required(List.of(FD_NUMBER))
                                 .build()
                 )
                 .build();
@@ -66,7 +67,7 @@ public class GetFdByNumberTool implements AiTool {
     @Override
     public FdResponse execute(Map<String, Object> arguments) {
 
-        Object fdNumberValue = arguments.get("fdNumber");
+        Object fdNumberValue = arguments.get(FD_NUMBER);
 
         if (fdNumberValue == null) {
             throw new IllegalArgumentException(

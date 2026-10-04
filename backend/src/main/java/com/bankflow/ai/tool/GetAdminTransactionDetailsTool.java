@@ -17,6 +17,7 @@ import java.util.Set;
 public class GetAdminTransactionDetailsTool implements AiTool {
 
     public static final String NAME = "get_admin_transaction_details";
+    public static final String TRANSACTION_ID = "transactionId";
 
     private final TransactionService transactionService;
 
@@ -42,7 +43,7 @@ public class GetAdminTransactionDetailsTool implements AiTool {
                                 .type("OBJECT")
                                 .properties(
                                         Map.of(
-                                                "transactionId",
+                                                TRANSACTION_ID,
                                                 Schema.builder()
                                                         .type("STRING")
                                                         .description(
@@ -51,7 +52,7 @@ public class GetAdminTransactionDetailsTool implements AiTool {
                                                         .build()
                                 )
                                 )
-                                .required(List.of("transactionId"))
+                                .required(List.of(TRANSACTION_ID))
                                 .build()
                 )
                 .build();
@@ -67,7 +68,7 @@ public class GetAdminTransactionDetailsTool implements AiTool {
             Map<String, Object> arguments) {
 
         Object transactionIdValue =
-                arguments.get("transactionId");
+                arguments.get(TRANSACTION_ID);
 
         if (transactionIdValue == null) {
             throw new IllegalArgumentException(

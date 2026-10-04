@@ -209,12 +209,12 @@ BankFlow follows a layered backend architecture with a React frontend communicat
 The application integrates PostgreSQL for persistence and external services for email, document storage, malware scanning, asynchronous messaging, and OCR.
 ### System Architecture
 
-[View / edit the Draw.io source](docs/architecture/bankflow-system-architecture.drawio.xml)
+![BankFlow System Architecture](docs/architecture/bankflow-system-architecture.drawio.png)
 ## 🗄️ Data Model
 The application's relational data model is documented using an ER diagram covering users, accounts, transactions, cards, loans, fixed deposits, KYC data, scheduled transfers, refresh tokens, verification tokens, and audit information.
 ### Entity Relationship Diagram
 
-[View / edit the Draw.io source](docs/data-model/bankflow-erd.drawio.xml)
+![BankFlow Entity Relationship Diagram](docs/data-model/bankflow-erd.drawio.png)
 ## 🔄 Workflows
 The repository contains detailed workflow diagrams for the application's authentication, authorization, session, and KYC processing flows.
 ### Authentication
@@ -231,7 +231,7 @@ The repository contains detailed workflow diagrams for the application's authent
 ![Refresh Token and Logout Workflow](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.png)
 ### KYC Document Processing
 
-[View / edit the Draw.io source](docs/workflows/BankFlow_KYC_Workflow.drawio.xml)
+![KYC Document Processing Workflow](docs/workflows/BankFlow_KYC_Workflow.drawio.png)
 ## 🤖 AI Assistant & Claude MCP Integration
 
 BankFlow includes two AI-related capabilities that share the same read-only backend services and the same authorization rules as the REST APIs.

@@ -6,9 +6,26 @@ It provides customer and administrator workflows for account management, transac
 
 The project is built with **React**, **Java 21**, **Spring Boot**, and **PostgreSQL**, with AWS services used for asynchronous KYC document processing.
 
+It also includes an authenticated **AI assistant** (RAG + LLM tool calling) and a remote **Model Context Protocol (MCP) server** that lets **Claude** securely query a customer's banking data after an OAuth login.
+
 > **Portfolio / Learning Project**
 >
 > BankFlow is an educational and portfolio project and is **not intended for use as production banking software**. Real banking systems require substantially stronger security controls, regulatory compliance, audited infrastructure, fraud detection, operational controls, and resilience mechanisms.
+
+---
+
+## 🌐 Live Demo
+
+| Resource | Link |
+| --- | --- |
+| Web application | [https://bankflow-ui.onrender.com](https://bankflow-ui.onrender.com/) |
+| MCP server (for Claude) | `https://bankflow-qjpf.onrender.com/mcp` |
+
+> **Note:** BankFlow is hosted on Render's free tier, so the first request after a period of inactivity can take up to about a minute while the service wakes up.
+>
+> New accounts must verify their email address (sent through Brevo) before they can log in.
+
+<!-- TODO: add demo customer credentials here once the pre-verified demo account is created -->
 
 ---
 
@@ -122,6 +139,25 @@ The malware scan result is processed asynchronously. Clean documents continue to
 The listener also handles unexpected, duplicate, or invalid event scenarios without starting the extraction process.
 See the detailed workflow:
 [**KYC Document Processing Workflow**](docs/workflows/BankFlow_KYC_Workflow.drawio.png)
+
+### 🤖 AI Assistant (RAG + Tool Calling)
+
+- Authenticated in-app AI assistant available after login
+- Retrieval-Augmented Generation (RAG) over the project's documentation (README, OpenAPI specification, architecture and workflow documents)
+- Embeddings generated with a Google Gemini embedding model and stored in Neon PostgreSQL alongside the application data
+- LLM tool calling for read-only lookups of the logged-in customer's accounts, transactions, and related data
+- No state-changing operations (no transfers or updates) are exposed to the assistant
+
+### 🔌 MCP Server for Claude
+
+- Remote MCP server deployed on Render at `https://bankflow-qjpf.onrender.com/mcp`
+- OAuth login and consent flow: users sign in with their BankFlow account and authorize access to their profile and email
+- Read-only banking tools (accounts, transactions) callable directly from Claude chat
+- Streamable HTTP transport, secured with OAuth 2.0 / JWT
+- Works with Claude through a remote custom connector, or through Claude Desktop's config file
+
+See [AI Assistant & Claude MCP Integration](#-ai-assistant--claude-mcp-integration) for details and setup steps.
+
 ## 🛠️ Technology Stack
 ### Frontend
 - React
@@ -150,6 +186,13 @@ See the detailed workflow:
 - Amazon EventBridge
 - Amazon SQS
 - Amazon Textract
+### AI / LLM
+- Retrieval-Augmented Generation (RAG)
+- Google Gemini embedding model
+- LLM tool calling
+- Model Context Protocol (MCP) server
+- OAuth 2.0 / JWT-secured MCP access
+- Streamable HTTP MCP transport
 ### Other Services / Libraries
 - Brevo — email delivery
 - OpenPDF — PDF generation
@@ -157,7 +200,7 @@ See the detailed workflow:
 - Mockito / JUnit — testing
 - JaCoCo — test coverage
 ### Deployment
-- Render — frontend and backend hosting
+- Render — frontend, backend, and MCP server hosting
 - Neon — PostgreSQL
 - AWS — cloud services
 - Brevo — email delivery
@@ -189,6 +232,215 @@ The repository contains detailed workflow diagrams for the application's authent
 ### KYC Document Processing
 
 [View / edit the Draw.io source](docs/workflows/BankFlow_KYC_Workflow.drawio.xml)
+## 🤖 AI Assistant & Claude MCP Integration
+
+BankFlow includes two AI-related capabilities that share the same read-only backend services and the same authorization rules as the REST APIs.
+
+### AI Assistant (RAG + Tool Calling)
+
+Logged-in customers can use an in-app AI assistant that combines two techniques:
+
+| Technique | Purpose | Example question |
+| --- | --- | --- |
+| **RAG** (Retrieval-Augmented Generation) | Answers questions about BankFlow itself using retrieved documentation | "How does KYC malware scanning work?" |
+| **Tool calling** | Fetches the customer's own data through read-only tools instead of guessing | "Show my last 5 transactions" |
+
+```text
+Customer question
+      │
+      ▼
+React Frontend ──► Spring Boot AI endpoint (authenticated)
+                         │
+        ┌────────────────┴─────────────────┐
+        ▼                                  ▼
+ Documentation question             Account / transaction question
+        │                                  │
+        ▼                                  ▼
+ Gemini embedding of the question   LLM selects a read-only tool
+        │                                  │
+        ▼                                  ▼
+ Similarity search over document    Tool runs through existing services
+ embeddings in Neon PostgreSQL      with customer-ownership checks
+        │                                  │
+        └────────────────┬─────────────────┘
+                         ▼
+               LLM composes the answer
+```
+
+**Knowledge sources for RAG:** the project README, the OpenAPI specification, and the architecture and workflow documentation.
+
+**Design notes**
+
+- The assistant is only available to authenticated users.
+- Tools are **read-only** and scoped to the logged-in customer. Money movement and other state-changing operations are not exposed.
+- Embeddings are generated with a Google Gemini embedding model and stored in the same Neon PostgreSQL database as the application tables.
+- The assistant's tool access is tied to the authenticated BankFlow customer rather than asking the model to supply an arbitrary customer identifier.
+
+This design separates two concerns:
+
+- **Knowledge retrieval:** information retrieved from the BankFlow knowledge base (RAG)
+- **Banking data retrieval:** information obtained through controlled backend tools
+
+### AI Assistant & MCP Architecture
+
+![BankFlow AI Assistant and MCP Architecture](docs/ai/BankFlow_AI_Assistant_MCP.png)
+
+The diagram above shows the currently implemented AI flow: the in-app AI assistant combines RAG and read-only LLM tool calling, while Claude connects to the same customer-scoped banking capabilities through the OAuth-protected MCP server.
+
+### MCP Server for Claude
+
+BankFlow also exposes selected banking capabilities through a remote **Model Context Protocol (MCP)** server, so users can query their own data from Claude.
+
+| Item | Value |
+| --- | --- |
+| MCP endpoint | `https://bankflow-qjpf.onrender.com/mcp` |
+| Hosting | Render (part of the Spring Boot backend) |
+| Transport | Streamable HTTP |
+| Authorization | OAuth 2.0 / JWT: BankFlow login followed by a consent screen (profile and email) |
+
+**Current MCP tools** (all read-only):
+
+| Tool | Description |
+| --- | --- |
+| `get_my_accounts` | Retrieves accounts belonging to the authenticated BankFlow customer |
+| `get_my_transactions` | Retrieves transactions belonging to the authenticated BankFlow customer, with supported filtering and pagination |
+
+```text
+Claude (claude.ai / Claude Desktop)
+      │
+      │ 1. Add connector / start MCP client
+      ▼
+BankFlow OAuth login + consent
+      │
+      │ 2. Access granted for the logged-in customer
+      ▼
+BankFlow MCP Server  (/mcp, Streamable HTTP, OAuth 2.0 / JWT)
+      │
+      │ 3. Read-only tool calls
+      ▼
+BankFlow services (ownership checks) ──► Neon PostgreSQL
+```
+
+The important security boundary is that the MCP tools use the **authenticated user context**. The MCP client or model does **not** supply a customer ID to select another customer's data.
+
+> You need a verified BankFlow customer account to sign in. See [Live Demo](#-live-demo).
+
+Claude can connect to the BankFlow MCP server in two ways.
+
+#### Option 1: Remote Custom Connector (Production, claude.ai and Claude Desktop)
+
+This is the simplest approach and needs no local software. The connector was verified against the deployed BankFlow application with live production data: both `get_my_accounts` and `get_my_transactions` were successfully invoked through Claude.
+
+1. Open Claude and go to **Settings → Connectors**.
+2. Choose **Add custom connector**.
+3. Enter a name (for example `BankFlow`) and the MCP server URL:
+
+   ```text
+   https://bankflow-qjpf.onrender.com/mcp
+   ```
+
+4. Configure the connector:
+
+- **Authentication:** `Sign in now`
+- **OAuth client:** `Use your own OAuth client`
+- **OAuth client ID:** `bankflow-claude`
+- **OAuth client secret:** leave blank (public client)
+- **Transport:** `Streamable HTTP`
+
+5. Click **Add**, then **Connect**.
+6. Sign in on the **BankFlow login screen** with your customer account.
+7. Review and **authorize** access to your profile and email.
+8. After the success message, return to Claude. The BankFlow tools now appear under the connector.
+9. Start a normal Claude chat, make sure the BankFlow connector is enabled for the conversation, and ask about your banking data.
+
+The BankFlow OAuth server handles user authentication and authorization before Claude can use the MCP tools.
+
+> Custom connector availability depends on your Claude plan. Check Anthropic's current documentation for plan requirements and exact menu names.
+
+#### Option 2: Claude Desktop Config File (`mcp-remote`)
+
+Claude Desktop can also connect through its config file using the `mcp-remote` bridge, which runs the OAuth flow in your browser using the registered public client `bankflow-claude`.
+
+**Requirements:** Claude Desktop and Node.js (for `npx`).
+
+1. Open Claude Desktop's config file:
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+2. Add the BankFlow server pointing at the deployed endpoint:
+
+   ```json
+   {
+     "mcpServers": {
+       "bankflow": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "mcp-remote@0.14.3",
+           "https://bankflow-qjpf.onrender.com/mcp",
+           "3334",
+           "--transport",
+           "http-only",
+           "--static-oauth-client-info",
+           "{\"client_id\":\"bankflow-claude\"}"
+         ]
+       }
+     }
+   }
+   ```
+
+3. Save the file and **restart Claude Desktop**.
+4. A browser window opens for the **BankFlow login and consent** flow. Sign in and authorize access.
+5. The BankFlow tools appear in Claude Desktop. Ask about your accounts or transactions in a normal chat.
+
+**Local development variant:** to test against a locally running backend, use the same configuration with the local endpoint and plain HTTP allowed:
+
+```json
+{
+  "mcpServers": {
+    "bankflow": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.14.3",
+        "http://localhost:8080/mcp",
+        "3334",
+        "--allow-http",
+        "--transport",
+        "http-only",
+        "--static-oauth-client-info",
+        "{\"client_id\":\"bankflow-claude\"}"
+      ]
+    }
+  }
+}
+```
+
+The `--allow-http` flag is for local development only and should not be used with the deployed endpoint.
+
+### MCP Authentication Configuration
+
+The MCP/OAuth deployment requires server-side OAuth configuration, provided through environment variables. **Do not commit OAuth keys or other secrets to the repository.**
+
+```text
+OAUTH2_ISSUER
+BANKFLOW_OAUTH_JWK
+```
+
+The registered public OAuth client used by the Claude integration is `bankflow-claude`. The MCP server and OAuth endpoints are part of the Spring Boot backend.
+
+### Example Prompts
+
+- "Show me all my BankFlow accounts and their balances."
+- "List my last 5 transactions."
+- "How much did I spend last month?" *(answered from your transaction data)*
+
+### Notes and Troubleshooting
+
+- **Cold start:** the first call after inactivity can take up to about a minute on Render's free tier. If the connection times out, wait a moment and retry.
+- **Email verification:** accounts must be verified before they can sign in to BankFlow, including through the OAuth flow.
+- **Disconnecting:** remove the connector in Claude's **Settings → Connectors** (Option 1) or delete the `bankflow` entry from the config file and restart Claude Desktop (Option 2).
+- **Read-only:** the MCP tools cannot move money, change account settings, or modify data.
+
 ## 📖 API Documentation
 BankFlow exposes REST APIs documented using OpenAPI.
 ### OpenAPI Specification
@@ -302,6 +554,9 @@ Security-related functionality implemented in BankFlow includes:
 - Private S3 KYC document storage
 - Asynchronous malware scanning before OCR processing
 - Malware result handling through AWS event-driven processing
+- OAuth login and consent flow for MCP clients
+- Read-only, customer-scoped tools for the AI assistant and MCP server
+- Authenticated-only access to the AI assistant
 ## 📂 Project Structure
 
 ```text
@@ -333,6 +588,9 @@ BankFlow/
 │   │   ├── BankFlow_Refresh_Logout_Workflow.drawio.png
 │   │   └── BankFlow_Refresh_Logout_Workflow.drawio.xml
 │   │
+│   ├── ai/
+│   │   └── BankFlow_AI_Assistant_MCP.png
+│
 │   ├── api/
 │   │   ├── bankflow_openapi.yml
 │   │   └── bankflow_openapi.json
@@ -588,10 +846,23 @@ Spring Boot Backend
       ├──► AWS EventBridge
       ├──► AWS SQS
       ├──► AWS Textract
-      └──► Brevo
+      ├──► Brevo
+      └──► Google Gemini API (embeddings)
+
+Claude (claude.ai / Claude Desktop)
+      │
+      │ OAuth 2.0 / JWT + MCP (Streamable HTTP)
+      ▼
+Spring Boot Backend (/mcp)
+      │
+      ▼
+Authenticated BankFlow Customer
+      │
+      ├──► get_my_accounts
+      └──► get_my_transactions
 ```
 
-The deployed application can be accessed through the project's configured Render deployment.
+The deployed application can be accessed through the project's configured Render deployment. The MCP server is served by the same Spring Boot backend at `/mcp`.
 
 ## 📚 Documentation
 
@@ -606,11 +877,14 @@ The deployed application can be accessed through the project's configured Render
 | [KYC Workflow](docs/workflows/BankFlow_KYC_Workflow.drawio.png) | Asynchronous KYC malware scanning and extraction |
 | [OpenAPI YAML](docs/api/bankflow_openapi.yml) | API specification |
 | [OpenAPI JSON](docs/api/bankflow_openapi.json) | API specification in JSON format |
+| [AI Assistant & Claude MCP Integration](#-ai-assistant--claude-mcp-integration) | RAG, tool calling, MCP architecture, and Claude integration |
+| [AI Assistant & MCP Architecture](docs/ai/BankFlow_AI_Assistant_MCP.png) | RAG, tool calling, OAuth-protected MCP, and Claude integration architecture |
 | [SonarQube Cloud Analysis](docs/quality/sonarqube_cloud_bankflow_project.png) | Code quality, coverage, duplication, and quality-gate evidence |
 
 ## ⚠️ Disclaimer
 BankFlow is a portfolio and learning project intended to demonstrate full-stack development, backend architecture, security concepts, database design, testing, and cloud integration.
 It should not be used for handling real banking operations or sensitive financial information.
+The AI assistant and MCP server are read-only demonstrations. Their answers are generated by a language model and may be incomplete or inaccurate, and they are not financial advice.
 A production banking platform would require additional controls such as:
 - Regulatory compliance
 - Independent security audits
@@ -625,4 +899,4 @@ A production banking platform would require additional controls such as:
 - Industry-specific compliance requirements
 ## 👨‍💻 Project
 BankFlow — Retail Banking Management Platform
-Built as a full-stack engineering project to explore secure REST API design, banking-domain workflows, asynchronous cloud processing, database design, testing, and deployment.
+Built as a full-stack engineering project to explore secure REST API design, banking-domain workflows, asynchronous cloud processing, retrieval-augmented generation, LLM tool calling, MCP integration, database design, testing, and deployment.

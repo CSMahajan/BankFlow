@@ -44,7 +44,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: OFF
     org.hibernate.orm.jdbc.bind: OFF
     org.springframework.orm.jpa: WARN
-    org.springframework.security: TRACE
+    org.springframework.security: INFO
 
 springdoc:
   swagger-ui:

@@ -138,7 +138,7 @@ Extracted KYC Data
 The malware scan result is processed asynchronously. Clean documents continue to the existing KYC extraction flow, while infected documents are prevented from reaching OCR processing.
 The listener also handles unexpected, duplicate, or invalid event scenarios without starting the extraction process.
 See the detailed workflow:
-[**KYC Document Processing Workflow**](docs/workflows/BankFlow_KYC_Workflow.drawio.png)
+![KYC Document Processing Workflow](docs/workflows/BankFlow_KYC_Workflow.drawio.png)
 
 ### 🤖 AI Assistant (RAG + Tool Calling)
 
@@ -219,16 +219,16 @@ The application's relational data model is documented using an ER diagram coveri
 The repository contains detailed workflow diagrams for the application's authentication, authorization, session, and KYC processing flows.
 ### Authentication
 
-[View / edit the Draw.io source](docs/workflows/BankFlow_Authentication_Workflows.drawio.xml)
+![Authentication Workflow](docs/workflows/BankFlow_Authentication_Workflows.drawio.png)
 ### Email Verification & Password Reset
 
-[View / edit the Draw.io source](docs/workflows/BankFlow_Email_Password_Workflows.drawio.xml)
+![Email Verification and Password Reset Workflow](docs/workflows/BankFlow_Email_Password_Workflows.drawio.png)
 ### JWT Authorization
 
-[View / edit the Draw.io source](docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.xml)
+![JWT Authorization Workflow](docs/workflows/BankFlow_JWT_Authorization_Workflow.drawio.png)
 ### Refresh Token & Logout
 
-[View / edit the Draw.io source](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.xml)
+![Refresh Token and Logout Workflow](docs/workflows/BankFlow_Refresh_Logout_Workflow.drawio.png)
 ### KYC Document Processing
 
 [View / edit the Draw.io source](docs/workflows/BankFlow_KYC_Workflow.drawio.xml)

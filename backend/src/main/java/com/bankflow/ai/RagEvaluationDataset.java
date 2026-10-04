@@ -4,6 +4,11 @@ import java.util.List;
 
 public final class RagEvaluationDataset {
 
+    public static final String KYC_WORKFLOW_DRAWIO_XML = "docs/workflows/BankFlow_KYC_Workflow.drawio.xml";
+    public static final String DOCUMENT_PROCESSING_WORKFLOW = "Diagram > BankFlow KYC Document Processing Workflow";
+    public static final String BANKFLOW_OPENAPI_YML = "docs/api/bankflow_openapi.yml";
+    public static final String SOURCE_PATH = "README.md";
+
     private RagEvaluationDataset() {
     }
 
@@ -14,7 +19,7 @@ public final class RagEvaluationDataset {
                         "How can I temporarily stop my debit card from being used?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > ✨ Features > 💳 Cards"
                                 )
                         )
@@ -24,7 +29,7 @@ public final class RagEvaluationDataset {
                         "Which API is used to freeze or unfreeze a card?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > PATCH /api/v1/cards/{cardId}/toggle-status"
                                 )
                         )
@@ -34,7 +39,7 @@ public final class RagEvaluationDataset {
                         "What endpoint gives me my transaction history?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > GET /api/v1/transactions/my-transactions"
                                 )
                         )
@@ -44,7 +49,7 @@ public final class RagEvaluationDataset {
                         "What database does BankFlow use?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > 🛠️ Technology Stack > Database"
                                 )
                         )
@@ -54,12 +59,12 @@ public final class RagEvaluationDataset {
                         "How does BankFlow handle KYC documents?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > ✨ Features > 🪪 KYC Document Processing"
                                 ),
                                 new RagEvaluationEvidence(
-                                        "docs/workflows/BankFlow_KYC_Workflow.drawio.xml",
-                                        "Diagram > BankFlow KYC Document Processing Workflow"
+                                        KYC_WORKFLOW_DRAWIO_XML,
+                                        DOCUMENT_PROCESSING_WORKFLOW
                                 )
                         )
                 ),
@@ -78,7 +83,7 @@ public final class RagEvaluationDataset {
                         "What happens during user registration?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > ✨ Features > 🔐 Authentication & Authorization"
                                 ),
                                 new RagEvaluationEvidence(
@@ -86,7 +91,7 @@ public final class RagEvaluationDataset {
                                         "Diagram > BankFlow Authentication Workflows"
                                 ),
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > POST /api/v1/auth/register"
                                 )
                         )
@@ -106,7 +111,7 @@ public final class RagEvaluationDataset {
                         "How does the frontend communicate with the backend?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > 🏗️ Architecture"
                                 )
                         )
@@ -116,7 +121,7 @@ public final class RagEvaluationDataset {
                         "How do I retrieve my bank accounts?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > GET /api/v1/accounts/my-accounts"
                                 )
                         )
@@ -126,7 +131,7 @@ public final class RagEvaluationDataset {
                         "How can I search my transactions?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > ✨ Features > 💸 Transactions & Transfers"
                                 )
                         )
@@ -136,8 +141,8 @@ public final class RagEvaluationDataset {
                         "How are KYC documents processed asynchronously?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "docs/workflows/BankFlow_KYC_Workflow.drawio.xml",
-                                        "Diagram > BankFlow KYC Document Processing Workflow"
+                                        KYC_WORKFLOW_DRAWIO_XML,
+                                        DOCUMENT_PROCESSING_WORKFLOW
                                 )
                         )
                 ),
@@ -146,7 +151,7 @@ public final class RagEvaluationDataset {
                         "What happens when a user forgets their password?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > ✨ Features > 🔐 Authentication & Authorization"
                                 ),
                                 new RagEvaluationEvidence(
@@ -154,7 +159,7 @@ public final class RagEvaluationDataset {
                                         "Diagram > BankFlow Email Verification and Password Recovery"
                                 ),
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > POST /api/v1/auth/forgot-password"
                                 )
                         )
@@ -168,7 +173,7 @@ public final class RagEvaluationDataset {
                                         "Diagram > BankFlow Refresh Token Rotation and Logout"
                                 ),
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > POST /api/v1/auth/refresh"
                                 )
                         )
@@ -178,7 +183,7 @@ public final class RagEvaluationDataset {
                         "Which API updates the card daily limit?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > PATCH /api/v1/cards/{cardId}/limit"
                                 )
                         )
@@ -188,7 +193,7 @@ public final class RagEvaluationDataset {
                         "What technologies are used by the BankFlow backend?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > 🛠️ Technology Stack > Backend"
                                 )
                         )
@@ -198,11 +203,11 @@ public final class RagEvaluationDataset {
                         "What happens when an account is frozen?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > ✨ Features > 🏦 Banking Accounts"
                                 ),
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > PATCH /api/v1/accounts/{accountNumber}/toggle-status"
                                 )
                         )
@@ -212,7 +217,7 @@ public final class RagEvaluationDataset {
                         "How are customer passwords protected?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > 🔐 Security"
                                 )
                         )
@@ -222,7 +227,7 @@ public final class RagEvaluationDataset {
                         "What API is used to view a specific transaction?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "docs/api/bankflow_openapi.yml",
+                                        BANKFLOW_OPENAPI_YML,
                                         "API > GET /api/v1/transactions/{transactionId}"
                                 )
                         )
@@ -232,16 +237,16 @@ public final class RagEvaluationDataset {
                         "Which AWS services are involved in KYC processing?",
                         List.of(
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > ✨ Features > 🪪 KYC Document Processing"
                                 ),
                                 new RagEvaluationEvidence(
-                                        "README.md",
+                                        SOURCE_PATH,
                                         "BankFlow — Retail Banking Management Platform > 🛠️ Technology Stack > AWS"
                                 ),
                                 new RagEvaluationEvidence(
-                                        "docs/workflows/BankFlow_KYC_Workflow.drawio.xml",
-                                        "Diagram > BankFlow KYC Document Processing Workflow"
+                                        KYC_WORKFLOW_DRAWIO_XML,
+                                        DOCUMENT_PROCESSING_WORKFLOW
                                 )
                         )
                 )

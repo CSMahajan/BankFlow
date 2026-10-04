@@ -86,9 +86,9 @@ public class RagEvaluationService {
         double mrr =
                 reciprocalRankSum / totalCases;
 
-        log.info("========================================");
+        log.info("================START========================");
         log.info("RAG EVALUATION SUMMARY");
-        log.info("========================================");
+        log.info("=================END=======================");
         log.info(
                 "Recall@5  : {} / {} = {}",
                 recallAt5Hits,
@@ -105,7 +105,7 @@ public class RagEvaluationService {
                 "MRR       : {}",
                 formatMetric(mrr)
         );
-        log.info("========================================");
+        log.info("==================EVALUATION END======================");
     }
 
     private int findFirstRelevantRank(

@@ -44,6 +44,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: OFF
     org.hibernate.orm.jdbc.bind: OFF
     org.springframework.orm.jpa: WARN
+    org.springframework.security: TRACE
 
 springdoc:
   swagger-ui:
@@ -61,6 +62,12 @@ rag:
 
   evaluation:
     enabled: ${RAG_EVALUATION_ENABLED:false}
+
+oauth2:
+  issuer: ${OAUTH2_ISSUER:http://localhost:8080}
+  jwk: ${BANKFLOW_OAUTH_JWK}
+  claude-client-id: ${CLAUDE_OAUTH_CLIENT_ID:bankflow-claude}
+  claude-redirect-uri: ${CLAUDE_OAUTH_REDIRECT_URI:https://claude.ai/api/mcp/auth_callback}
 
 app:
   cors-origin: ${CORS_ORIGIN:http://localhost:5173}
@@ -143,3 +150,11 @@ rate-limit:
   user:
     limit: 100
     window: 60s
+
+  oauth-authorize:
+    limit: 20
+    window: 1m
+
+  oauth-token:
+    limit: 20
+    window: 1m

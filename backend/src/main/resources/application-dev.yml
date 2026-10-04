@@ -16,4 +16,4 @@ app:
     type: s3
 
 rate-limit:
-  enabled: true
+  enabled: false

@@ -81,6 +81,25 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         }
 
+        else if (path.equals("/oauth2/authorize")) {
+
+            allowed = checkLimit(
+                    "OAUTH_AUTHORIZE:" + getClientIp(request),
+                    properties.getOauthAuthorize(),
+                    response
+            );
+
+        }
+        else if (path.equals("/oauth2/token")) {
+
+            allowed = checkLimit(
+                    "OAUTH_TOKEN:" + getClientIp(request),
+                    properties.getOauthToken(),
+                    response
+            );
+
+        }
+
         if (!allowed) {
             return;
         }

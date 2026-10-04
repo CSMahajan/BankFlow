@@ -27,6 +27,10 @@ public class RateLimitProperties {
 
     private LimitWindowConfig user;
 
+    private LimitWindowConfig oauthAuthorize;
+
+    private LimitWindowConfig oauthToken;
+
     @Getter
     @Setter
     public static class LimitWindowConfig {

@@ -6,8 +6,10 @@ import com.bankflow.filter.UserRateLimitFilter;
 import com.bankflow.security.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -41,6 +43,7 @@ public class SecurityConfig {
     private String corsOrigin;
 
     @Bean
+    @Order(4)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -52,6 +55,10 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         // Allow public access to Swagger API docs
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(
+                                "/.well-known/oauth-protected-resource",
+                                "/.well-known/oauth-protected-resource/mcp"
+                        ).permitAll()
                         // Require authentication for any other endpoint
                         .anyRequest().authenticated()
                 )
@@ -104,5 +111,17 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterRegistration(
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) {
+        FilterRegistrationBean<JwtAuthenticationFilter> registration =
+                new FilterRegistrationBean<>(jwtAuthenticationFilter);
+
+        registration.setEnabled(false);
+
+        return registration;
     }
 }

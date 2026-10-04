@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankFlow - Secure Authorization</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 36px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin: 8px 0 28px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #d0d5dd;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 7px;
+            background: #1f6feb;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1558b0;
+        }
+
+        .security-note {
+            margin-top: 24px;
+            padding: 12px;
+            background: #f5f7fb;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 18px;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 48px;
+            box-sizing: border-box;
+            margin-bottom: 0;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 14px;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            width: auto;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+        }
+
+        .password-toggle:hover {
+            background: transparent;
+            color: #374151;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <div class="logo">🏦</div>
+
+        <h1>BankFlow</h1>
+
+        <p class="subtitle">
+            Secure authorization
+        </p>
+
+        <form th:action="@{/oauth/login}" method="post">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <label for="username">Email</label>
+
+            <input
+                    type="email"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your email"
+                    required
+                    autofocus
+            >
+
+            <label for="password">Password</label>
+
+            <div class="password-wrapper">
+
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                >
+
+                <button
+                        type="button"
+                        id="togglePassword"
+                        class="password-toggle"
+                        aria-label="Show password"
+                >
+                    <svg
+                            id="eyeIcon"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.8"
+                            stroke="currentColor"
+                            width="22"
+                            height="22"
+                    >
+                        <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.577 3.01 9.964 7.178.07.21.07.438 0 .644C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.01-9.964-7.178z"
+                        />
+                        <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                    </svg>
+                </button>
+
+            </div>
+
+            <button type="submit">
+                Sign in
+            </button>
+
+        </form>
+
+        <div class="security-note">
+            🔒 You are signing in to authorize a BankFlow-connected application.
+        </div>
+
+    </div>
+</div>
+<script>
+    const passwordInput = document.getElementById("password");
+    const togglePassword = document.getElementById("togglePassword");
+    const eyeIcon = document.getElementById("eyeIcon");
+
+    togglePassword.addEventListener("click", function () {
+        const isPassword = passwordInput.type === "password";
+
+        passwordInput.type = isPassword ? "text" : "password";
+
+        togglePassword.setAttribute(
+            "aria-label",
+            isPassword ? "Hide password" : "Show password"
+        );
+
+        if (isPassword) {
+            eyeIcon.innerHTML = `
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.25 16.338 7.29 19.5 12 19.5c1.645 0 3.21-.39 4.59-1.083M6.228 6.228A10.45 10.45 0 0112 4.5c4.71 0 8.75 3.162 10.066 7.5a10.523 10.523 0 01-4.132 5.411M6.228 6.228L3 3m3.228 3.228l12.544 12.544M9.88 9.88a3 3 0 104.24 4.24"
+                />
+            `;
+        } else {
+            eyeIcon.innerHTML = `
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.644C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.577 3.01 9.964 7.178.07.21.07.438 0 .644C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.01-9.964-7.178z"
+                />
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+            `;
+        }
+    });
+</script>
+</body>
+</html>

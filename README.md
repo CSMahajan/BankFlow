@@ -660,7 +660,7 @@ Make sure the following are installed:
 Clone the repository and navigate to the project directory:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/CSMahajan/BankFlow.git
 cd BankFlow
 ```
 

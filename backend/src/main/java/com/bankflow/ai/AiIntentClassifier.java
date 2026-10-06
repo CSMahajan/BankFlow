@@ -85,6 +85,7 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_USER_CARDS",
                                                                                                         "ADMIN_LOANS",
                                                                                                         "ADMIN_USER_LOANS",
+                                                                                                        "ADMIN_FIXED_DEPOSITS",
                                                                                                         "ADMIN_ACCOUNT_TRANSACTIONS",
                                                                                                         "ADMIN_TRANSACTION_DETAILS",
                                                                                                         "ADMIN_AUDIT_LOGS",
@@ -698,6 +699,28 @@ public class AiIntentClassifier {
                 - Use ADMIN_LOANS for the global pending-loans listing.
                 - Use ADMIN_USER_LOANS for loans belonging to a specific user.
                 - Do not use the customer LOANS intent for administrator requests.
+                
+                ADMIN_FIXED_DEPOSITS:
+                - Use when an administrator wants the individual fixed deposit records/details
+                  belonging to ONE specific user.
+                - A specific numeric userId must be provided.
+                - This includes requests mentioning:
+                  "fixed deposits", "FDs", "FD details", "FD records",
+                  "fixed deposit details", "deposit details", "maturity details".
+                - Do NOT use ADMIN_USER_DETAILS merely because the user asks for "details".
+                - Do NOT use this intent for the general user profile/summary.
+                
+                Examples:
+                "Show me the fixed deposits for user 4" -> ADMIN_FIXED_DEPOSITS
+                "Show fixed deposit details for user 4" -> ADMIN_FIXED_DEPOSITS
+                "Show user 4's FDs" -> ADMIN_FIXED_DEPOSITS
+                "Get FD records for user 4" -> ADMIN_FIXED_DEPOSITS
+                "Show maturity details for user 4's FDs" -> ADMIN_FIXED_DEPOSITS
+                
+                Examples for ADMIN_USER_DETAILS:
+                "Show me details for user 4" -> ADMIN_USER_DETAILS
+                "Give me the profile of user 4" -> ADMIN_USER_DETAILS
+                "Show user 4's account/card/loan counts" -> ADMIN_USER_DETAILS
                 
                 ADMIN_ACCOUNT_TRANSACTIONS:
                 - Use when an ADMIN asks for transactions belonging to a specific account.

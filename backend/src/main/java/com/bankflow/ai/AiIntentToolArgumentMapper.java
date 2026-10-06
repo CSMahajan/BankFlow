@@ -52,6 +52,8 @@ public class AiIntentToolArgumentMapper {
 
             case ADMIN_TRANSACTION_DETAILS -> mapAdminTransactionDetails(operation);
 
+            case ADMIN_FIXED_DEPOSITS -> mapAdminUserFixedDeposits(operation);
+
             case ADMIN_AUDIT_LOGS -> mapAdminAuditLogs(operation);
 
             case ACCOUNT -> mapAccount(operation);
@@ -122,6 +124,8 @@ public class AiIntentToolArgumentMapper {
             case ADMIN_LOANS -> "get_admin_loans";
 
             case ADMIN_USER_LOANS -> "get_admin_user_loans";
+
+            case ADMIN_FIXED_DEPOSITS -> "get_admin_user_fixed_deposits";
 
             case ADMIN_ACCOUNT_TRANSACTIONS -> "get_admin_account_transactions";
 
@@ -281,6 +285,21 @@ public class AiIntentToolArgumentMapper {
         }
 
         return arguments;
+    }
+
+    private Map<String, Object> mapAdminUserFixedDeposits(
+            AiIntent.Operation operation) {
+
+        if (operation.userId() == null) {
+            throw new IllegalArgumentException(
+                    "userId is required for ADMIN_FIXED_DEPOSITS"
+            );
+        }
+
+        return Map.of(
+                USER_ID,
+                operation.userId()
+        );
     }
 
     private Map<String, Object> mapAdminUserLoans(

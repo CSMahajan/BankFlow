@@ -11,14 +11,12 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.TextContent;
 import io.modelcontextprotocol.spec.McpSchema.Tool;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Locale;
+import java.util.*;
 
+@Slf4j
 @Component
 public class McpAiToolAdapter {
 
@@ -95,20 +93,52 @@ public class McpAiToolAdapter {
         if (!(authenticationValue
                 instanceof org.springframework.security.core.Authentication authentication)) {
 
+            log.warn(
+                    "MCP TOOL REJECTED | tool={} | reason=AUTHENTICATION_REQUIRED",
+                    request.name()
+            );
+
             return errorResult("Authenticated user is required.");
         }
 
         if (!(audienceValue instanceof AiAudience audience)) {
+
+            log.warn(
+                    "MCP TOOL REJECTED | tool={} | reason=AUDIENCE_REQUIRED",
+                    request.name()
+            );
+
             return errorResult("Authenticated BankFlow audience is required.");
         }
 
+        String userId = authentication.getName();
+        String toolName = request.name();
+
         if (!aiTool.supportedAudiences().contains(audience)) {
+
+            log.warn(
+                    "MCP TOOL REJECTED | userId={} | audience={} | tool={} | reason=UNAUTHORIZED_AUDIENCE",
+                    userId,
+                    audience,
+                    toolName
+            );
+
             return errorResult(
                     "Tool [" + aiTool.name()
                             + "] is not available for audience ["
                             + audience + "]."
             );
         }
+
+        long startTime = System.nanoTime();
+
+        log.info(
+                "MCP TOOL START | userId={} | audience={} | tool={} | arguments={}",
+                userId,
+                audience,
+                toolName,
+                request.arguments()
+        );
 
         var previousContext =
                 org.springframework.security.core.context.SecurityContextHolder
@@ -120,11 +150,12 @@ public class McpAiToolAdapter {
                             .createEmptyContext();
 
             context.setAuthentication(authentication);
+
             org.springframework.security.core.context.SecurityContextHolder
                     .setContext(context);
 
             Object result = aiToolRegistry.execute(
-                    request.name(),
+                    toolName,
                     audience,
                     request.arguments()
             );
@@ -132,21 +163,48 @@ public class McpAiToolAdapter {
             String json =
                     objectMapper.writeValueAsString(result);
 
+            long durationMs =
+                    (System.nanoTime() - startTime) / 1_000_000;
+
+            log.info(
+                    "MCP TOOL END | userId={} | audience={} | tool={} | status=SUCCESS | durationMs={}",
+                    userId,
+                    audience,
+                    toolName,
+                    durationMs
+            );
+
             return CallToolResult.builder()
                     .content(List.of(new TextContent(json)))
                     .build();
 
         } catch (Exception e) {
+
+            long durationMs =
+                    (System.nanoTime() - startTime) / 1_000_000;
+
+            log.error(
+                    "MCP TOOL END | userId={} | audience={} | tool={} | status=ERROR | exception={} | durationMs={}",
+                    userId,
+                    audience,
+                    toolName,
+                    e.getClass().getSimpleName(),
+                    durationMs,
+                    e
+            );
+
             return errorResult(
                     e.getMessage() == null
                             ? "MCP tool execution failed."
                             : e.getMessage()
             );
+
         } finally {
             org.springframework.security.core.context.SecurityContextHolder
                     .setContext(previousContext);
         }
     }
+
     private Map<String, Object> toMcpInputSchema(
             FunctionDeclaration declaration) {
 
@@ -157,7 +215,8 @@ public class McpAiToolAdapter {
         if (declaration.parametersJsonSchema().isPresent()) {
             return objectMapper.convertValue(
                     declaration.parametersJsonSchema().orElseThrow(),
-                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() { }
+                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+                    }
             );
         }
 

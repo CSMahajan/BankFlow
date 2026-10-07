@@ -22,6 +22,7 @@ public class McpServerConfig {
 
     public static final String AUTHENTICATION = "authentication";
     public static final String AUDIENCE = "audience";
+    public static final String TRACE_ID = "traceId";
 
     @Bean
     public HttpServletStreamableServerTransportProvider mcpTransportProvider(
@@ -32,19 +33,24 @@ public class McpServerConfig {
                 .mcpEndpoint("/mcp")
                 .contextExtractor((HttpServletRequest request) -> {
 
-                    Authentication authentication =
-                            SecurityContextHolder.getContext()
-                                    .getAuthentication();
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-                    AiAudience audience =
-                            audienceResolver.resolve();
+                    AiAudience audience = audienceResolver.resolve();
+
+                    String traceId = (String) request.getAttribute(TRACE_ID);
+
+                    if (traceId == null || traceId.isBlank()) {
+                        traceId = "unknown";
+                    }
 
                     return McpTransportContext.create(
                             Map.of(
                                     AUTHENTICATION,
                                     authentication,
                                     AUDIENCE,
-                                    audience
+                                    audience,
+                                    TRACE_ID,
+                                    traceId
                             )
                     );
                 })

@@ -79,6 +79,9 @@ public class McpAiToolAdapter {
                                 exchange.transportContext().get(
                                         McpServerConfig.AUDIENCE
                                 ),
+                                exchange.transportContext().get(
+                                        McpServerConfig.TRACE_ID
+                                ),
                                 request
                         ))
                 .build();
@@ -88,6 +91,7 @@ public class McpAiToolAdapter {
             AiTool aiTool,
             Object authenticationValue,
             Object audienceValue,
+            Object traceIdValue,
             McpSchema.CallToolRequest request) {
 
         if (!(authenticationValue
@@ -113,11 +117,16 @@ public class McpAiToolAdapter {
 
         String userId = authentication.getName();
         String toolName = request.name();
+        String traceId =
+                traceIdValue instanceof String value && !value.isBlank()
+                        ? value
+                        : "unknown";
 
         if (!aiTool.supportedAudiences().contains(audience)) {
 
             log.warn(
-                    "MCP TOOL REJECTED | userId={} | audience={} | tool={} | reason=UNAUTHORIZED_AUDIENCE",
+                    "MCP TOOL REJECTED | traceId={} | userId={} | audience={} | tool={} | reason=UNAUTHORIZED_AUDIENCE",
+                    traceId,
                     userId,
                     audience,
                     toolName
@@ -133,7 +142,8 @@ public class McpAiToolAdapter {
         long startTime = System.nanoTime();
 
         log.info(
-                "MCP TOOL START | userId={} | audience={} | tool={} | arguments={}",
+                "MCP TOOL START | traceId={} | userId={} | audience={} | tool={} | arguments={}",
+                traceId,
                 userId,
                 audience,
                 toolName,
@@ -167,7 +177,8 @@ public class McpAiToolAdapter {
                     (System.nanoTime() - startTime) / 1_000_000;
 
             log.info(
-                    "MCP TOOL END | userId={} | audience={} | tool={} | status=SUCCESS | durationMs={}",
+                    "MCP TOOL END | traceId={} | userId={} | audience={} | tool={} | status=SUCCESS | durationMs={}",
+                    traceId,
                     userId,
                     audience,
                     toolName,
@@ -184,7 +195,8 @@ public class McpAiToolAdapter {
                     (System.nanoTime() - startTime) / 1_000_000;
 
             log.error(
-                    "MCP TOOL END | userId={} | audience={} | tool={} | status=ERROR | exception={} | durationMs={}",
+                    "MCP TOOL END | traceId={} | userId={} | audience={} | tool={} | status=ERROR | exception={} | durationMs={}",
+                    traceId,
                     userId,
                     audience,
                     toolName,

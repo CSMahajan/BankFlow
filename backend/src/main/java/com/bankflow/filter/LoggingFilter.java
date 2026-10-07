@@ -29,20 +29,39 @@ public class LoggingFilter extends OncePerRequestFilter {
         }
 
         MDC.put(TRACE_ID, traceId);
+
+        // Make the trace ID available beyond the servlet thread.
+        request.setAttribute(TRACE_ID, traceId);
+
         response.setHeader(TRACE_HEADER, traceId);
 
         long startTime = System.currentTimeMillis();
         String method = request.getMethod();
         String uri = request.getRequestURI();
-        String queryString = request.getQueryString() != null ? "?" + request.getQueryString() : "";
+        String queryString =
+                request.getQueryString() != null
+                        ? "?" + request.getQueryString()
+                        : "";
 
-        log.info("HTTP Request Started: [{}{}] via [{}]", uri, queryString, method);
+        log.info(
+                "HTTP Request Started: [{}{}] via [{}]",
+                uri,
+                queryString,
+                method
+        );
 
         try {
             filterChain.doFilter(request, response);
         } finally {
             long duration = System.currentTimeMillis() - startTime;
-            log.info("HTTP Response Completed: [{}] Status [{}] in [{} ms]", method + " " + uri, response.getStatus(), duration);
+
+            log.info(
+                    "HTTP Response Completed: [{}] Status [{}] in [{} ms]",
+                    method + " " + uri,
+                    response.getStatus(),
+                    duration
+            );
+
             MDC.remove(TRACE_ID);
         }
     }

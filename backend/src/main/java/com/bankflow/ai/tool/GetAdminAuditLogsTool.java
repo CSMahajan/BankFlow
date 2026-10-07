@@ -1,9 +1,9 @@
 package com.bankflow.ai.tool;
 
 import com.bankflow.ai.AiAudience;
+import com.bankflow.dto.AuditLogResponse;
 import com.bankflow.entity.AuditAction;
 import com.bankflow.entity.User;
-import com.bankflow.dto.AuditLogResponse;
 import com.bankflow.service.AuditLogService;
 import com.google.genai.types.FunctionDeclaration;
 import com.google.genai.types.Schema;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,15 +39,15 @@ public class GetAdminAuditLogsTool implements AiTool {
                 .name(NAME)
                 .description("""
                         Returns BankFlow audit logs for administrators.
-
+                        
                         Optional filters:
                         - search: searches performed-by user or audit description
                         - role: filter by CUSTOMER or ADMIN
                         - action: filter by one audit action
                         - actions: filter by multiple audit actions
-
+                        
                         Logs are returned with the most recent entries first.
-
+                        
                         This function is available only to administrators.
                         """)
                 .parameters(
@@ -77,6 +78,9 @@ public class GetAdminAuditLogsTool implements AiTool {
                                                 "action",
                                                 Schema.builder()
                                                         .type(SCHEMA_TYPE_STRING)
+                                                        .enum_(Arrays.stream(AuditAction.values())
+                                                                .map(Enum::name)
+                                                                .toList())
                                                         .description(
                                                                 "Optional single audit action"
                                                         )
@@ -88,13 +92,16 @@ public class GetAdminAuditLogsTool implements AiTool {
                                                         .items(
                                                                 Schema.builder()
                                                                         .type(SCHEMA_TYPE_STRING)
+                                                                        .enum_(Arrays.stream(AuditAction.values())
+                                                                                .map(Enum::name)
+                                                                                .toList())
                                                                         .build()
                                                         )
                                                         .description(
                                                                 "Optional list of audit actions"
                                                         )
                                                         .build()
-                                )
+                                        )
                                 )
                                 .build()
                 )

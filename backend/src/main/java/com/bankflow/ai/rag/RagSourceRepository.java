@@ -1,6 +1,5 @@
-package com.bankflow.ai;
+package com.bankflow.ai.rag;
 
-import com.bankflow.entity.RagSource;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

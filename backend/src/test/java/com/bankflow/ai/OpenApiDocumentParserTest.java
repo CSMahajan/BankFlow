@@ -1,5 +1,7 @@
 package com.bankflow.ai;
 
+import com.bankflow.ai.rag.RagDocument;
+import com.bankflow.ai.rag.RagSourceType;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

@@ -1,4 +1,4 @@
-package com.bankflow.ai;
+package com.bankflow.ai.rag;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

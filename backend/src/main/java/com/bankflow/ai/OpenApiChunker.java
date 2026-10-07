@@ -1,5 +1,8 @@
 package com.bankflow.ai;
 
+import com.bankflow.ai.rag.RagAudience;
+import com.bankflow.ai.rag.RagChunk;
+import com.bankflow.ai.rag.RagDocument;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 

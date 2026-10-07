@@ -1,7 +1,6 @@
-package com.bankflow.ai;
+package com.bankflow.ai.rag;
 
-import com.bankflow.entity.RagChunkEntity;
-import com.bankflow.entity.RagSource;
+import com.bankflow.ai.GeminiEmbeddingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

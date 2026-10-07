@@ -1,5 +1,7 @@
-package com.bankflow.ai;
+package com.bankflow.ai.rag;
 
+import com.bankflow.ai.GeminiEmbeddingService;
+import com.bankflow.ai.QueryTransformationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

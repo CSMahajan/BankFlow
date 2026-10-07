@@ -1,7 +1,8 @@
 package com.bankflow.ai;
 
-import com.bankflow.entity.RagChunkEntity;
-import com.bankflow.entity.RagSource;
+import com.bankflow.ai.rag.*;
+import com.bankflow.ai.rag.RagChunkEntity;
+import com.bankflow.ai.rag.RagSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

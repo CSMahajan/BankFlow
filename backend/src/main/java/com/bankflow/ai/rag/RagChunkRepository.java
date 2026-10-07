@@ -1,6 +1,5 @@
-package com.bankflow.ai;
+package com.bankflow.ai.rag;
 
-import com.bankflow.entity.RagChunkEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

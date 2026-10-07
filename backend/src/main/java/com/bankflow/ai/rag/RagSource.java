@@ -1,6 +1,5 @@
-package com.bankflow.entity;
+package com.bankflow.ai.rag;
 
-import com.bankflow.ai.RagSourceType;
 import jakarta.persistence.*;
 import lombok.*;
 

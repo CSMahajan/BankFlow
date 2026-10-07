@@ -1,8 +1,9 @@
-package com.bankflow.config;
+package com.bankflow.ai.mcp;
 
 import com.bankflow.ai.AiAudience;
 import com.bankflow.ai.tool.AiTool;
 import com.bankflow.ai.tool.AiToolRegistry;
+import com.bankflow.config.McpServerConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.types.FunctionDeclaration;
 import com.google.genai.types.Schema;

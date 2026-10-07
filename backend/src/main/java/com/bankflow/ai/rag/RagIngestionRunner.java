@@ -1,5 +1,8 @@
-package com.bankflow.ai;
+package com.bankflow.ai.rag;
 
+import com.bankflow.ai.DrawioChunker;
+import com.bankflow.ai.MarkdownChunker;
+import com.bankflow.ai.OpenApiChunker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

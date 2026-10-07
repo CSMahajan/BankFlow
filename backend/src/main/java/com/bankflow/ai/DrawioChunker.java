@@ -1,5 +1,9 @@
 package com.bankflow.ai;
 
+import com.bankflow.ai.rag.RagAudience;
+import com.bankflow.ai.rag.RagChunk;
+import com.bankflow.ai.rag.RagDocument;
+import com.bankflow.ai.rag.RagSourceType;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,7 +31,7 @@ public class DrawioChunker {
         }
 
         if (document.sourceType()
-                != com.bankflow.ai.RagSourceType.DRAWIO_XML) {
+                != RagSourceType.DRAWIO_XML) {
 
             throw new IllegalArgumentException(
                     "DrawioChunker supports only DRAWIO_XML documents"

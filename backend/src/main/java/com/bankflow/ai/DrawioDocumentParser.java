@@ -1,5 +1,8 @@
 package com.bankflow.ai;
 
+import com.bankflow.ai.rag.RagDocument;
+import com.bankflow.ai.rag.RagDocumentParser;
+import com.bankflow.ai.rag.RagSourceType;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

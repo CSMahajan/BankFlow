@@ -1,4 +1,4 @@
-package com.bankflow.ai;
+package com.bankflow.ai.rag;
 
 import java.util.List;
 

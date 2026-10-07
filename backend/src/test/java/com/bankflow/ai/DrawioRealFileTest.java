@@ -1,5 +1,7 @@
 package com.bankflow.ai;
 
+import com.bankflow.ai.rag.RagChunk;
+import com.bankflow.ai.rag.RagDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

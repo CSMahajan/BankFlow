@@ -1,4 +1,4 @@
-package com.bankflow.config;
+package com.bankflow.ai.mcp;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

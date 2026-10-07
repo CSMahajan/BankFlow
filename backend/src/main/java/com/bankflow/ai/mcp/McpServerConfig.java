@@ -1,8 +1,7 @@
-package com.bankflow.config;
+package com.bankflow.ai.mcp;
 
 import com.bankflow.ai.AiAudience;
 import com.bankflow.ai.AiAudienceResolver;
-import com.bankflow.ai.mcp.McpAiToolAdapter;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonDefaults;
 import io.modelcontextprotocol.server.McpServer;

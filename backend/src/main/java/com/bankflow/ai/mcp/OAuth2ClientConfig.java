@@ -1,4 +1,4 @@
-package com.bankflow.config;
+package com.bankflow.ai.mcp;
 
 import java.util.UUID;
 

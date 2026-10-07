@@ -1,4 +1,4 @@
-    package com.bankflow.config;
+    package com.bankflow.ai.mcp;
 
     import com.nimbusds.jose.jwk.JWKSet;
     import com.nimbusds.jose.jwk.RSAKey;

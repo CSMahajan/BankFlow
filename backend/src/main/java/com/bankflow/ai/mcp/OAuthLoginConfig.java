@@ -1,4 +1,4 @@
-package com.bankflow.config;
+package com.bankflow.ai.mcp;
 
 import com.bankflow.security.BankFlowUserDetailsService;
 import lombok.RequiredArgsConstructor;

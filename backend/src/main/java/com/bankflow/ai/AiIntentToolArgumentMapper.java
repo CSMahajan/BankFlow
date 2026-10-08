@@ -56,6 +56,8 @@ public class AiIntentToolArgumentMapper {
 
             case ADMIN_AUDIT_LOGS -> mapAdminAuditLogs(operation);
 
+            case ADMIN_FRAUD_ASSESSMENT -> mapAdminFraudAssessment(operation);
+
             case ACCOUNT -> mapAccount(operation);
 
             case FIXED_DEPOSIT -> mapFixedDeposit(operation);
@@ -132,6 +134,8 @@ public class AiIntentToolArgumentMapper {
             case ADMIN_TRANSACTION_DETAILS -> "get_admin_transaction_details";
 
             case ADMIN_AUDIT_LOGS -> "get_admin_audit_logs";
+
+            case ADMIN_FRAUD_ASSESSMENT -> "get_fraud_assessment";
 
             default -> throw new UnsupportedOperationException(
                     "Live-data intent is not mapped yet: "
@@ -388,6 +392,21 @@ public class AiIntentToolArgumentMapper {
         }
 
         return arguments;
+    }
+
+    private Map<String, Object> mapAdminFraudAssessment(
+            AiIntent.Operation operation) {
+
+        if (operation.userId() == null) {
+            throw new IllegalArgumentException(
+                    "userId is required for ADMIN_FRAUD_ASSESSMENT"
+            );
+        }
+
+        return Map.of(
+                USER_ID,
+                operation.userId()
+        );
     }
 
     private Map<String, Object> mapTransactionTotal(

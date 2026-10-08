@@ -1,0 +1,14 @@
+package com.bankflow.ai.fraud;
+
+public enum FraudSignalType {
+
+    RAPID_ACCOUNT_CREATION,
+
+    LARGE_INITIAL_DEPOSIT,
+
+    RAPID_LOAN_AFTER_ACCOUNT_CREATION,
+
+    PREMATURE_FD_CHURN,
+
+    OVERDUE_LOAN_WITH_HIGH_BALANCE
+}

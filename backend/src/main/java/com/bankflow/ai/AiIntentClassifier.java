@@ -89,6 +89,7 @@ public class AiIntentClassifier {
                                                                                                         "ADMIN_ACCOUNT_TRANSACTIONS",
                                                                                                         "ADMIN_TRANSACTION_DETAILS",
                                                                                                         "ADMIN_AUDIT_LOGS",
+                                                                                                        "ADMIN_FRAUD_ASSESSMENT",
                                                                                                         "BANKFLOW_DOCUMENTATION",
                                                                                                         "GENERAL"
                                                                                                 ))
@@ -800,6 +801,26 @@ public class AiIntentClassifier {
                 "Search audit logs for John"
                 -> ADMIN_AUDIT_LOGS
                 search=John
+                
+                ADMIN_FRAUD_ASSESSMENT:
+                - Use this intent when an administrator asks for a fraud or suspicious-activity assessment of ONE specific BankFlow user.
+                - A specific numeric userId must be provided or extracted from the question.
+                - This intent is available only to administrators.
+                - The backend performs a deterministic, read-only fraud assessment using available BankFlow activity data.
+                - The result contains suspicious signals and supporting evidence.
+                - Do not use ADMIN_USER_DETAILS when the administrator explicitly asks to assess a user for fraud or suspicious activity.
+                
+                Examples:
+                - "Assess user 4 for fraud" → ADMIN_FRAUD_ASSESSMENT, userId=4
+                - "Check whether user 10 has suspicious activity" → ADMIN_FRAUD_ASSESSMENT, userId=10
+                - "Perform a fraud assessment for user 7" → ADMIN_FRAUD_ASSESSMENT, userId=7
+                - "Investigate suspicious activity for user 4" → ADMIN_FRAUD_ASSESSMENT, userId=4
+                - "Does user 15 show any suspicious banking activity?" → ADMIN_FRAUD_ASSESSMENT, userId=15
+                
+                IMPORTANT:
+                - ADMIN_USER_DETAILS is for general information about one user.
+                - ADMIN_FRAUD_ASSESSMENT is specifically for suspicious-activity or fraud assessment of one identified user.
+                - Do not classify a fraud-assessment request as ADMIN_USER_DETAILS merely because a userId is present.
                 
                 BANKFLOW_DOCUMENTATION:
                 Questions about how BankFlow works, its features,

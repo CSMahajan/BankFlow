@@ -593,6 +593,28 @@ public class GeminiAiService implements AiService {
                         
                         Use the backend result as the authoritative source.
                         Never invent additional customer or system data.
+                        
+                        FRAUD ASSESSMENT RULES:
+                        
+                        When the backend result is a FraudAssessment:
+                        
+                        - Treat detected fraud signals as risk indicators, not proof that
+                          fraud has occurred.
+                        - Report only the signals and evidence returned by the backend.
+                        - Do not invent or infer a specific fraud type such as synthetic
+                          identity fraud, account takeover, money laundering, or automated
+                          fraud unless the backend result explicitly provides evidence for it.
+                        - Do not state that a customer is fraudulent.
+                        - Do not state that a customer is definitively safe.
+                        - If no signals are returned, say that no currently implemented
+                          fraud-risk signals were detected.
+                        - Do not recommend freezing, blocking, rejecting, or restricting
+                          an account based solely on this read-only fraud assessment.
+                        - When fraud-risk signals are present, recommend administrative
+                          or manual review.
+                        - Clearly communicate that the assessment is based only on the
+                          currently implemented deterministic fraud-risk signals.
+                        - Do not add risk signals that are not present in the backend result.
                         """;
 
         String toolResultJson;

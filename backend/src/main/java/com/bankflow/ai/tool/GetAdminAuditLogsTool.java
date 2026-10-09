@@ -149,43 +149,81 @@ public class GetAdminAuditLogsTool implements AiTool {
     }
 
     private User.Role parseRole(Object value) {
-
         String role = parseString(value);
 
         if (role == null) {
             return null;
         }
 
-        return User.Role.valueOf(
-                role.toUpperCase()
-        );
+        try {
+            return User.Role.valueOf(role.toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Invalid role: " + role
+                            + ". Allowed values: CUSTOMER, ADMIN"
+            );
+        }
     }
 
     private AuditAction parseAuditAction(Object value) {
-
         String action = parseString(value);
 
         if (action == null) {
             return null;
         }
 
-        return AuditAction.valueOf(
-                action.toUpperCase()
-        );
+        try {
+            return AuditAction.valueOf(
+                    action.toUpperCase(java.util.Locale.ROOT)
+            );
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Invalid audit action: " + action
+                            + ". Allowed values: "
+                            + Arrays.toString(AuditAction.values())
+            );
+        }
     }
 
     private List<AuditAction> parseAuditActions(Object value) {
-
-        if (!(value instanceof List<?> values)) {
+        if (value == null) {
             return List.of();
         }
 
+        if (!(value instanceof List<?> values)) {
+            throw new IllegalArgumentException(
+                    "'actions' must be a list of valid audit actions"
+            );
+        }
+
         return values.stream()
-                .map(Object::toString)
-                .map(String::trim)
-                .filter(action -> !action.isBlank())
-                .map(String::toUpperCase)
-                .map(AuditAction::valueOf)
+                .map(item -> {
+                    if (item == null) {
+                        throw new IllegalArgumentException(
+                                "Audit action must not be null"
+                        );
+                    }
+
+                    String action = item.toString().trim();
+
+                    if (action.isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Audit action must not be blank"
+                        );
+                    }
+
+                    try {
+                        return AuditAction.valueOf(
+                                action.toUpperCase(java.util.Locale.ROOT)
+                        );
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalArgumentException(
+                                "Invalid audit action: " + action
+                                        + ". Allowed values: "
+                                        + Arrays.toString(AuditAction.values())
+                        );
+                    }
+                })
                 .toList();
     }
 }

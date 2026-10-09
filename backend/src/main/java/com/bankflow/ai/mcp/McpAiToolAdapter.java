@@ -205,11 +205,7 @@ public class McpAiToolAdapter {
                     e
             );
 
-            return errorResult(
-                    e.getMessage() == null
-                            ? "MCP tool execution failed."
-                            : e.getMessage()
-            );
+            return errorResult("MCP tool execution failed. Please try again.");
 
         } finally {
             org.springframework.security.core.context.SecurityContextHolder

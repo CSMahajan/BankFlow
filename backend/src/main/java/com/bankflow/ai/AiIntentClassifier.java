@@ -1111,11 +1111,7 @@ public class AiIntentClassifier {
             );
         }
 
-        log.info(
-                "AI intent classification | question={} | result={}",
-                question,
-                json
-        );
+        log.info("AI intent classification completed");
 
         return parse(json);
     }
@@ -1133,7 +1129,7 @@ public class AiIntentClassifier {
 
         } catch (Exception e) {
             throw new IllegalStateException(
-                    "Failed to parse AI intent classification: " + json,
+                    "Failed to parse AI intent classification",
                     e
             );
         }

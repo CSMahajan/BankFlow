@@ -115,7 +115,6 @@ public class McpAiToolAdapter {
             return errorResult("Authenticated BankFlow audience is required.");
         }
 
-        String userId = authentication.getName();
         String toolName = request.name();
         String traceId =
                 traceIdValue instanceof String value && !value.isBlank()
@@ -125,9 +124,8 @@ public class McpAiToolAdapter {
         if (!aiTool.supportedAudiences().contains(audience)) {
 
             log.warn(
-                    "MCP TOOL REJECTED | traceId={} | userId={} | audience={} | tool={} | reason=UNAUTHORIZED_AUDIENCE",
+                    "MCP TOOL REJECTED | traceId={} | audience={} | tool={} | reason=UNAUTHORIZED_AUDIENCE",
                     traceId,
-                    userId,
                     audience,
                     toolName
             );
@@ -142,12 +140,10 @@ public class McpAiToolAdapter {
         long startTime = System.nanoTime();
 
         log.info(
-                "MCP TOOL START | traceId={} | userId={} | audience={} | tool={} | arguments={}",
+                "MCP TOOL START | traceId={} | audience={} | tool={}",
                 traceId,
-                userId,
                 audience,
-                toolName,
-                request.arguments()
+                toolName
         );
 
         var previousContext =
@@ -177,9 +173,8 @@ public class McpAiToolAdapter {
                     (System.nanoTime() - startTime) / 1_000_000;
 
             log.info(
-                    "MCP TOOL END | traceId={} | userId={} | audience={} | tool={} | status=SUCCESS | durationMs={}",
+                    "MCP TOOL END | traceId={} | audience={} | tool={} | status=SUCCESS | durationMs={}",
                     traceId,
-                    userId,
                     audience,
                     toolName,
                     durationMs
@@ -195,9 +190,8 @@ public class McpAiToolAdapter {
                     (System.nanoTime() - startTime) / 1_000_000;
 
             log.error(
-                    "MCP TOOL END | traceId={} | userId={} | audience={} | tool={} | status=ERROR | exception={} | durationMs={}",
+                    "MCP TOOL END | traceId={} | audience={} | tool={} | status=ERROR | exception={} | durationMs={}",
                     traceId,
-                    userId,
                     audience,
                     toolName,
                     e.getClass().getSimpleName(),

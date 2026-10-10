@@ -176,11 +176,17 @@ public class GetMyTransactionsTool implements AiTool {
             return null;
         }
 
-        String valueAsString = value.toString().trim();
+        if (!(value instanceof String string)) {
+            throw new IllegalArgumentException(
+                    "Expected a string argument"
+            );
+        }
 
-        return valueAsString.isBlank()
+        String parsedValue = string.trim();
+
+        return parsedValue.isBlank()
                 ? null
-                : valueAsString;
+                : parsedValue;
     }
 
     private Transaction.TransactionType parseTransactionType(
@@ -193,7 +199,7 @@ public class GetMyTransactionsTool implements AiTool {
         }
 
         return Transaction.TransactionType.valueOf(
-                type.toUpperCase()
+                type.toUpperCase(java.util.Locale.ROOT)
         );
     }
 

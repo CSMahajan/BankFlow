@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Component
@@ -202,7 +203,7 @@ public class AiIntentToolArgumentMapper {
 
             arguments.put(
                     "status",
-                    operation.accountStatus().trim().toUpperCase()
+                    operation.accountStatus().trim().toUpperCase(Locale.ROOT)
             );
         }
 
@@ -386,7 +387,7 @@ public class AiIntentToolArgumentMapper {
                     operation.auditActions()
                             .stream()
                             .map(String::trim)
-                            .map(String::toUpperCase)
+                            .map(value -> value.toUpperCase(Locale.ROOT))
                             .toList()
             );
         }

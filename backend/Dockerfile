@@ -3,17 +3,19 @@ FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
-# Copy Maven Wrapper
-COPY .mvn .mvn
-COPY mvnw .
-COPY pom.xml .
+# Maven configuration
+COPY backend/.mvn .mvn
+COPY backend/mvnw .
+COPY backend/pom.xml .
 
-# Download dependencies (improves build caching)
+# Download dependencies
 RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 
-# Copy source code and documentation
-COPY src src
+# Backend source
+COPY backend/src src
+
+# Repository documentation
 COPY README.md README.md
 COPY docs docs
 
@@ -26,10 +28,10 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copy application JAR
+# Application JAR
 COPY --from=builder /app/target/*.jar app.jar
 
-# Copy only the documentation required for RAG ingestion
+# RAG documentation
 COPY --from=builder /app/README.md /app/rag-docs/README.md
 COPY --from=builder /app/docs/ /app/rag-docs/docs/
 

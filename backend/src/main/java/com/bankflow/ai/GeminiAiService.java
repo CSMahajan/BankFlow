@@ -58,6 +58,7 @@ public class GeminiAiService implements AiService {
     public AiResponse ask(String question) {
         long startTime = System.currentTimeMillis();
         String route = "UNRESOLVED";
+        String stage = "AUDIENCE_RESOLUTION";
         String status = "FAILURE";
 
         log.info("AI request started");
@@ -65,6 +66,7 @@ public class GeminiAiService implements AiService {
         try {
             AiAudience audience = aiAudienceResolver.resolve();
 
+            stage = "INTENT_CLASSIFICATION";
             AiIntent intent = aiIntentClassifier.classify(question);
             route = intent.route().name();
 
@@ -77,6 +79,8 @@ public class GeminiAiService implements AiService {
             AiResponse response;
 
             if (intent.route() == AiIntent.Route.LIVE_DATA) {
+                stage = "LIVE_DATA_EXECUTION";
+
                 if (intent.operations() == null
                         || intent.operations().isEmpty()) {
                     throw new IllegalArgumentException(
@@ -98,17 +102,29 @@ public class GeminiAiService implements AiService {
                     );
                 }
             } else {
+                stage = "KNOWLEDGE_ANSWER";
                 response = answerKnowledgeQuestion(question, audience);
             }
 
             status = "SUCCESS";
             return response;
+
+        } catch (RuntimeException e) {
+            log.error(
+                    "AI request failed | stage={} | route={}",
+                    stage,
+                    route,
+                    e
+            );
+            throw e;
+
         } finally {
             long durationMs = System.currentTimeMillis() - startTime;
 
             log.info(
-                    "AI request completed | route={} | status={} | durationMs={}",
+                    "AI request completed | route={} | stage={} | status={} | durationMs={}",
                     route,
+                    stage,
                     status,
                     durationMs
             );
@@ -210,6 +226,8 @@ public class GeminiAiService implements AiService {
                         question,
                         config
                 );
+
+        logTokenUsage("KNOWLEDGE", response);
 
         log.info("Gemini knowledge response received");
 
@@ -496,6 +514,8 @@ public class GeminiAiService implements AiService {
                         config
                 );
 
+        logTokenUsage("MULTI_OPERATION_LIVE_DATA", response);
+
         log.info(
                 "AI TIMING | multi-operation live-data Gemini call = {} ms",
                 System.currentTimeMillis() - startTime
@@ -670,6 +690,8 @@ public class GeminiAiService implements AiService {
                         prompt,
                         config
                 );
+
+        logTokenUsage("LIVE_DATA", response);
 
         log.info(
                 "AI TIMING | live-data Gemini call = {} ms",
@@ -886,6 +908,25 @@ public class GeminiAiService implements AiService {
                 BankFlowAiContext.CONTEXT,
                 currentDate,
                 ragContext
+        );
+    }
+
+    private void logTokenUsage(
+            String callType,
+            GenerateContentResponse response) {
+
+        response.usageMetadata().ifPresentOrElse(
+                usage -> log.info(
+                        "AI TOKEN USAGE | call={} | promptTokens={} | outputTokens={} | totalTokens={}",
+                        callType,
+                        usage.promptTokenCount().orElse(-1),
+                        usage.candidatesTokenCount().orElse(-1),
+                        usage.totalTokenCount().orElse(-1)
+                ),
+                () -> log.info(
+                        "AI TOKEN USAGE | call={} | metadata unavailable",
+                        callType
+                )
         );
     }
 

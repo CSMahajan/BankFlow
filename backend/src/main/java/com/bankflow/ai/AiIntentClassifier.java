@@ -1103,6 +1103,18 @@ public class AiIntentClassifier {
                 System.currentTimeMillis() - startTime
         );
 
+        response.usageMetadata().ifPresentOrElse(
+                usage -> log.info(
+                        "AI TOKEN USAGE | call=INTENT_CLASSIFICATION | promptTokens={} | outputTokens={} | totalTokens={}",
+                        usage.promptTokenCount().orElse(-1),
+                        usage.candidatesTokenCount().orElse(-1),
+                        usage.totalTokenCount().orElse(-1)
+                ),
+                () -> log.info(
+                        "AI TOKEN USAGE | call=INTENT_CLASSIFICATION | metadata unavailable"
+                )
+        );
+
         String json = response.text();
 
         if (json == null || json.isBlank()) {

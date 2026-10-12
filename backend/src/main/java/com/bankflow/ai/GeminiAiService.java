@@ -56,49 +56,63 @@ public class GeminiAiService implements AiService {
 
     @Override
     public AiResponse ask(String question) {
+        long startTime = System.currentTimeMillis();
+        String route = "UNRESOLVED";
+        String status = "FAILURE";
 
-        AiAudience audience =
-                aiAudienceResolver.resolve();
+        log.info("AI request started");
 
-        AiIntent intent =
-                aiIntentClassifier.classify(question);
+        try {
+            AiAudience audience = aiAudienceResolver.resolve();
 
-        log.info(
-                "AI intent resolved | route={} | operationCount={}",
-                intent.route(),
-                intent.operations() == null ? 0 : intent.operations().size()
-        );
+            AiIntent intent = aiIntentClassifier.classify(question);
+            route = intent.route().name();
 
-        if (intent.route() == AiIntent.Route.LIVE_DATA) {
+            log.info(
+                    "AI intent resolved | route={} | operationCount={}",
+                    intent.route(),
+                    intent.operations() == null ? 0 : intent.operations().size()
+            );
 
-            if (intent.operations() == null
-                    || intent.operations().isEmpty()) {
+            AiResponse response;
 
-                throw new IllegalArgumentException(
-                        "LIVE_DATA intent must contain at least one operation"
-                );
+            if (intent.route() == AiIntent.Route.LIVE_DATA) {
+                if (intent.operations() == null
+                        || intent.operations().isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "LIVE_DATA intent must contain at least one operation"
+                    );
+                }
+
+                if (intent.operations().size() == 1) {
+                    response = executeSingleLiveDataOperation(
+                            question,
+                            audience,
+                            intent.operations().getFirst()
+                    );
+                } else {
+                    response = executeMultipleLiveDataOperations(
+                            question,
+                            audience,
+                            intent.operations()
+                    );
+                }
+            } else {
+                response = answerKnowledgeQuestion(question, audience);
             }
 
-            if (intent.operations().size() == 1) {
+            status = "SUCCESS";
+            return response;
+        } finally {
+            long durationMs = System.currentTimeMillis() - startTime;
 
-                return executeSingleLiveDataOperation(
-                        question,
-                        audience,
-                        intent.operations().getFirst()
-                );
-            }
-
-            return executeMultipleLiveDataOperations(
-                    question,
-                    audience,
-                    intent.operations()
+            log.info(
+                    "AI request completed | route={} | status={} | durationMs={}",
+                    route,
+                    status,
+                    durationMs
             );
         }
-
-        return answerKnowledgeQuestion(
-                question,
-                audience
-        );
     }
 
     private AiResponse answerKnowledgeQuestion(
